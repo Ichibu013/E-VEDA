@@ -36,6 +36,4 @@ import java.util.Optional;
 @Repository
 public interface IUserImageRepository extends MongoRepository<UserImage, String> {
     Optional<UserImage> findImageByUid(String uid);
-
-    void delete(Optional<UserImage> userImage);
 }

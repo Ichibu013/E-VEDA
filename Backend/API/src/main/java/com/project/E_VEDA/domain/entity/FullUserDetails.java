@@ -1,11 +1,12 @@
 package com.project.E_VEDA.domain.entity;
 
 import com.project.E_VEDA.common.enums.Gender;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Objects;
 
@@ -46,38 +47,25 @@ import java.util.Objects;
 public class FullUserDetails {
 
     @Id
-    @Column(name = "user_id",
-            nullable = false,
-            updatable = false,
-            unique = true)
     private String uid;
 
-    @Column(name = "name",
-            nullable = false)
+    @Field(name = "name")
     private String name;
 
-
-    @Column(name = "phone",
-            nullable = false)
+    @Field(name = "phone")
     private Integer phone;
 
-    @Column(name = "dob",
-            columnDefinition = "DATE")
+    @Field(name = "dob")
     private String dob;
 
-    @Column(name = "address", length = 1000)
+    @Field(name = "address")
     private String address;
 
-    @Column(name = "gender")
-    @Enumerated(EnumType.STRING)
+    @Field(name = "gender")
     private Gender gender;
 
-    @Column(name = "updated_date",
-            nullable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Field(name = "updated_date")
     private String updatedDate;
-
-
 
     @Override
     public boolean equals(Object o) {

@@ -1,10 +1,12 @@
 package com.project.E_VEDA.domain.entity;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -42,17 +44,16 @@ import java.util.Objects;
 public class UserImage {
 
     @Id
-    @Column(name = "user_id")
     private String uid;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @DBRef(lazy = true)
+    @Field(name = "user")
     private FullUserDetails fullUserDetails;
 
-    @Column(name = "image_name")
+    @Field(name = "image_name")
     private String imageName;
 
-    @Column(name = "image")
+    @Field(name = "image")
     private byte[] image;
 
     @Override

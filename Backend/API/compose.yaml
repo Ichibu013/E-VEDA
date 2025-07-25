@@ -1,9 +1,25 @@
+#version: '3.8'
+volumes:
+  mongo_data:
 services:
   mongodb:
     image: 'mongo:latest'
-    environment:
-      - 'MONGO_INITDB_DATABASE=e_veda'
-      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
-      - 'MONGO_INITDB_ROOT_USERNAME=root'
     ports:
-      - '27017'
+      - '27017:27017'
+    healthcheck:
+      test: ["CMD",  "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - 'mongo_data:/data/db'
+
+  e-veda:
+    build: . # Or image: your_spring_boot_image_name
+    depends_on:
+      mongodb:
+        condition: service_healthy # It waits for MongoDB to be ready.
+    environment:
+      SPRING_DATA_MONGODB_URI: 'mongodb://mongodb:27017/e_veda'
+    ports:
+      - '8080:8080' # Assuming your Spring Boot app runs on 8080

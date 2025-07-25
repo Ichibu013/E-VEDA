@@ -7,9 +7,11 @@ import com.project.E_VEDA.dto.response.GenericResponse;
 import com.project.E_VEDA.mapping.GenericDtoMapper;
 import com.project.E_VEDA.repository.IUserDetailsRepository;
 import com.project.E_VEDA.service.interfaces.IFullUserDetailsService;
-import jakarta.transaction.Transactional;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -27,6 +29,7 @@ import java.util.Optional;
  * - Updating or creating a user's profile based on input data. <br>
  * - Deleting a user's profile by ID. <br>
  */
+@Slf4j
 @Service("fullUserService")
 public class FullUserServiceService extends BaseService implements IFullUserDetailsService {
 
@@ -46,12 +49,14 @@ public class FullUserServiceService extends BaseService implements IFullUserDeta
      */
     @Override
     public GenericResponse<ProfileDTO> getProfile(String userId) {
-        Optional<FullUserDetails> user = Optional.ofNullable(fetchUserDetails(userId));
+        Optional<FullUserDetails> user = fetchUserDetails(userId);
         if (user.isEmpty()) {
+            log.warn("User with ID {} not found.", userId);
             return genericResponseFactory.errorResponse(HttpStatus.NOT_FOUND,
                     null,
                     "user.profile.not.found");
         }
+        log.info("User with ID {} found.", userId);
         return genericResponseFactory.successResponse(HttpStatus.OK,
                 mapper.map(user, ProfileDTO.class),
                 "user.profile.success");
@@ -70,7 +75,7 @@ public class FullUserServiceService extends BaseService implements IFullUserDeta
     @Override
     @Transactional
     public GenericResponse<ProfileDTO> updateProfile(String userId, ProfileDTO profileDTO) {
-        FullUserDetails userDetails = Optional.ofNullable(fetchUserDetails(userId))
+        FullUserDetails userDetails = fetchUserDetails(userId)
                 .orElseGet(() -> createNewProfile(userId));
         final FullUserDetails usertoSave = mapper.map(profileDTO, userDetails.getClass());
         usertoSave.setUid(userId);
@@ -94,7 +99,7 @@ public class FullUserServiceService extends BaseService implements IFullUserDeta
     @Override
     @Transactional
     public GenericResponse<ProfileDTO> deleteProfile(String userId) {
-        Optional<FullUserDetails> userDetails = Optional.ofNullable(fetchUserDetails(userId));
+        Optional<FullUserDetails> userDetails = fetchUserDetails(userId);
         if (userDetails.isEmpty()) {
             return genericResponseFactory.errorResponse(HttpStatus.NOT_FOUND,
                     null,

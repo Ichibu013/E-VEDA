@@ -10,13 +10,16 @@ import com.project.E_VEDA.mapping.GenericDtoMapper;
 import com.project.E_VEDA.repository.IUserDetailsRepository;
 import com.project.E_VEDA.repository.IUserImageRepository;
 import com.project.E_VEDA.service.interfaces.IUserImageService;
-import jakarta.transaction.Transactional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Optional;
+
+import static java.util.Optional.of;
 
 /**
  * UserImageService is a service class responsible for managing user image operations,
@@ -63,15 +66,28 @@ public class UserImageService extends BaseService implements IUserImageService {
     }
 
     /**
-     * Uploads an image file for the given user. If the user already has an image uploaded,
-     * the existing image will be updated with the new file. If no image exists for the user,
-     * a new image*/
+     * Handles the upload of an image for a specified user, validating the file
+     * and updating the existing user image or creating a new one if none exists.
+     *
+     * @param userId the unique identifier of the user for whom the image is being uploaded
+     * @param file the image file to upload; must be a valid, non-empty file and within size constraints
+     * @return a {@code GenericResponse} containing information about the success or failure of the operation
+     * @throws InvalidFileException if the provided file is null, empty, or exceeds the maximum allowed size
+     * @throws ResourceNotFoundException if no user details are found for the specified user ID
+     */
     @Override
     @Transactional
     public GenericResponse<MultipartFile> uploadImage(String userId, MultipartFile file) {
         validateFile(file);
 
-        FullUserDetails userDetails = fetchUserDetails(userId);
+        Optional<FullUserDetails> userDetails = fetchUserDetails(userId);
+        if (userDetails.isEmpty()) {
+            return genericResponseFactory.errorResponse(
+                    HttpStatus.NOT_FOUND,
+                    null,
+                    "user.not.found"
+            );
+        }
         UserImage existingUserImage = userImageRepository.findImageByUid(userId)
                 .orElseGet(() -> createNewUserImage(userId));
 
@@ -98,7 +114,7 @@ public class UserImageService extends BaseService implements IUserImageService {
     @Transactional
     public void updateImage(String userId, MultipartFile file) {
         validateFile(file);
-        Optional<UserImage> userImage = fetchUserImage(userId);
+        Optional<UserImage> userImage = Optional.ofNullable(findUserImageByUserId(userId));
         updateImageBytes(userImage.get(), file);
         userImageRepository.save(userImage.get());
     }
@@ -116,7 +132,8 @@ public class UserImageService extends BaseService implements IUserImageService {
     @Override
     @Transactional
     public void deleteImage(String userId) {
-        userImageRepository.delete(fetchUserImage(userId));
+        UserImage userImage = findUserImageByUserId(userId);
+        userImageRepository.delete(userImage);
     }
 
     /**
@@ -127,9 +144,9 @@ public class UserImageService extends BaseService implements IUserImageService {
      * @return an Optional containing the UserImage if it exists, otherwise an empty Optional
      * @throws ResourceNotFoundException if no image is found for the specified user ID
      */
-    private Optional<UserImage> fetchUserImage(String userId) {
-        return Optional.ofNullable(userImageRepository.findImageByUid(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User image not found for user ID: " + userId)));
+    private UserImage findUserImageByUserId(String userId) {
+        return userImageRepository.findImageByUid(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User image not found for user ID: " + userId));
     }
 
     /**

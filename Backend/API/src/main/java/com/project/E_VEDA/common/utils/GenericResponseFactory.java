@@ -29,7 +29,7 @@ public class GenericResponseFactory {
      * @return the generic response
      */
     public <T> GenericResponse<T> successResponse(final HttpStatus httpStatus,final T data, final String messageKey) {
-        return new GenericResponse<>(httpStatus,data, messageKey, messageSource, (Object) null);
+        return new GenericResponse<>(httpStatus,data, messageKey, messageSource);
     }
 
     /**
@@ -47,7 +47,7 @@ public class GenericResponseFactory {
      * @return the generic response
      */
     public <T> GenericResponse<T> errorResponse(final HttpStatus httpStatus,final Map<String, String> errors, final String messageKey) {
-        return new GenericResponse<>(httpStatus,errors, messageKey, messageSource, (Object) null);
+        return new GenericResponse<>(httpStatus,errors, messageKey, messageSource);
     }
 
     /**
