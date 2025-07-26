@@ -1,15 +1,16 @@
 package com.project.E_VEDA.service.impl;
 
-import com.project.E_VEDA.common.exceptions.InvalidFileException;
-import com.project.E_VEDA.common.exceptions.ResourceNotFoundException;
-import com.project.E_VEDA.common.utils.GenericResponseFactory;
 import com.project.E_VEDA.domain.entity.FullUserDetails;
 import com.project.E_VEDA.domain.entity.UserImage;
-import com.project.E_VEDA.dto.response.GenericResponse;
-import com.project.E_VEDA.mapping.GenericDtoMapper;
 import com.project.E_VEDA.repository.IUserDetailsRepository;
 import com.project.E_VEDA.repository.IUserImageRepository;
 import com.project.E_VEDA.service.interfaces.IUserImageService;
+
+import com.project.common.common.exceptions.InvalidFileException;
+import com.project.common.common.exceptions.ResourceNotFoundException;
+import com.project.common.common.utils.GenericResponseFactory;
+import com.project.common.dto.response.GenericResponse;
+import com.project.common.mapping.GenericDtoMapper;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,37 +20,20 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Optional;
 
-import static java.util.Optional.of;
-
 /**
- * UserImageService is a service class responsible for managing user image operations,
- * including uploading, updating, retrieving, and deleting user images. It extends the
- * BaseService class and implements the IUserImageService interface.
+ * Service class responsible for managing user images. This includes
+ * handling image upload, update, retrieval, and deletion functionalities
+ * for a user. The service uses an {@code IUserImageRepository} to perform
+ * persistence operations and relies on a set of validations to ensure
+ * proper handling of images.
  * <p>
- * Responsibilities: <br>
- * - Validate and handle image upload for a specific user. <br>
- * - Update the existing image for a user. <br>
- * - Retrieve a user's image. <br>
- * - Delete a user's image. <br>
- * </p> <p>
- * Key Features: <br>
- * - Enforces business rules to validate image files, including file size limitations. <br>
- * - Handles scenarios where no image exists for a user by creating a new UserImage entity. <br>
- * - Provides transactional support for data persistence operations. <br>
- * </p> <p>
- * Dependencies: <br>
- * - IUserImageRepository: Manages fine-grained database operations for UserImage entities. <br>
- * - IUserDetailsRepository: Fetches user-related details from the database. <br>
- * - GenericResponseFactory: Constructs standardized response objects. <br>
- * - GenericDtoMapper: Maps DTOs to entities and vice versa. <br>
- * </p> <p>
- * Exception Handling: <br>
- * - Throws InvalidFileException for invalid file uploads (e.g., empty file, file size exceeding limits). <br>
- * - Throws ResourceNotFoundException when no image is found for a given user ID. <br>
- * - Handles IOExceptions during file processing and wraps them in a runtime exception. <br>
+ * Constraints:
+ * - The file size should not exceed 5 MB.
+ * - File validation must occur before any other operation.
  * </p>
- * Constants: <br>
- * - MAX_FILE_SIZE: Specifies the maximum allowed file size for uploads (5 MB). <br>
+ * This class extends {@code BaseService} to inherit common functionality
+ * and implements {@code IUserImageService} interface to provide concrete
+ * implementations for the defined methods.
  */
 @Service("userImageService")
 public class UserImageService extends BaseService implements IUserImageService {
@@ -57,7 +41,8 @@ public class UserImageService extends BaseService implements IUserImageService {
     private static final long MAX_FILE_SIZE = 1024 * 1024 * 5;
     private final IUserImageRepository userImageRepository;
 
-    protected UserImageService(IUserDetailsRepository userDetailsRepository,
+
+    public UserImageService(IUserDetailsRepository userDetailsRepository,
                             GenericResponseFactory genericResponseFactory,
                             GenericDtoMapper mapper,
                             IUserImageRepository userImageRepository) {
@@ -70,9 +55,9 @@ public class UserImageService extends BaseService implements IUserImageService {
      * and updating the existing user image or creating a new one if none exists.
      *
      * @param userId the unique identifier of the user for whom the image is being uploaded
-     * @param file the image file to upload; must be a valid, non-empty file and within size constraints
+     * @param file   the image file to upload; must be a valid, non-empty file and within size constraints
      * @return a {@code GenericResponse} containing information about the success or failure of the operation
-     * @throws InvalidFileException if the provided file is null, empty, or exceeds the maximum allowed size
+     * @throws InvalidFileException      if the provided file is null, empty, or exceeds the maximum allowed size
      * @throws ResourceNotFoundException if no user details are found for the specified user ID
      */
     @Override
@@ -94,11 +79,7 @@ public class UserImageService extends BaseService implements IUserImageService {
         updateImageBytes(existingUserImage, file);
         userImageRepository.save(existingUserImage);
 
-        return genericResponseFactory.successResponse(
-                HttpStatus.OK,
-                null,
-                "user.image.upload.success"
-        );
+        return buildSuccessResponse(null, "user.image.upload.success");
     }
 
     /**
@@ -106,8 +87,8 @@ public class UserImageService extends BaseService implements IUserImageService {
      * already exists, it is replaced with the provided new image file.
      *
      * @param userId the unique identifier of the user whose image is to be updated
-     * @param file the new image file to update; must be a valid non-empty file and within size constraints
-     * @throws InvalidFileException if the provided file is null, empty, or exceeds the maximum allowed size
+     * @param file   the new image file to update; must be a valid non-empty file and within size constraints
+     * @throws InvalidFileException      if the provided file is null, empty, or exceeds the maximum allowed size
      * @throws ResourceNotFoundException if no existing image is found for the specified user ID
      */
     @Override
@@ -185,7 +166,7 @@ public class UserImageService extends BaseService implements IUserImageService {
      * If the operation encounters an IOException while reading the file content, a RuntimeException will be thrown.
      *
      * @param userImage the UserImage object to update; must not be null
-     * @param file the MultipartFile containing the new image bytes; must not be null and must contain readable data
+     * @param file      the MultipartFile containing the new image bytes; must not be null and must contain readable data
      * @throws RuntimeException if an IOException occurs while reading the file content
      */
     private void updateImageBytes(UserImage userImage, MultipartFile file) {
@@ -195,4 +176,5 @@ public class UserImageService extends BaseService implements IUserImageService {
             throw new RuntimeException("Failed to read image bytes for user ID: " + userImage.getUid(), e);
         }
     }
+
 }

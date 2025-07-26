@@ -1,10 +1,10 @@
 package com.project.E_VEDA.service.impl;
 
-import com.project.E_VEDA.common.utils.GenericResponseFactory;
+import com.project.common.common.utils.GenericResponseFactory;
 import com.project.E_VEDA.domain.entity.FullUserDetails;
 import com.project.E_VEDA.dto.fullUserDetails.ProfileDTO;
-import com.project.E_VEDA.dto.response.GenericResponse;
-import com.project.E_VEDA.mapping.GenericDtoMapper;
+import com.project.common.dto.response.GenericResponse;
+import com.project.common.mapping.GenericDtoMapper;
 import com.project.E_VEDA.repository.IUserDetailsRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -69,11 +68,11 @@ public class FullUserServiceServiceTest {
         GenericResponse<ProfileDTO> actualResponse = fullUserServiceService.getProfile(userId);
 
         // Assert
-        assertNotNull(actualResponse);
-        assertEquals(expectedResponse.getHttpStatus(), actualResponse.getHttpStatus());
-        assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        assertEquals(expectedResponse.getData(), actualResponse.getData());
-        assertEquals(expectedResponse.getSuccess(), actualResponse.getSuccess());
+        Assertions.assertNotNull(actualResponse);
+        Assertions.assertEquals(expectedResponse.getHttpStatus(), actualResponse.getHttpStatus());
+        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
+        Assertions.assertEquals(expectedResponse.getData(), actualResponse.getData());
+        Assertions.assertEquals(expectedResponse.getSuccess(), actualResponse.getSuccess());
         verify(userDetailsRepository,times(1)).findById(userId);
         verify(mapper,times(1)).map(Optional.of(userDetails), ProfileDTO.class);
         verify(genericResponseFactory,times(1)).successResponse(
@@ -108,11 +107,11 @@ public class FullUserServiceServiceTest {
         GenericResponse<ProfileDTO> actualResponse = fullUserServiceService.getProfile(userId);
 
         // Assert
-        assertNotNull(actualResponse);
-        assertEquals(HttpStatus.NOT_FOUND, actualResponse.getHttpStatus());
-        assertEquals(messageKey, actualResponse.getMessage());
-        assertNull(actualResponse.getData());
-        assertFalse(actualResponse.getSuccess());
+        Assertions.assertNotNull(actualResponse);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, actualResponse.getHttpStatus());
+        Assertions.assertEquals(messageKey, actualResponse.getMessage());
+        Assertions.assertNull(actualResponse.getData());
+        Assertions.assertFalse(actualResponse.getSuccess());
         verify(userDetailsRepository,times(1)).findById(userId);
         verify(genericResponseFactory,times(1)).errorResponse(
                 HttpStatus.NOT_FOUND,

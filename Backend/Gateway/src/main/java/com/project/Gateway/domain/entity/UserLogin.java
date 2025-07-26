@@ -1,7 +1,8 @@
 package com.project.Gateway.domain.entity;
 
 import com.project.E_VEDA.domain.entity.FullUserDetails;
-import com.project.Gateway.common.enums.Status;
+import com.project.common.common.emuns.Role;
+import com.project.common.common.emuns.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Represents a UserLogin entity.
@@ -23,6 +25,7 @@ import java.util.Objects;
  * - A username associated with the user. <br>
  * - The user's email address (must be unique and non-null). <br>
  * - The password for account authentication (stored in an encrypted form). <br>
+ * - The role of a user's account for role-based authentication. <br>
  * - The status of the user's account, represented by the Status enumeration. <br>
  * - A reference to the FullUserDetails entity which contains additional user information. <br>
  * - A creation date timestamp, which is unmodifiable and set to the current date and time by default. <br>
@@ -56,6 +59,9 @@ public class UserLogin {
 
     @Field(name = "password")
     private String password;
+
+    @Field(name = "Role")
+    private Set<Role> role;
 
     @Field(name = "status")
     private Status status;

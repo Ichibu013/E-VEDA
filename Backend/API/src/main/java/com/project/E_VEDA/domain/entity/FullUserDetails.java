@@ -1,6 +1,6 @@
 package com.project.E_VEDA.domain.entity;
 
-import com.project.E_VEDA.common.enums.Gender;
+import com.project.common.common.emuns.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

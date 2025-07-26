@@ -1,7 +1,7 @@
 package com.project.E_VEDA.service.interfaces;
 
 import com.project.E_VEDA.dto.fullUserDetails.ProfileDTO;
-import com.project.E_VEDA.dto.response.GenericResponse;
+import com.project.common.dto.response.GenericResponse;
 import org.springframework.stereotype.Service;
 
 /**

@@ -29,6 +29,7 @@
     <modules>
         <module>API</module>
         <module>Gateway</module>
+        <module>Common</module>
     </modules>
 
     <dependencyManagement>

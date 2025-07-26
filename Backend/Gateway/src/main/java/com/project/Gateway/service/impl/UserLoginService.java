@@ -1,22 +1,38 @@
 package com.project.Gateway.service.impl;
 
-import com.project.Gateway.common.utils.GenericResponseFactory;
+import com.project.E_VEDA.repository.IUserDetailsRepository;
+import com.project.E_VEDA.service.impl.BaseService;
 import com.project.Gateway.domain.entity.UserLogin;
-import com.project.Gateway.dto.response.GenericResponse;
 import com.project.Gateway.dto.userLogin.LoginDTO;
 import com.project.Gateway.dto.userLogin.RegisterDTO;
-import com.project.Gateway.mapping.GenericDtoMapper;
+
+import com.project.common.common.emuns.Role;
+import com.project.common.common.utils.GenericResponseFactory;
+import com.project.common.dto.response.AuthResponse;
+import com.project.common.dto.response.GenericResponse;
 import com.project.Gateway.repository.IUserRepository;
 import com.project.Gateway.service.interfaces.IUserLoginService;
 
+import com.project.common.mapping.GenericDtoMapper;
+
+import com.project.common.service.JwtService;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 
 /**
  * UserLoginService is a service class responsible for managing user authentication and
@@ -57,13 +73,26 @@ public class UserLoginService extends BaseService implements IUserLoginService {
 
     private final PasswordEncoder passwordEncoder;
 
-    protected UserLoginService(GenericResponseFactory genericResponseFactory,
+    private final UserDetailsServiceImpl userDetailsService;
+
+    private final AuthenticationManager authenticationManager;
+
+    private final JwtService jwtService;
+
+    public UserLoginService(IUserDetailsRepository userDetailsRepository,
+                            GenericResponseFactory genericResponseFactory,
                             GenericDtoMapper mapper,
                             IUserRepository userRepository,
-                            PasswordEncoder passwordEncoder) {
-        super(genericResponseFactory, mapper);
+                            PasswordEncoder passwordEncoder,
+                            UserDetailsServiceImpl userDetailsService,
+                            AuthenticationManager authenticationManager,
+                            JwtService jwtService) {
+        super(userDetailsRepository, genericResponseFactory, mapper);
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userDetailsService = userDetailsService;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     /**
@@ -73,7 +102,7 @@ public class UserLoginService extends BaseService implements IUserLoginService {
      *
      * @param loginDTO contains the user's login details such as email and password
      * @return a GenericResponse containing the LoginDTO object if authentication succeeds,
-     *         otherwise an error response with appropriate status and message
+     * otherwise an error response with appropriate status and message
      */
     @Override
     @Transactional
@@ -83,13 +112,11 @@ public class UserLoginService extends BaseService implements IUserLoginService {
         if (user.isEmpty()) {
             log.info("Login attempt failed for user with email {}.", loginDTO.getEmail());
             return genericResponseFactory.errorResponse(HttpStatus.NOT_FOUND,
-                    null ,
+                    null,
                     "user.login.failed");
         }
         log.info("Login attempt successful for user with email {}.", loginDTO.getEmail());
-        return genericResponseFactory.successResponse(HttpStatus.OK,
-                mapper.map(user.get(), LoginDTO.class),
-                "user.login.success");
+        return buildSuccessResponse(mapper.map(user.get(), LoginDTO.class), "user.login.success");
     }
 
     /**
@@ -100,39 +127,54 @@ public class UserLoginService extends BaseService implements IUserLoginService {
      * @param registerDTO contains the user's registration details, such as username, email, password,
      *                    confirm password, and registration status. Used to create a new user.
      * @return a GenericResponse containing the RegisterDTO object for the successfully registered user
-     *         if registration is successful, otherwise an error response with appropriate status and message.
+     * if registration is successful, otherwise an error response with appropriate status and message.
      */
     @Override
     @Transactional
     public GenericResponse<RegisterDTO> register(RegisterDTO registerDTO) {
         Optional<UserLogin> existingUser = userRepository.findByEmail(registerDTO.getEmail());
-        if (existingUser.isPresent()){
+        if (existingUser.isPresent()) {
             log.info("User with email {} already exists.", registerDTO.getEmail());
             return genericResponseFactory.errorResponse(HttpStatus.FOUND,
                     Map.of("Email", registerDTO.getEmail()),
                     "user.already.exists");
         }
 
-        final UserLogin usertoSave = mapper.map(registerDTO, UserLogin.class);
-        usertoSave.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
+        final UserLogin userToSave = mapper.map(registerDTO, UserLogin.class);
+        userToSave.setRole(Collections.singleton(Role.ROLE_USER));
+        userToSave.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
 
-/*
-        FullUserDetails userDetails = new FullUserDetails();
-        userDetails.setUid(usertoSave.getId());
-        userDetailsRepository.save(userDetails);
-
-        UserImage userImage = new UserImage();
-        userImage.setUserLoginId(usertoSave);
-        userImage.setUid(userDetails.getUid());
-        userImageRepository.save(userImage);
-*/
-
-        final UserLogin savedUser = userRepository.save(usertoSave);
+        final UserLogin savedUser = userRepository.save(userToSave);
         final RegisterDTO savedRegisterDTO = mapper.map(savedUser, RegisterDTO.class);
         log.info("User {} registered successfully.", savedRegisterDTO.getEmail());
         return genericResponseFactory.successResponse(HttpStatus.CREATED,
                 savedRegisterDTO,
                 "user.registration.success");
 
+    }
+
+    /**
+     * Authenticates a user using the provided login credentials and generates a JWT token.
+     * Validates the user's email and password through the authentication manager,
+     * retrieves user details, and assigns the user roles.
+     *
+     * @param loginDTO the user's login details, including email and password
+     * @return an AuthResponse containing a JWT token and a set of user roles if authentication succeeds
+     */
+    @Override
+    public AuthResponse authenticate(LoginDTO loginDTO) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword())
+        );
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginDTO.getEmail());
+        String jwt = jwtService.generateToken(userDetails);
+
+        Set<String> role = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
+
+        log.info("JWT token generated for user {}.", loginDTO.getEmail());
+        return new AuthResponse(jwt, role);
     }
 }

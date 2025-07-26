@@ -1,12 +1,13 @@
 package com.project.E_VEDA.service.impl;
 
-import com.project.E_VEDA.common.utils.GenericResponseFactory;
+import com.project.E_VEDA.repository.IUserDetailsRepository;
 import com.project.E_VEDA.domain.entity.FullUserDetails;
 import com.project.E_VEDA.dto.fullUserDetails.ProfileDTO;
-import com.project.E_VEDA.dto.response.GenericResponse;
-import com.project.E_VEDA.mapping.GenericDtoMapper;
-import com.project.E_VEDA.repository.IUserDetailsRepository;
 import com.project.E_VEDA.service.interfaces.IFullUserDetailsService;
+
+import com.project.common.dto.response.GenericResponse;
+import com.project.common.mapping.GenericDtoMapper;
+import com.project.common.common.utils.GenericResponseFactory;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,26 +17,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 /**
- * FullUserServiceService is a service that provides operations for managing user profiles.
- * This class extends BaseService and implements IFullUserDetailsService, offering support
- * for fetching, updating, and deleting user profile details.
- * <p>
- * The class uses dependencies such as GenericResponseFactory for response creation,
- * GenericDtoMapper for mapping data transfer objects, and IUserDetailsRepository for
- * repository operations. Transactions are managed for update and delete operations.
- * </p>
- * Key functionalities include: <br>
- * - Retrieving a user's profile by ID. <br>
- * - Updating or creating a user's profile based on input data. <br>
- * - Deleting a user's profile by ID. <br>
+ * Service class for handling user profiles and their related operations such as retrieval, update, and deletion.
+ * It extends {@link BaseService} and implements {@link IFullUserDetailsService}.
+ * This service is annotated as a Spring {@link Service} and utilizes logging through the {@link Slf4j} annotation.
  */
 @Slf4j
 @Service("fullUserService")
 public class FullUserServiceService extends BaseService implements IFullUserDetailsService {
 
-    protected FullUserServiceService(GenericResponseFactory genericResponseFactory,
-                                      GenericDtoMapper mapper,
-                                      IUserDetailsRepository userDetailsRepository) {
+    protected FullUserServiceService(IUserDetailsRepository userDetailsRepository,
+                                  GenericResponseFactory genericResponseFactory,
+                                  GenericDtoMapper mapper) {
         super(userDetailsRepository, genericResponseFactory, mapper);
     }
 
@@ -57,9 +49,7 @@ public class FullUserServiceService extends BaseService implements IFullUserDeta
                     "user.profile.not.found");
         }
         log.info("User with ID {} found.", userId);
-        return genericResponseFactory.successResponse(HttpStatus.OK,
-                mapper.map(user, ProfileDTO.class),
-                "user.profile.success");
+        return buildSuccessResponse(mapper.map(user, ProfileDTO.class),"user.profile.success");
     }
 
     /**
@@ -77,12 +67,10 @@ public class FullUserServiceService extends BaseService implements IFullUserDeta
     public GenericResponse<ProfileDTO> updateProfile(String userId, ProfileDTO profileDTO) {
         FullUserDetails userDetails = fetchUserDetails(userId)
                 .orElseGet(() -> createNewProfile(userId));
-        final FullUserDetails usertoSave = mapper.map(profileDTO, userDetails.getClass());
-        usertoSave.setUid(userId);
-        final FullUserDetails savedUser = userDetailsRepository.save(usertoSave);
-        return genericResponseFactory.successResponse(HttpStatus.OK,
-                mapper.map(savedUser, ProfileDTO.class),
-                "user.profile.success");
+        final FullUserDetails userToSave = mapper.map(profileDTO, userDetails.getClass());
+        userToSave.setUid(userId);
+        final FullUserDetails savedUser = userDetailsRepository.save(userToSave);
+        return buildSuccessResponse(mapper.map(savedUser, ProfileDTO.class),"user.profile.success");
     }
 
     /**
@@ -106,9 +94,8 @@ public class FullUserServiceService extends BaseService implements IFullUserDeta
                     "user.profile.not.found");
         }
         userDetailsRepository.deleteById(userId);
-        return genericResponseFactory.successResponse(HttpStatus.OK,
-                null,
-                "user.profile.delete.success");
+        log.info("User profile for user ID {} deleted successfully.", userId);
+        return buildSuccessResponse(null,"user.profile.delete.success");
     }
 
     /**
