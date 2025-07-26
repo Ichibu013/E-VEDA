@@ -68,7 +68,8 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.38</version>
+			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 
 		<!-- Springdoc OpenAPI UI (version inherited from parent) -->
@@ -149,9 +150,15 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<executions>
 					<execution>
+						<!-- The jar is repackaged, and all the packages and classes are put in the BOOT-INF folder. -->
 						<goals>
 							<goal>repackage</goal>
 						</goals>
+						<!-- Spring Boot Maven Plugin will create 2 JARs: -->
+						<!-- the main one will be the same as a usual Maven project, while the second one will have the classifier appended and be the executable JAR. -->
+						<configuration>
+							<classifier>exec</classifier>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -161,7 +168,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<!-- Configuration inherited from parent, but can be overridden here if needed -->
 			</plugin>
 		</plugins>
 	</build>

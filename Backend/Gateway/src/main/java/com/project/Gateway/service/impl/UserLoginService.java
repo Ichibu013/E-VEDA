@@ -6,9 +6,7 @@ import com.project.Gateway.dto.response.GenericResponse;
 import com.project.Gateway.dto.userLogin.LoginDTO;
 import com.project.Gateway.dto.userLogin.RegisterDTO;
 import com.project.Gateway.mapping.GenericDtoMapper;
-import com.project.E_VEDA.repository.IUserDetailsRepository;
 import com.project.Gateway.repository.IUserRepository;
-import com.project.Gateway.service.impl.BaseService;
 import com.project.Gateway.service.interfaces.IUserLoginService;
 
 import lombok.extern.slf4j.Slf4j;
