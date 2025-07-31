@@ -1,19 +1,19 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './WelcomePage.css'; // Component-specific styles
+import './WelcomePage.css'; // Ensure this CSS file exists and is linked properly
 import doctImage from './Assets/doct.PNG';
 
 function WelcomePage() {
   const navigate = useNavigate();
 
   const handleProceedClick = () => {
-    navigate('/login'); // Navigate to the login page
+    navigate('/login'); // Corrected route to the login page
   };
 
   return (
     <div className="landing-container">
       <div className="doctor-image-wrapper">
-        <img src={doctImage} alt="AI Doctor Illustration" />
+        <img src={doctImage} alt="Doctor Illustration for E-VEDA" />
       </div>
       <h1 className="welcome-text">Welcome to E-VEDA!</h1>
       <button className="proceed-button" onClick={handleProceedClick}>
