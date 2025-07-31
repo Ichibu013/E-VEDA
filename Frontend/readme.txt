@@ -1,1 +1,1 @@
-Frontend folder of E-VEDA test
+Frontend folder of E-VEDA demo
