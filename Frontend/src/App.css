@@ -383,8 +383,8 @@ img {
 
 /* Banner One */
 .banner-one {
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-    url('../assets/banner-bg.jpg') center/cover no-repeat; /* Replace with an actual background image */
+  /* background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url('../assets/banner-bg.png') center/cover no-repeat; /* Replace with an actual background image */
   padding: 5rem 0;
 }
 

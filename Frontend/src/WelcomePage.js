@@ -7,7 +7,7 @@ function WelcomePage() {
   const navigate = useNavigate();
 
   const handleProceedClick = () => {
-    navigate('/login'); // Corrected route to the login page
+    navigate('/HomePage'); // Corrected route to the login page
   };
 
   return (
