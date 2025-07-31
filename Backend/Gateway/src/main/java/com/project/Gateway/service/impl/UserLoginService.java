@@ -5,19 +5,18 @@ import com.project.E_VEDA.service.impl.BaseService;
 import com.project.Gateway.domain.entity.UserLogin;
 import com.project.Gateway.dto.userLogin.LoginDTO;
 import com.project.Gateway.dto.userLogin.RegisterDTO;
-
-import com.project.common.common.emuns.Role;
+import com.project.Gateway.repository.IUserRepository;
+import com.project.Gateway.service.interfaces.IUserLoginService;
+import com.project.Gateway.service.validator.UserValidator;
+import com.project.common.common.exceptions.LoginFailedException;
+import com.project.common.common.exceptions.RegistrationFailedException;
 import com.project.common.common.utils.GenericResponseFactory;
 import com.project.common.dto.response.AuthResponse;
 import com.project.common.dto.response.GenericResponse;
-import com.project.Gateway.repository.IUserRepository;
-import com.project.Gateway.service.interfaces.IUserLoginService;
-
 import com.project.common.mapping.GenericDtoMapper;
-
 import com.project.common.service.JwtService;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,8 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,6 +69,8 @@ public class UserLoginService extends BaseService implements IUserLoginService {
 
     private final IUserRepository userRepository;
 
+    private final MessageSource messageSource;
+
     private final PasswordEncoder passwordEncoder;
 
     private final UserDetailsServiceImpl userDetailsService;
@@ -78,21 +78,27 @@ public class UserLoginService extends BaseService implements IUserLoginService {
     private final AuthenticationManager authenticationManager;
 
     private final JwtService jwtService;
+    private final UserValidator userValidator;
 
     public UserLoginService(IUserDetailsRepository userDetailsRepository,
+                            MessageSource messageSource,
                             GenericResponseFactory genericResponseFactory,
                             GenericDtoMapper mapper,
                             IUserRepository userRepository,
+                            MessageSource messageSource1,
                             PasswordEncoder passwordEncoder,
                             UserDetailsServiceImpl userDetailsService,
                             AuthenticationManager authenticationManager,
-                            JwtService jwtService) {
-        super(userDetailsRepository, genericResponseFactory, mapper);
+                            JwtService jwtService,
+                            UserValidator userValidator) {
+        super(userDetailsRepository, messageSource, genericResponseFactory, mapper);
         this.userRepository = userRepository;
+        this.messageSource = messageSource1;
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = userDetailsService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.userValidator = userValidator;
     }
 
     /**
@@ -111,9 +117,7 @@ public class UserLoginService extends BaseService implements IUserLoginService {
                 .filter(u -> passwordEncoder.matches(loginDTO.getPassword(), u.getPassword()));
         if (user.isEmpty()) {
             log.info("Login attempt failed for user with email {}.", loginDTO.getEmail());
-            return genericResponseFactory.errorResponse(HttpStatus.NOT_FOUND,
-                    null,
-                    "user.login.failed");
+            throw new LoginFailedException("Login failed for user with email " + loginDTO.getEmail() + ".");
         }
         log.info("Login attempt successful for user with email {}.", loginDTO.getEmail());
         return buildSuccessResponse(mapper.map(user.get(), LoginDTO.class), "user.login.success");
@@ -132,24 +136,36 @@ public class UserLoginService extends BaseService implements IUserLoginService {
     @Override
     @Transactional
     public GenericResponse<RegisterDTO> register(RegisterDTO registerDTO) {
-        Optional<UserLogin> existingUser = userRepository.findByEmail(registerDTO.getEmail());
-        if (existingUser.isPresent()) {
-            log.info("User with email {} already exists.", registerDTO.getEmail());
-            return genericResponseFactory.errorResponse(HttpStatus.FOUND,
-                    Map.of("Email", registerDTO.getEmail()),
-                    "user.already.exists");
+        if (isEmpty(registerDTO.getEmail(), registerDTO.getPassword(), registerDTO.getConfirmPassword())) {
+            log.warn("Fields cannot be empty for registration.");
+            throw new RegistrationFailedException("Registration failed.");
         }
 
-        final UserLogin userToSave = mapper.map(registerDTO, UserLogin.class);
-        userToSave.setRole(Collections.singleton(Role.ROLE_USER));
-        userToSave.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
+        if (!userValidator.isValidRegisterDTO(registerDTO)) {
+            log.warn("Registration failed for user with email {}.", registerDTO.getEmail());
+            throw new RegistrationFailedException("Validation failed for registration data.");
+        }
 
-        final UserLogin savedUser = userRepository.save(userToSave);
-        final RegisterDTO savedRegisterDTO = mapper.map(savedUser, RegisterDTO.class);
-        log.info("User {} registered successfully.", savedRegisterDTO.getEmail());
-        return genericResponseFactory.successResponse(HttpStatus.CREATED,
-                savedRegisterDTO,
-                "user.registration.success");
+        try {
+            UserLogin userToSave = createUserLogin(registerDTO);
+
+            UserLogin savedUser = userRepository.save(userToSave);
+            RegisterDTO savedRegisterDTO = new RegisterDTO();
+            savedRegisterDTO.setEmail(savedUser.getEmail());
+            savedRegisterDTO.setUsername(savedUser.getUsername());
+            log.info("User {} registered successfully.", savedRegisterDTO.getEmail());
+            return genericResponseFactory.successResponse(
+                    HttpStatus.CREATED,
+                    savedRegisterDTO,
+                    "user.registration.success",
+                    messageSource.getMessage("user.registration.success",null, Locale.getDefault())
+            );
+        } catch (Exception e) {
+            log.error("Registration failed for user with email {}.", registerDTO.getEmail(), e);
+            throw new RegistrationFailedException("Registration failed for user with email " + registerDTO.getEmail() + ".");
+        }
+
+
 
     }
 
@@ -176,5 +192,13 @@ public class UserLoginService extends BaseService implements IUserLoginService {
 
         log.info("JWT token generated for user {}.", loginDTO.getEmail());
         return new AuthResponse(jwt, role);
+    }
+
+    private UserLogin createUserLogin(RegisterDTO registerDTO) {
+        return userValidator.populateUserWithValues(registerDTO);
+    }
+
+    private boolean isEmpty(String... strings) {
+        return strings == null || strings.length == 0 || strings[0] == null || strings[0].isEmpty();
     }
 }

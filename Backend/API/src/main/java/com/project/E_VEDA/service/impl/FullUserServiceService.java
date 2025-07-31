@@ -10,6 +10,7 @@ import com.project.common.mapping.GenericDtoMapper;
 import com.project.common.common.utils.GenericResponseFactory;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +26,11 @@ import java.util.Optional;
 @Service("fullUserService")
 public class FullUserServiceService extends BaseService implements IFullUserDetailsService {
 
-    protected FullUserServiceService(IUserDetailsRepository userDetailsRepository,
+    public FullUserServiceService(IUserDetailsRepository userDetailsRepository,
+                                  MessageSource messageSource,
                                   GenericResponseFactory genericResponseFactory,
                                   GenericDtoMapper mapper) {
-        super(userDetailsRepository, genericResponseFactory, mapper);
+        super(userDetailsRepository, messageSource, genericResponseFactory, mapper);
     }
 
     /**

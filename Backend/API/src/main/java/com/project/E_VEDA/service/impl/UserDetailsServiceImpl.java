@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,7 +20,7 @@ import java.util.List;
  * The primary role of this class is to decode a JWT token, extract the username and assigned roles,
  * and construct a UserDetails object representing the authenticated user.
  */
-@Service
+@Service( "apiUserDetailsService")
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final JwtService jwtService;
@@ -47,14 +47,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("The username was not found in the token");
         }
 
-        Collection<? extends SimpleGrantedAuthority> authorities = roles.stream()
-                .map(SimpleGrantedAuthority::new)
-                .toList();
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(roles.getFirst());
+
+//        Collection<? extends SimpleGrantedAuthority> authorities = roles.stream()
+//                .map(SimpleGrantedAuthority::new)
+//                .toList();
 
         return new User(
                 username,
                 "",
-                authorities
+                Collections.singleton(authority)
         );
     }
 }

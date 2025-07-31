@@ -1,7 +1,7 @@
 package com.project.Gateway.dto.userLogin;
 
-import lombok.Builder;
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
 /**
  * Data Transfer Object (DTO) representing the user's registration details.
@@ -19,15 +19,20 @@ import lombok.Data;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RegisterDTO {
 
+    @NotBlank(message = "username.required")
     private String username;
 
+    @NotBlank(message = "email.required")
     private String email;
 
+    @NotBlank(message = "password.required")
     private String password;
 
+    @NotBlank(message = "confirmPassword.required")
     private String confirmPassword;
 
-    private String status;
 }
