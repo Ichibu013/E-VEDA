@@ -1,82 +1,52 @@
+// Navbar.jsx
 import React from 'react';
-import './HomePage.css'; // Use the same CSS file for styling
+import './HomePage.css';
 import logo from './Assets/bg remove logo.png';
 import menuIcon from './Assets/ham-menu-icon.png';
 import closeIcon from './Assets/close-icon.png';
-import searchIcon from './Assets/search-icon-dark.png';
 
-const Navbar = ({ isNavbarOpen, toggleNavbar }) => {
+function Navbar({ isNavbarOpen, toggleNavbar }) {
   return (
-    <nav className="navbar bg-blue">
+    <nav className="navbar">
       <div className="container flex">
         <a href="#home" className="navbar-brand">
-          <img src={logo} alt="site logo" />
+          <img src={logo} alt="Logo" />
         </a>
-        <button
-          type="button"
-          className="navbar-show-btn"
-          onClick={toggleNavbar}
-        >
-          <img src={menuIcon} alt="menu" />
+        <button className="hamburger" onClick={toggleNavbar}>
+          <img src={isNavbarOpen ? closeIcon : menuIcon} alt="menu" />
         </button>
 
-        <div
-          className={`navbar-collapse bg-white ${
-            isNavbarOpen ? 'show-navbar' : ''
-          }`}
-        >
-          <button
-            type="button"
-            className="navbar-hide-btn"
-            onClick={toggleNavbar}
-          >
-            <img src={closeIcon} alt="close" />
-          </button>
+        <div className={`navbar-collapse ${isNavbarOpen ? 'open' : ''}`}>
           <ul className="navbar-nav">
             <li className="nav-item">
-              <a href="#home" className="nav-link">
+              <a href="#home" className="nav-link" onClick={toggleNavbar}>
                 Home
               </a>
             </li>
             <li className="nav-item">
-              <a href="#about" className="nav-link">
+              <a href="#about" className="nav-link" onClick={toggleNavbar}>
                 About
               </a>
             </li>
+            {/* Uncomment if you re-enable the Services section */}
+            {/* <li className="nav-item">
+              <a href="#services" className="nav-link" onClick={toggleNavbar}>Services</a>
+            </li> */}
             <li className="nav-item">
-              <a href="#services" className="nav-link">
-                Service
-              </a>
-            </li>
-            <li className="nav-item">
-              <a href="#doc-panel" className="nav-link">
+              <a href="#doc-panel" className="nav-link" onClick={toggleNavbar}>
                 Doctors
               </a>
             </li>
             <li className="nav-item">
-              <a href="#contact" className="nav-link">
+              <a href="#contact" className="nav-link" onClick={toggleNavbar}>
                 Contact
               </a>
             </li>
           </ul>
-          <div className="search-bar">
-            <form>
-              <div className="search-bar-box flex">
-                <span className="search-icon flex">
-                  <img src={searchIcon} alt="search" />
-                </span>
-                <input
-                  type="search"
-                  className="search-control"
-                  placeholder="Search here"
-                />
-              </div>
-            </form>
-          </div>
         </div>
       </div>
     </nav>
   );
-};
+}
 
 export default Navbar;
