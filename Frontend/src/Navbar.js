@@ -28,10 +28,6 @@ function Navbar({ isNavbarOpen, toggleNavbar }) {
                 About
               </a>
             </li>
-            {/* Uncomment if you re-enable the Services section */}
-            {/* <li className="nav-item">
-              <a href="#services" className="nav-link" onClick={toggleNavbar}>Services</a>
-            </li> */}
             <li className="nav-item">
               <a href="#doc-panel" className="nav-link" onClick={toggleNavbar}>
                 Doctors
@@ -40,6 +36,16 @@ function Navbar({ isNavbarOpen, toggleNavbar }) {
             <li className="nav-item">
               <a href="#contact" className="nav-link" onClick={toggleNavbar}>
                 Contact
+              </a>
+            </li>
+            <li className="nav-item">
+              <a href="#login" className="nav-link" onClick={toggleNavbar}>
+                Login
+              </a>
+            </li>
+            <li className="nav-item">
+              <a href="#signup" className="nav-link" onClick={toggleNavbar}>
+                Sign Up
               </a>
             </li>
           </ul>
