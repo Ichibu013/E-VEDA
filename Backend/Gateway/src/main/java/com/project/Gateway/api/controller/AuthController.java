@@ -1,7 +1,8 @@
 package com.project.Gateway.api.controller;
 
-import com.project.Gateway.dto.userLogin.LoginDTO;
-import com.project.Gateway.dto.userLogin.RegisterDTO;
+import com.project.Gateway.dto.request.userLogin.RequestLoginDTO;
+import com.project.Gateway.dto.request.userLogin.RequestRegisterDTO;
+import com.project.Gateway.dto.response.userLogin.ResponseRegisterDTO;
 import com.project.Gateway.service.interfaces.IUserLoginService;
 import com.project.common.dto.response.GenericResponse;
 import jakarta.validation.Valid;
@@ -21,15 +22,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @Valid @RequestBody LoginDTO loginDTO
+            @Valid @RequestBody RequestLoginDTO loginDTO
     ) {
         return ResponseEntity.ok().body(userLoginService.authenticate(loginDTO));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<GenericResponse<RegisterDTO>> signup(
-            @RequestBody RegisterDTO registerDTO
+    public ResponseEntity<GenericResponse<ResponseRegisterDTO>> signup(
+            @RequestBody RequestRegisterDTO requestRegisterDTO
     ) {
-        return ResponseEntity.ok().body(userLoginService.register(registerDTO));
+        return ResponseEntity.ok().body(userLoginService.register(requestRegisterDTO));
     }
+
 }

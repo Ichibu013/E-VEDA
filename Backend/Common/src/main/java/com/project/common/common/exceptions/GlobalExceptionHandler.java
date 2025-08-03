@@ -117,6 +117,33 @@ public class GlobalExceptionHandler extends RuntimeException {
                 );
     }
 
+    @ExceptionHandler(NoUserProfileException.class)
+    public ResponseEntity<GenericResponse<Map<String,String>>> handleNoUserProfileException(NoUserProfileException ex){
+        log.error("No user profile found: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(genericResponseFactory
+                        .errorResponse(
+                                HttpStatus.NOT_FOUND,
+                                getErrorDetails(ex),
+                                "user.profile.not.found")
+                );
+    }
+
+    @ExceptionHandler(PassTokenInvalidException.class)
+    public ResponseEntity<GenericResponse<Map<String,String>>> handlePassTokenInvalidException(PassTokenInvalidException exc){
+        log.error("Pass token invalid: {}", exc.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(genericResponseFactory
+                    .errorResponse(
+                            HttpStatus.BAD_REQUEST,
+                            getErrorDetails(exc),
+                            "user.pass.token.invalid"
+                    )
+                );
+    }
+
     /**
      * Extracts error details from the provided exception by recursively traversing
      * the exception cause chain and returning a map containing an error message.

@@ -22,7 +22,7 @@ public class BaseService {
 
     protected final IUserDetailsRepository userDetailsRepository;
 
-    private final MessageSource messageSource;
+    protected final MessageSource messageSource;
 
     protected final GenericResponseFactory genericResponseFactory;
 

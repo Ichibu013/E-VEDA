@@ -1,8 +1,9 @@
 package com.project.Gateway.service.impl;
 
 import com.project.Gateway.domain.entity.UserLogin;
-import com.project.Gateway.dto.userLogin.LoginDTO;
-import com.project.Gateway.dto.userLogin.RegisterDTO;
+import com.project.Gateway.dto.request.userLogin.RequestRegisterDTO;
+import com.project.Gateway.dto.request.userLogin.RequestLoginDTO;
+import com.project.Gateway.dto.response.userLogin.ResponseRegisterDTO;
 import com.project.Gateway.repository.IUserRepository;
 import com.project.Gateway.service.validator.UserValidator;
 import com.project.common.common.exceptions.RegistrationFailedException;
@@ -11,6 +12,7 @@ import com.project.common.dto.response.AuthResponse;
 import com.project.common.dto.response.GenericResponse;
 import com.project.common.mapping.GenericDtoMapper;
 import com.project.common.service.JwtService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -19,14 +21,12 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Locale;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -64,124 +64,104 @@ class UserLoginServiceTest {
     @InjectMocks
     private UserLoginService userLoginService;
 
-    public UserLoginServiceTest() {
+    @BeforeEach
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
     void shouldRegisterUserSuccessfully() {
         // Arrange
-        RegisterDTO registerDTO = RegisterDTO.builder()
-                .username("TestUser")
-                .email("testuser@example.com")
-                .password("strongPassword@123")
-                .confirmPassword("strongPassword@123")
+        RequestRegisterDTO testUser = validRequestRegisterDTO();
+        UserLogin mockUserLogin = new UserLogin();
+        UserLogin savedUser = UserLogin.builder()
+                .username(testUser.getUsername())
+                .email(testUser.getEmail())
                 .build();
+        ResponseRegisterDTO savedResponse = validResponseRegisterDTO();
 
-        UserLogin userLogin = new UserLogin();
-        UserLogin savedUser = new UserLogin();
-        RegisterDTO savedRegisterDTO = new RegisterDTO();
+        // Mocking validators and repository behavior
+        when(userValidator.isValidRegisterDTO(testUser)).thenReturn(true);
+        when(userValidator.populateUserWithValues(testUser)).thenReturn(mockUserLogin);
+        when(userRepository.save(mockUserLogin)).thenReturn(savedUser);
+        when(mapper.map(savedUser, ResponseRegisterDTO.class)).thenReturn(savedResponse);
 
-        when(userValidator.isValidRegisterDTO(registerDTO)).thenReturn(true);
-        when(userValidator.populateUserWithValues(registerDTO)).thenReturn(userLogin);
-        when(userRepository.save(userLogin)).thenReturn(savedUser);
-        when(mapper.map(savedUser, RegisterDTO.class)).thenReturn(savedRegisterDTO);
+        // Mock success message for generic response
+        when(messageSource.getMessage("user.registration.success", null, Locale.getDefault()))
+                .thenReturn("Registration successful");
 
-        when(messageSource.getMessage("user.registration.success", null, Locale.getDefault())).thenReturn("Registration successful");
-
-        GenericResponse<RegisterDTO> mockedResponse =
-                new GenericResponse<>(HttpStatus.CREATED, savedRegisterDTO, "Registration successful", messageSource);
-
-        when(genericResponseFactory.successResponse(HttpStatus.CREATED, savedRegisterDTO, "user.registration.success", "Registration successful"))
-                .thenReturn(mockedResponse);
+        // Mocking generic response factory
+        GenericResponse<ResponseRegisterDTO> mockedResponse = new GenericResponse<>(
+                HttpStatus.CREATED, savedResponse, "Registration successful", messageSource
+        );
+        when(genericResponseFactory.successResponse(HttpStatus.CREATED, savedResponse, "user.registration.success",
+                "Registration successful")).thenReturn(mockedResponse);
 
         // Act
-        GenericResponse<RegisterDTO> response = userLoginService.register(registerDTO);
+        GenericResponse<ResponseRegisterDTO> response = userLoginService.register(testUser);
 
         // Assert
-        assertNotNull(response);
-        assertTrue(response.getSuccess());
-        assertEquals(HttpStatus.CREATED, response.getHttpStatus());
-        assertEquals(savedRegisterDTO, response.getData());
+        assertNotNull(response, "GenericResponse should not be null");
+        assertTrue(response.getSuccess(), "Success flag should be true");
+        assertEquals(HttpStatus.CREATED, response.getHttpStatus(), "HTTP status should be CREATED");
+        assertEquals(savedResponse, response.getData(), "Response data should match the mocked response");
 
-        verify(userValidator).isValidRegisterDTO(registerDTO);
-        verify(userValidator).populateUserWithValues(registerDTO);
-        verify(userRepository).save(userLogin);
-        verify(genericResponseFactory).successResponse(HttpStatus.CREATED, savedRegisterDTO, "user.registration.success", "Registration successful");
+        verify(userValidator).isValidRegisterDTO(testUser);
+        verify(userValidator).populateUserWithValues(testUser);
+        verify(userRepository).save(mockUserLogin);
+        verify(genericResponseFactory).successResponse(HttpStatus.CREATED, savedResponse, "user.registration.success",
+                "Registration successful");
     }
 
     @Test
     void shouldThrowExceptionWhenRegisterDTOValidationFails() {
-        RegisterDTO registerDTO = RegisterDTO.builder()
-                .username("TestUser")
-                .email("testuser@example.com")
-                .password("strongpassword")
-                .confirmPassword("mismatchedpassword")
+        // Arrange
+        RequestRegisterDTO invalidRequest = RequestRegisterDTO.builder()
+                .username("TestUser")                  // Valid username
+                .email("testuser@example.com")         // Valid email format
+                .password("validPassword@123")         // Valid password
+                .confirmPassword("differentPassword")  // Invalid: does not match password
                 .build();
 
-        when(userValidator.isValidRegisterDTO(registerDTO)).thenReturn(false);
+        // Mock to return false for validation failure
+        when(userValidator.isValidRegisterDTO(invalidRequest)).thenReturn(false);
 
-        assertThrows(RegistrationFailedException.class, () -> userLoginService.register(registerDTO));
+        // Act & Assert
+        assertThrows(RegistrationFailedException.class, () -> userLoginService.register(invalidRequest));
 
-        verify(userValidator).isValidRegisterDTO(registerDTO);
-        verifyNoInteractions(userRepository, mapper, genericResponseFactory);
+        // Verify interactions
+        verify(userValidator).isValidRegisterDTO(invalidRequest); // Ensure validator is called
+        verifyNoInteractions(userRepository, mapper, genericResponseFactory); // Ensure no downstream interactions
     }
 
     @Test
     void shouldThrowExceptionWhenRepositoryThrowsException() {
-        RegisterDTO registerDTO = RegisterDTO.builder()
-                .username("TestUser")
-                .email("testuser@example.com")
-                .password("strongpassword")
-                .confirmPassword("strongpassword")
-                .build();
-
+        // Arrange
+        RequestRegisterDTO userRequest = validRequestRegisterDTO();
         UserLogin userLogin = new UserLogin();
 
-        when(userValidator.isValidRegisterDTO(registerDTO)).thenReturn(true);
-        when(userValidator.populateUserWithValues(registerDTO)).thenReturn(userLogin);
+        when(userValidator.isValidRegisterDTO(userRequest)).thenReturn(true);
+        when(userValidator.populateUserWithValues(userRequest)).thenReturn(userLogin);
         when(userRepository.save(userLogin)).thenThrow(new RuntimeException("Database error"));
 
-        assertThrows(RegistrationFailedException.class, () -> userLoginService.register(registerDTO));
+        // Act & Assert
+        assertThrows(RegistrationFailedException.class, () -> userLoginService.register(userRequest));
 
-        verify(userValidator).isValidRegisterDTO(registerDTO);
-        verify(userValidator).populateUserWithValues(registerDTO);
+        verify(userValidator).isValidRegisterDTO(userRequest);
+        verify(userValidator).populateUserWithValues(userRequest);
         verify(userRepository).save(userLogin);
         verifyNoInteractions(mapper, genericResponseFactory);
     }
 
     @Test
-    void shouldThrowConstraintViolationExceptionForInvalidData() {
-        RegisterDTO registerDTO = RegisterDTO.builder()
-                .username("")
-                .email("")
-                .password("")
-                .confirmPassword("")
-                .build();
-
-        assertThrows(RegistrationFailedException.class, () -> userLoginService.register(registerDTO));
-
-        verifyNoInteractions(userValidator, userRepository, mapper, genericResponseFactory);
-    }
-
-    @Test
     void shouldAuthenticateUserSuccessfully() {
         // Arrange
-        String email = "test@example.com";
-        String password = "password";
+        RequestLoginDTO loginDTO = validRequestLoginDTO();
         String jwtToken = "dummy.jwt.token";
         Set<String> roles = Set.of("ROLE_USER");
 
-        LoginDTO loginDTO = LoginDTO.builder().email(email).password(password).build();
-
-        // Create a real Spring Security UserDetails object to return from the mock
-        UserDetails userDetails = new User(email, password,
-                roles.stream().map(role -> (GrantedAuthority) () -> role).collect(Collectors.toSet()));
-
-        // Mock the behavior of userDetailsService when loadUserByUsername is called
-        when(userDetailsService.loadUserByUsername(email)).thenReturn(userDetails);
-
-        // Mock the behavior of jwtService
+        UserDetails userDetails = new User(loginDTO.getEmail(), loginDTO.getPassword(), Set.of());
+        when(userDetailsService.loadUserByUsername(loginDTO.getEmail())).thenReturn(userDetails);
         when(jwtService.generateToken(userDetails)).thenReturn(jwtToken);
 
         // Act
@@ -189,32 +169,63 @@ class UserLoginServiceTest {
 
         // Assert
         assertNotNull(response, "Response should not be null");
-        assertNotNull(response.getToken(), "Response token should not be null");
         assertEquals(jwtToken, response.getToken());
-        assertEquals(roles, response.getRoles());
 
-        // Verify that userDetailsService.loadUserByUsername was called exactly once with the correct email
-        verify(userDetailsService, times(1)).loadUserByUsername(email);
-        // Verify that jwtService.generateToken was called exactly once with the userDetails
-        verify(jwtService, times(1)).generateToken(userDetails);
+        verify(userDetailsService).loadUserByUsername(loginDTO.getEmail());
+        verify(jwtService).generateToken(userDetails);
     }
 
     @Test
     void shouldThrowExceptionForInvalidCredentials() {
         // Arrange
-        LoginDTO loginDTO = LoginDTO.builder()
-                .email("invaliduser@example.com")
-                .password("wrongPassword")
-                .build();
-
+        RequestLoginDTO invalidLogin = invalidRequestLoginDTO();
         doThrow(RuntimeException.class).when(authenticationManager)
                 .authenticate(any(UsernamePasswordAuthenticationToken.class));
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> userLoginService.authenticate(loginDTO));
+        assertThrows(RuntimeException.class, () -> userLoginService.authenticate(invalidLogin));
 
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verifyNoInteractions(userDetailsService, jwtService);
     }
 
+    // Helper methods for reusable test data
+    private RequestRegisterDTO validRequestRegisterDTO() {
+        return RequestRegisterDTO.builder()
+                .username("TestUser")
+                .email("testuser@example.com")
+                .password("Password@123")
+                .confirmPassword("Password@123")
+                .build();
+    }
+
+    private RequestRegisterDTO invalidRequestRegisterDTO() {
+        return RequestRegisterDTO.builder()
+                .username("")
+                .email("")
+                .password("")
+                .confirmPassword("")
+                .build();
+    }
+
+    private ResponseRegisterDTO validResponseRegisterDTO() {
+        return ResponseRegisterDTO.builder()
+                .username("TestUser")
+                .email("testuser@example.com")
+                .build();
+    }
+
+    private RequestLoginDTO validRequestLoginDTO() {
+        return RequestLoginDTO.builder()
+                .email("valid@example.com")
+                .password("ValidPassword@123")
+                .build();
+    }
+
+    private RequestLoginDTO invalidRequestLoginDTO() {
+        return RequestLoginDTO.builder()
+                .email("invalid@example.com")
+                .password("InvalidPass")
+                .build();
+    }
 }

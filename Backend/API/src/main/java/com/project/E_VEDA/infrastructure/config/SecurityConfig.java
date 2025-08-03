@@ -1,4 +1,4 @@
-package com.project.E_VEDA.infrastructure.config;
+    package com.project.E_VEDA.infrastructure.config;
 
 import com.project.E_VEDA.api.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package com.project.Gateway.dto.userLogin;
+package com.project.Gateway.dto.response.userLogin;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginDTO {
+public class ResponseLoginDTO {
 
     @NotBlank(message = "username.required")
     private String username;

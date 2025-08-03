@@ -1,7 +1,7 @@
 package com.project.Gateway.service.validator;
 
 import com.project.Gateway.domain.entity.UserLogin;
-import com.project.Gateway.dto.userLogin.RegisterDTO;
+import com.project.Gateway.dto.request.userLogin.RequestRegisterDTO;
 import com.project.Gateway.repository.IUserRepository;
 import com.project.common.common.emuns.Role;
 import com.project.common.common.emuns.Status;
@@ -40,10 +40,10 @@ public class UserValidator {
     );
 
 
-    public boolean isValidRegisterDTO(RegisterDTO registerDTO) {
-        boolean isEmailValid = isEmailUnique(registerDTO.getEmail());
-        boolean isPasswordValid = isPasswordValid(registerDTO.getPassword());
-        boolean isPasswordMatching = isPasswordMatching(registerDTO);
+    public boolean isValidRegisterDTO(RequestRegisterDTO requestRegisterDTO) {
+        boolean isEmailValid = isEmailUnique(requestRegisterDTO.getEmail());
+        boolean isPasswordValid = isPasswordValid(requestRegisterDTO.getPassword());
+        boolean isPasswordMatching = isPasswordMatching(requestRegisterDTO);
 
         return isEmailValid && isPasswordValid && isPasswordMatching;
     }
@@ -64,18 +64,18 @@ public class UserValidator {
         return isValid;
     }
 
-    public boolean isPasswordMatching(RegisterDTO registerDTO) {
-        boolean matches = registerDTO.getPassword().equals(registerDTO.getConfirmPassword());
+    public boolean isPasswordMatching(RequestRegisterDTO requestRegisterDTO) {
+        boolean matches = requestRegisterDTO.getPassword().equals(requestRegisterDTO.getConfirmPassword());
         if (!matches) {
-            log.warn("Passwords provided for user {} do not match.", registerDTO.getEmail());
+            log.warn("Passwords provided for user {} do not match.", requestRegisterDTO.getEmail());
         }
         return matches;
     }
 
-    public UserLogin populateUserWithValues(RegisterDTO registerDTO) {
-        UserLogin userLogin = mapper.map(registerDTO, UserLogin.class);
+    public UserLogin populateUserWithValues(RequestRegisterDTO requestRegisterDTO) {
+        UserLogin userLogin = mapper.map(requestRegisterDTO, UserLogin.class);
         userLogin.setRole(Role.ROLE_USER);
-        userLogin.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
+        userLogin.setPassword(passwordEncoder.encode(requestRegisterDTO.getPassword()));
         userLogin.setStatus(Status.ACTIVE);
         userLogin.assignCreatedDate();
         return userLogin;
