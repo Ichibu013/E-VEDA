@@ -8,14 +8,15 @@ import closeIcon from './Assets/close-icon.png';
 function Navbar({ isNavbarOpen, toggleNavbar }) {
   return (
     <nav className="navbar">
-      <div className="container flex">
+      <>
         <a href="#home" className="navbar-brand">
           <img src={logo} alt="Logo" />
         </a>
         <button className="hamburger" onClick={toggleNavbar}>
           <img src={isNavbarOpen ? closeIcon : menuIcon} alt="menu" />
         </button>
-
+      </>
+      <div className="container flex">
         <div className={`navbar-collapse ${isNavbarOpen ? 'open' : ''}`}>
           <ul className="navbar-nav">
             <li className="nav-item">
@@ -44,7 +45,7 @@ function Navbar({ isNavbarOpen, toggleNavbar }) {
               </a>
             </li>
             <li className="nav-item">
-              <a href="#signup" className="nav-link" onClick={toggleNavbar}>
+              <a href="#signup" className="nav-link " onClick={toggleNavbar}>
                 Sign Up
               </a>
             </li>

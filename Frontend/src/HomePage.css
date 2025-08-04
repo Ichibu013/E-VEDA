@@ -43,10 +43,12 @@ img {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 1rem;
   background-color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 
 .bg-blue {
@@ -85,7 +87,7 @@ img {
 }
 
 .py {
-  padding: 5rem 0;
+  padding: 2rem 0;
 }
 
 .grid {
@@ -96,7 +98,7 @@ img {
 }
 
 .flex {
-  display: flex;
+  /* display: flex; */
   align-items: center;
   justify-content: center;
 }
@@ -163,6 +165,7 @@ img {
 }
 
 .navbar {
+  display: flex;
   background-color: var(--white);
   padding: 1rem 2rem;
   position: sticky;
@@ -197,6 +200,55 @@ img {
   transition: color 0.3s ease;
 }
 
+/* === Base nav-link styling (you can adjust var‑values to fit your theme) */
+
+.navbar-nav .nav-item > .nav-link {
+  color: var(--text-color, #333);
+  padding: 0.5rem, 1rem;
+  display: inline-block;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border: 1px solid transparent;
+}
+
+/* Hover & focus states improve accessibility for keyboard users */
+.navbar-nav .nav-item > .nav-link:hover,
+.navbar-nav .nav-item > .nav-link:focus {
+  background-color: var(--dark-blue);
+  color: var(--light-blue, #000);
+  text-decoration: none;
+}
+
+/* === Specific button look for Login */
+.navbar-nav a[href='#login'].nav-link {
+  color: var(--white);
+  background-color: var(--light-blue);
+  border-color: var(--blue);
+}
+
+.navbar-nav a[href='#login'].nav-link:hover,
+.navbar-nav a[href='#login'].nav-link:focus {
+  background-color: transparent;
+  color: var(--blue);
+}
+
+/* === Specific button look for Sign Up */
+.navbar-nav a[href='#signup'].nav-link {
+  color: var(--white);
+  background-color: var(--light-blue);
+  border-color: var(--blue);
+}
+.navbar-nav a[href='#signup'].nav-link:hover,
+.navbar-nav a[href='#signup'].nav-link:focus {
+  background-color: transparent;
+  color: var(--light-blue);
+}
+
+.navbar-nav .nav-item .nav-link:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+  border-radius: 5px;
+}
+
 .nav-item .nav-link:hover {
   color: var(--blue);
 }
@@ -211,12 +263,13 @@ img {
 .header {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .header-inner {
   flex-grow: 1;
   display: flex;
-  align-items: center;
+  /* align-items: center; */
 }
 
 .header-inner-left h1 {

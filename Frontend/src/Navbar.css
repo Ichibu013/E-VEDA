@@ -1,5 +1,5 @@
 /* Navbar.css */
-.navbar {
+/* .navbar {
   background-color: var(--white);
   padding: 1rem 2rem;
   position: sticky;
@@ -38,7 +38,7 @@
   gap: 1.5rem;
   list-style: none;
   padding: 0;
-}
+} */
 
 .nav-item .nav-link {
   text-decoration: none;
@@ -47,11 +47,12 @@
   transition: color 0.3s ease;
 }
 
-.nav-item .nav-link:hover {
-  color: var(--blue);
-}
+/* .nav-item .nav-link:hover {
+  color: var(--light-blue);
+  background-color: transparent;
+} */
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .hamburger {
     display: block;
   }
@@ -75,4 +76,4 @@
     flex-direction: column;
     gap: 1rem;
   }
-}
+} */
