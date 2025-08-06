@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import './HomePage.css';
-import headerImg from './Assets/header.png';
-import aboutImg from './Assets/about-img.png';
-import doc1 from './Assets/doc-1.png';
-import doc2 from './Assets/doc-2.png';
-import doc3 from './Assets/doc-3.png';
+import '../Styles/HomePage.css';
+import headerImg from '../Assets/header.png';
+import aboutImg from '../Assets/about-img.png';
+import doc1 from '../Assets/doc-1.png';
+import doc2 from '../Assets/doc-2.png';
+import doc3 from '../Assets/doc-3.png';
 
 // Import the new Navbar component
-import Navbar from './Navbar';
+import Navbar from '../Components/Navbar';
 
 function HomePage() {
   // State for the navbar is now managed here
@@ -26,7 +26,7 @@ function HomePage() {
       </header>
 
       <main>
-        <div className="header-inner text-white text-center">
+        <section className="health py">
           <div className="container grid">
             <div className="header-inner-left">
               <h1>
@@ -51,7 +51,7 @@ function HomePage() {
               <img src={headerImg} alt="header visual" />
             </div>
           </div>
-        </div>
+        </section>
 
         {/* About */}
         <section id="about" className="about py">
