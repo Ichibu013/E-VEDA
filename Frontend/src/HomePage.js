@@ -26,34 +26,32 @@ function HomePage() {
       </header>
 
       <main>
-        <section>
-          <div className="header-inner text-white text-center">
-            <div className="container grid">
-              <div className="header-inner-left">
-                <h1>
-                  Your most trusted
-                  <br /> <span>health partner</span>
-                </h1>
-                <p className="lead">the best match services for you</p>
-                <p className="text text-md">
-                  Pain itself is something that is very important, and it is
-                  pursued by those who desire it because of the consequences.
-                </p>
-                <div className="btn-group">
-                  <a href="#about" className="btn btn-white">
-                    Learn More
-                  </a>
-                  <a href="#contact" className="btn btn-light-blue">
-                    Sign In
-                  </a>
-                </div>
-              </div>
-              <div className="header-inner-right">
-                <img src={headerImg} alt="header visual" />
+        <div className="header-inner text-white text-center">
+          <div className="container grid">
+            <div className="header-inner-left">
+              <h1>
+                Your most trusted
+                <br /> <span>health partner</span>
+              </h1>
+              <p className="lead">the best match services for you</p>
+              <p className="text text-md">
+                Pain itself is something that is very important, and it is
+                pursued by those who desire it because of the consequences.
+              </p>
+              <div className="btn-group">
+                <a href="#about" className="btn btn-white">
+                  Learn More
+                </a>
+                <a href="#contact" className="btn btn-light-blue">
+                  Sign In
+                </a>
               </div>
             </div>
+            <div className="header-inner-right">
+              <img src={headerImg} alt="header visual" />
+            </div>
           </div>
-        </section>
+        </div>
 
         {/* About */}
         <section id="about" className="about py">

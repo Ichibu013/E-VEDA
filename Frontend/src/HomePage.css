@@ -184,11 +184,6 @@ img {
   height: 40px;
 }
 
-.navbar-collapse {
-  display: flex;
-  gap: 2rem;
-}
-
 .navbar-nav {
   display: flex;
   gap: 2rem;
@@ -417,6 +412,10 @@ img {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .navbar-collapse.open {
+    right: 0;
+  }
+
   .navbar-collapse {
     position: fixed;
     top: 0;
@@ -430,10 +429,6 @@ img {
     gap: 1.5rem;
     transition: right 0.3s ease;
     z-index: 999;
-  }
-
-  .navbar-collapse.open {
-    right: 0;
   }
 
   .navbar-nav {
