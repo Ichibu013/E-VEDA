@@ -29,6 +29,7 @@ body,
 
 /* Apply the background gradient globally to the body */
 body {
+<<<<<<< HEAD
   background: linear-gradient(
     135deg,
     var(--veda-blue-dark) 0%,
@@ -36,10 +37,15 @@ body {
     var(--veda-green-light) 100%
   );
   /* We'll make #root handle centering */
+=======
+    background: linear-gradient(135deg, var(--veda-blue-dark) 0%, var(--veda-blue-light) 50%, var(--veda-green-light) 100%);
+    /* We'll make #root handle centering */
+>>>>>>> develop
 }
 
 /* Make #root the main flex container for your app content */
 #root {
+<<<<<<< HEAD
   display: flex;
   flex-direction: column; /* Organize content vertically */
   justify-content: center; /* Center content vertically within #root */
@@ -47,4 +53,13 @@ body {
   min-height: 100vh; /* Ensure #root fills the viewport */
   width: 100%; /* Ensure #root spans full width */
   overflow: hidden; /* Hide overflow if content goes out of bounds */
+=======
+    display: flex;
+    flex-direction: column; /* Organize content vertically */
+    justify-content: center; /* Center content vertically within #root */
+    align-items: center; /* Center content horizontally within #root */
+    min-height: 100vh; /* Ensure #root fills the viewport */
+    width: 100%; /* Ensure #root spans full width */
+    overflow: hidden; /* Hide overflow if content goes out of bounds */
+>>>>>>> develop
 }
