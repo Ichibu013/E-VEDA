@@ -20,7 +20,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final String secretKey = "fa4527d9746eb33a1593579bb307e12cda106965b457a12a2fe0b80f3dea4f7057ac95c4c6f3629735bfc94d36951edbad27326673c7f9fb8858a754c971f948";
+    private static final String secretKey = "E_VEDA_SECRET_KEY";
     private static final long jwtExpirationMs = 3600000 ;
 
 
