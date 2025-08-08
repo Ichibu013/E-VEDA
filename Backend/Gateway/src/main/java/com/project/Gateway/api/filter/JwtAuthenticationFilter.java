@@ -45,7 +45,7 @@ import java.io.IOException;
  * To use this filter, it should be added as a pre-authentication filter in the Spring Security
  * filter chain, typically before `UsernamePasswordAuthenticationFilter`.
  */
-@Component
+@Component("apiJwtAuthenticationFilter")
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;

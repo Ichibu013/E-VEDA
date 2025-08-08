@@ -1,9 +1,10 @@
 package com.project.Gateway.service.interfaces;
 
+import com.project.Gateway.dto.request.userLogin.RequestLoginDTO;
+import com.project.Gateway.dto.request.userLogin.RequestRegisterDTO;
+import com.project.Gateway.dto.response.userLogin.ResponseRegisterDTO;
 import com.project.common.dto.response.AuthResponse;
 import com.project.common.dto.response.GenericResponse;
-import com.project.Gateway.dto.userLogin.LoginDTO;
-import com.project.Gateway.dto.userLogin.RegisterDTO;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,10 +14,12 @@ import org.springframework.stereotype.Service;
 @Service("IUserLoginService")
 public interface IUserLoginService {
 
-    GenericResponse<LoginDTO> login(LoginDTO loginDTO);
+    GenericResponse<ResponseRegisterDTO> register(RequestRegisterDTO requestRegisterDTO);
 
-    GenericResponse<RegisterDTO> register(RegisterDTO registerDTO);
+    AuthResponse authenticate(RequestLoginDTO loginDTO);
 
-    AuthResponse authenticate(LoginDTO loginDTO);
+    GenericResponse<String> forgetPassword(String email);
+
+    GenericResponse<String> resetPassword(String token,String password);
 
 }

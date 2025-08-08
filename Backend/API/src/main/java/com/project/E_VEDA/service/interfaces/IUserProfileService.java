@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
  * Service interface for managing the user profile operations.
  * Provides methods to fetch, update, and delete user profile details.
  */
-@Service("IFullUserDetailsService")
-public interface IFullUserDetailsService {
+@Service("IUserProfileService")
+public interface IUserProfileService {
 
     GenericResponse<ProfileDTO> getProfile(String userId);
 
-    GenericResponse<ProfileDTO> updateProfile(String userId, ProfileDTO profileDTO);
+    GenericResponse<ProfileDTO> createAndUpdateProfile(String userId, ProfileDTO profileDTO);
 
     GenericResponse<ProfileDTO> deleteProfile(String userId);
 

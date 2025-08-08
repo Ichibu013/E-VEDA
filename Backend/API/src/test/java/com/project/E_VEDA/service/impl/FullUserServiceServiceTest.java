@@ -1,21 +1,23 @@
 package com.project.E_VEDA.service.impl;
 
-import com.project.common.common.utils.GenericResponseFactory;
 import com.project.E_VEDA.domain.entity.FullUserDetails;
 import com.project.E_VEDA.dto.fullUserDetails.ProfileDTO;
+import com.project.E_VEDA.repository.IUserDetailsRepository;
+import com.project.common.common.utils.GenericResponseFactory;
 import com.project.common.dto.response.GenericResponse;
 import com.project.common.mapping.GenericDtoMapper;
-import com.project.E_VEDA.repository.IUserDetailsRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +34,9 @@ public class FullUserServiceServiceTest {
 
     @Mock
     private GenericDtoMapper mapper;
+
+    @Mock
+    private MessageSource messageSource;
 
 //    public FullUserServiceServiceTest() {
 //        MockitoAnnotations.openMocks(this);
@@ -61,7 +66,8 @@ public class FullUserServiceServiceTest {
         when(mapper.map(Optional.of(userDetails), ProfileDTO.class)).thenReturn(profileDTO);
         when(genericResponseFactory.successResponse(HttpStatus.OK,
                 profileDTO,
-                "user.profile.success"))
+                "user.profile.success",
+                messageSource))
                 .thenReturn(expectedResponse);
 
         // Act
@@ -69,16 +75,17 @@ public class FullUserServiceServiceTest {
 
         // Assert
         Assertions.assertNotNull(actualResponse);
-        Assertions.assertEquals(expectedResponse.getHttpStatus(), actualResponse.getHttpStatus());
-        Assertions.assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
-        Assertions.assertEquals(expectedResponse.getData(), actualResponse.getData());
-        Assertions.assertEquals(expectedResponse.getSuccess(), actualResponse.getSuccess());
+        assertEquals(expectedResponse.getHttpStatus(), actualResponse.getHttpStatus());
+        assertEquals(expectedResponse.getMessage(), actualResponse.getMessage());
+        assertEquals(expectedResponse.getData(), actualResponse.getData());
+        assertEquals(expectedResponse.getSuccess(), actualResponse.getSuccess());
         verify(userDetailsRepository,times(1)).findById(userId);
         verify(mapper,times(1)).map(Optional.of(userDetails), ProfileDTO.class);
         verify(genericResponseFactory,times(1)).successResponse(
                 HttpStatus.OK,
                 profileDTO,
-                "user.profile.success");
+                "user.profile.success",
+                messageSource);
         verify(genericResponseFactory,times(0)).errorResponse(
                 HttpStatus.NOT_FOUND,
                 null,
