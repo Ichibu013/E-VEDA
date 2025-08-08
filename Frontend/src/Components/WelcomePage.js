@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './WelcomePage.css'; // Ensure this CSS file exists and is linked properly
-import doctImage from './Assets/doct.PNG';
+import '../Styles/WelcomePage.css'; // Ensure this CSS file exists and is linked properly
+import doctImage from '../Assets/doct.PNG';
+import '../Styles/HomePage.css';
 
 function WelcomePage() {
   const navigate = useNavigate();

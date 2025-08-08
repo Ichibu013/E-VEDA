@@ -33,7 +33,7 @@ import java.io.IOException;
  * - Handles exceptions that may occur during the process and sets appropriate
  *   HTTP responses. <br>
  */
-@Component
+@Component("gatewayJwtAuthenticationFilter")
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
