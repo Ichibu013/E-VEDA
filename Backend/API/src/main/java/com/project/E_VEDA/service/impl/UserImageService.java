@@ -12,6 +12,7 @@ import com.project.common.common.utils.GenericResponseFactory;
 import com.project.common.dto.response.GenericResponse;
 import com.project.common.mapping.GenericDtoMapper;
 
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,12 +42,12 @@ public class UserImageService extends BaseService implements IUserImageService {
     private static final long MAX_FILE_SIZE = 1024 * 1024 * 5;
     private final IUserImageRepository userImageRepository;
 
-
     public UserImageService(IUserDetailsRepository userDetailsRepository,
+                            MessageSource messageSource,
                             GenericResponseFactory genericResponseFactory,
                             GenericDtoMapper mapper,
                             IUserImageRepository userImageRepository) {
-        super(userDetailsRepository, genericResponseFactory, mapper);
+        super(userDetailsRepository, messageSource, genericResponseFactory, mapper);
         this.userImageRepository = userImageRepository;
     }
 

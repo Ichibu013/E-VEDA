@@ -5,6 +5,7 @@ import com.project.E_VEDA.repository.IUserDetailsRepository;
 import com.project.common.common.utils.GenericResponseFactory;
 import com.project.common.dto.response.GenericResponse;
 import com.project.common.mapping.GenericDtoMapper;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
@@ -21,14 +22,17 @@ public class BaseService {
 
     protected final IUserDetailsRepository userDetailsRepository;
 
+    protected final MessageSource messageSource;
+
     protected final GenericResponseFactory genericResponseFactory;
 
     protected final GenericDtoMapper mapper;
 
-    protected BaseService(IUserDetailsRepository userDetailsRepository,
-                       GenericResponseFactory genericResponseFactory,
-                       GenericDtoMapper mapper) {
+    protected BaseService(IUserDetailsRepository userDetailsRepository, MessageSource messageSource,
+                          GenericResponseFactory genericResponseFactory,
+                          GenericDtoMapper mapper) {
         this.userDetailsRepository = userDetailsRepository;
+        this.messageSource = messageSource;
         this.genericResponseFactory = genericResponseFactory;
         this.mapper = mapper;
     }
@@ -38,7 +42,7 @@ public class BaseService {
     }
 
     protected   <T> GenericResponse<T> buildSuccessResponse(T data, String message) {
-        return genericResponseFactory.successResponse(HttpStatus.OK, data, message);
+        return genericResponseFactory.successResponse(HttpStatus.OK, data, message,messageSource);
     }
 
 }
