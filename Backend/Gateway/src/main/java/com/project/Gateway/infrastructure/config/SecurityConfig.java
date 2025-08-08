@@ -45,7 +45,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * - AuthenticationManager: Provides the default authentication manager configured by Spring Security. <br>
  * - PasswordEncoder: Configures BCryptPasswordEncoder for secure hashing of passwords. <br>
  */
-@Configuration
+@Configuration("apiConfig")
 @EnableWebSecurity
 public class SecurityConfig {
 
@@ -72,13 +72,14 @@ public class SecurityConfig {
      * @return a fully configured SecurityFilterChain that represents the security configuration
      * @throws Exception if an error occurs while building the security configuration
      */
-    @Bean
+    @Bean(name = "apiSecurityFilterChain")
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
+                .securityMatcher("/password/**","/api/auth/**")
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/password/**","/api/auth/**").permitAll()
                                 .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -121,7 +122,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {

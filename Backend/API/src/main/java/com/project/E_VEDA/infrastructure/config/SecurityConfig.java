@@ -1,27 +1,15 @@
-package com.project.E_VEDA.infrastructure.config;
+    package com.project.E_VEDA.infrastructure.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.E_VEDA.api.filter.JwtAuthenticationFilter;
-import com.project.common.common.utils.GenericResponseFactory;
-import com.project.common.dto.response.GenericResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import javax.naming.AuthenticationException;
-import java.io.IOException;
 
 /**
  * SecurityConfig is a configuration class that sets up the security features for the application.
@@ -35,23 +23,21 @@ import java.io.IOException;
  * - Adds custom JWT-based authentication filter to the security filter chain to handle user authentication. <br>
  * - Implements a password encoder for securely hashing passwords. <br>
  */
-@Configuration
+@Configuration("gatewayConfig")
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    private final GenericResponseFactory genericResponseFactory;
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(GenericResponseFactory genericResponseFactory, JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.genericResponseFactory = genericResponseFactory;
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    @Bean
+    @Bean(name = "gatewaySecurityFilterChain" )
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
+                .securityMatcher("/api/protected/**")
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
@@ -61,22 +47,4 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-    private void handleAuthenticationException(HttpServletRequest request,
-                                               HttpServletResponse response,
-                                               String errorMessage,
-                                               HttpStatus status,
-                                               AuthenticationException e) throws IOException {
-        response.setStatus(status.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        GenericResponse<?> genericResponse = genericResponseFactory.errorResponse(status,
-                null,
-                errorMessage,
-                e);
-        response.getWriter().write(new ObjectMapper().writeValueAsString(genericResponse));
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 }

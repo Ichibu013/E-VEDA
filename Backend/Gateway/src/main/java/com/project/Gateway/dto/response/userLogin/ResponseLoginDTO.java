@@ -1,7 +1,11 @@
-package com.project.Gateway.dto.userLogin;
+package com.project.Gateway.dto.response.userLogin;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 /**
  * Data Transfer Object (DTO) representing the user's login details.
@@ -24,12 +28,18 @@ import lombok.Builder;
  */
 @Data
 @Builder
-public class LoginDTO {
+@NoArgsConstructor
+@AllArgsConstructor
+public class ResponseLoginDTO {
 
+    @NotBlank(message = "username.required")
     private String username;
 
+    @NotBlank(message = "email.required")
+    @Email(message = "email.invalid")
     private String email;
 
+    @NotBlank(message = "password.required")
     private String password;
     
     
