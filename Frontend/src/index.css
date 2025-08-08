@@ -2,42 +2,49 @@
 
 /* Define your E-VEDA brand colors and other common variables */
 :root {
-    --veda-blue-dark: #2B6CB0; /* Deep blue from your logo */
-    --veda-blue-light: #4A90E2; /* Lighter blue from your logo */
-    --veda-green-dark: #2F855A; /* Dark green from your logo */
-    --veda-green-light: #5AD381; /* Light green from your logo */
-    --text-dark: #333333;
-    --text-light: #f9f9f9;
-    --card-bg: rgba(255, 255, 255, 0.9); /* Slightly transparent white card */
-    --border-color: #CCCCCC;
-    --focus-color: var(--veda-green-light);
-    --header-text-color: #FFFFFF; /* White for header text if it were outside */
+  --veda-blue-dark: #2b6cb0; /* Deep blue from your logo */
+  --veda-blue-light: #4a90e2; /* Lighter blue from your logo */
+  --veda-green-dark: #2f855a; /* Dark green from your logo */
+  --veda-green-light: #5ad381; /* Light green from your logo */
+  --text-dark: #333333;
+  --text-light: #f9f9f9;
+  --card-bg: rgba(255, 255, 255, 0.9); /* Slightly transparent white card */
+  --border-color: #cccccc;
+  --focus-color: var(--veda-green-light);
+  --header-text-color: #ffffff; /* White for header text if it were outside */
 }
 
 /* Global HTML, Body, and Root Div Styles */
-html, body, #root {
-    margin: 0;
-    padding: 0;
-    height: 100%; /* Make sure they take full height */
-    min-height: 100vh; /* Ensure they take full viewport height */
-    font-family: 'Open Sans', sans-serif;
-    color: var(--text-dark); /* Default text color */
-    box-sizing: border-box; /* Include padding in width calculations */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: auto; /* Make sure they take full height */
+  min-height: 100vh; /* Ensure they take full viewport height */
+  font-family: 'Open Sans', sans-serif;
+  color: var(--text-dark); /* Default text color */
+  box-sizing: border-box; /* Include padding in width calculations */
 }
 
 /* Apply the background gradient globally to the body */
 body {
-    background: linear-gradient(135deg, var(--veda-blue-dark) 0%, var(--veda-blue-light) 50%, var(--veda-green-light) 100%);
-    /* We'll make #root handle centering */
+  background: linear-gradient(
+    135deg,
+    var(--veda-blue-dark) 0%,
+    var(--veda-blue-light) 50%,
+    var(--veda-green-light) 100%
+  );
+  /* We'll make #root handle centering */
 }
 
 /* Make #root the main flex container for your app content */
 #root {
-    display: flex;
-    flex-direction: column; /* Organize content vertically */
-    justify-content: center; /* Center content vertically within #root */
-    align-items: center; /* Center content horizontally within #root */
-    min-height: 100vh; /* Ensure #root fills the viewport */
-    width: 100%; /* Ensure #root spans full width */
-    overflow: hidden; /* Hide overflow if content goes out of bounds */
+  display: flex;
+  flex-direction: column; /* Organize content vertically */
+  justify-content: center; /* Center content vertically within #root */
+  align-items: center; /* Center content horizontally within #root */
+  min-height: 100vh; /* Ensure #root fills the viewport */
+  width: 100%; /* Ensure #root spans full width */
+  overflow: hidden; /* Hide overflow if content goes out of bounds */
 }

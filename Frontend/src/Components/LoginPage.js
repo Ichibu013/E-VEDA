@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './LoginPage.css'; // Component-specific styles
+import './LoginPage.css'; // Make sure this CSS file exists
 import logoImage from './Assets/bg remove logo.png';
 import sideIllustrationImage from './Assets/emo1.png';
 
@@ -10,17 +10,17 @@ function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you would typically send data to a backend
+    // You can add actual login logic here (API call, etc.)
     console.log('Login attempt:', { username, password, rememberMe });
     alert('Login functionality not implemented in this demo.');
   };
 
   return (
     <div className="page-container">
-      {/* Left Panel - AI Doctor Illustration */}
+      {/* Left Panel - Image or Illustration */}
       <div className="left-panel">
         <div className="ai-doctor-illustration">
-          <img src={sideIllustrationImage} alt="AI Doctor Illustration" />
+          <img src={sideIllustrationImage} alt="Illustration of AI Doctor" />
         </div>
       </div>
 
@@ -65,7 +65,11 @@ function LoginPage() {
                 />
                 Remember Me
               </label>
-              <a href="#" className="forgot-password">
+              <a
+                href="#"
+                className="forgot-password"
+                onClick={(e) => e.preventDefault()}
+              >
                 Forgot Password?
               </a>
             </div>
