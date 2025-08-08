@@ -2,7 +2,6 @@ package com.project.Gateway.service.impl;
 
 import com.project.Gateway.domain.entity.UserLogin;
 import com.project.Gateway.repository.IUserRepository;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,8 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 /**
  * Implementation of the Spring Security UserDetailsService interface for loading
@@ -24,15 +22,15 @@ import java.util.stream.Collectors;
  * - Fetches user details from the IUserRepository based on the provided username. <br>
  * - Constructs a UserDetails object containing the user's credentials and granted authorities. <br>
  * - Throws a UsernameNotFoundException if the user is not found in the database. <br>
- *  <br>
+ * <br>
  * Dependencies: <br>
  * - IUserRepository: Repository interface for retrieving UserLogin entities. <br>
- *  <br>
+ * <br>
  * Methods: <br>
  * - `loadUserByUsername(String username)`: Retrieves the user information and
- *   returns a UserDetails object for authentication.
+ * returns a UserDetails object for authentication.
  */
-@Service
+@Service("gatewayUserDetailsService")
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final IUserRepository userRepository;
@@ -56,10 +54,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         UserLogin user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email : " + email));
 
-        Set<GrantedAuthority> authorities = user.getRole().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getDeclaringClass().getName()))
-                .collect(Collectors.toSet());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
 
-        return new User(user.getUsername(), user.getPassword(), authorities);
+        return new User(user.getUsername(), user.getPassword(), Collections.singleton(authority));
     }
 }

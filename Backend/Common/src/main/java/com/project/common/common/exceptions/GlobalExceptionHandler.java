@@ -4,7 +4,6 @@ import com.project.common.common.utils.GenericResponseFactory;
 import com.project.common.dto.response.GenericResponse;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,51 +17,42 @@ import java.util.Map;
  * It extends RuntimeException and utilizes Spring's @RestControllerAdvice
  * to intercept exceptions across controllers.
  * <p>
- * This handler leverages a GenericResponseFactory to construct structured responses,
- * encapsulating error details, HTTP status, messages, and metadata in a unified format.
- * Two custom exceptions, ResourceNotFoundException and InvalidFileException, are managed
- * by this handler, ensuring consistent JSON responses for not found and invalid file errors.
- * </p> <p>
- * Logging is integrated to capture detailed information about errors for troubleshooting
- * and debugging purposes.
- * </p> <p>
- * Dependencies: <br>
- * - GenericResponseFactory: Facilitates creation of standard response objects. <br>
- * - MessageSource: Provides localized error messages as part of the response. <br>
- * </p>
+ *
  * Exception handlers: <br>
  * - handleResourceNotFoundException: Handles ResourceNotFoundException. <br>
  * - handleInvalidFileException: Handles InvalidFileException. <br>
+ * - handleLoginFailedException: Handles LoginFailedException. <br>
+ * - handleRegistrationFailedException: Handles RegistrationFailedException. <br>
  */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends RuntimeException {
 
     private final GenericResponseFactory genericResponseFactory;
-    private final MessageSource messageSource;
 
-    public GlobalExceptionHandler(GenericResponseFactory genericResponseFactory,
-                                  MessageSource messageSource) {
+    public GlobalExceptionHandler(GenericResponseFactory genericResponseFactory) {
         this.genericResponseFactory = genericResponseFactory;
-        this.messageSource = messageSource;
     }
 
     /**
-     * Handles the {@link ResourceNotFoundException} and provides a structured response
-     * containing detailed error information.
+     * Handles the {@link ResourceNotFoundException} and generates a structured response
+     * with error details, HTTP status, and error message.
      *
      * @param ex the {@link ResourceNotFoundException} thrown when a requested resource is not found
      * @return a {@link ResponseEntity} containing a {@link GenericResponse} object
-     *         populated with HTTP status, error message, and metadata
+     *         populated with HTTP status, error message, and additional error metadata
      */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<GenericResponse<Map<String, String>>> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        final GenericResponse<Map<String, String>> response = genericResponseFactory.errorResponse(HttpStatus.NOT_FOUND,
-                null,
-                ex.getMessage(),
-                ex.getCause());
         log.error("Resource not found: {}", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity
+                .ok()
+                .body(genericResponseFactory
+                        .errorResponse(
+                                HttpStatus.NOT_FOUND,
+                                getErrorDetails(ex),
+                                "resource.not.found")
+                );
     }
 
     /**
@@ -75,11 +65,103 @@ public class GlobalExceptionHandler extends RuntimeException {
      */
     @ExceptionHandler(InvalidFileException.class)
     public ResponseEntity<GenericResponse<Map<String, String>>> handleInvalidFileException(InvalidFileException ex) {
-        final GenericResponse<Map<String, String>> response = genericResponseFactory.errorResponse(HttpStatus.BAD_REQUEST,
-                null,
-                ex.getMessage(),
-                ex.getCause());
         log.error("Invalid file: {}", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity
+                .ok()
+                .body(genericResponseFactory
+                        .errorResponse(
+                                HttpStatus.BAD_REQUEST,
+                                getErrorDetails(ex),
+                                "invalid.file")
+                );
+    }
+
+    /**
+     * Handles the {@link LoginFailedException} and generates a structured response
+     * with error details, HTTP status, and an error message.
+     *
+     * @param ex the {@link LoginFailedException} thrown when a login attempt fails
+     * @return a {@link ResponseEntity} containing a {@link GenericResponse} object
+     *         populated with HTTP status, error message, and additional error metadata
+     */
+    @ExceptionHandler(LoginFailedException.class)
+    public ResponseEntity<GenericResponse<Map<String, String>>> handleLoginFailedException(LoginFailedException ex) {
+        log.error("Login failed: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(genericResponseFactory.errorResponse(
+                        HttpStatus.UNAUTHORIZED,
+                        getErrorDetails(ex),
+                        "user.login.failed")
+                );
+    }
+
+    /**
+     * Handles the {@link RegistrationFailedException} and generates a structured response
+     * with error details, HTTP status, and an appropriate error message.
+     *
+     * @param ex the {@link RegistrationFailedException} thrown when a registration attempt fails
+     * @return a {@link ResponseEntity} containing a {@link GenericResponse} object
+     *         populated with HTTP status, error details, and an error message
+     */
+    @ExceptionHandler(RegistrationFailedException.class)
+    public ResponseEntity<GenericResponse<Map<String,String>>> handleRegistrationFailedException(RegistrationFailedException ex){
+        log.error("Registration failed: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(genericResponseFactory
+                        .errorResponse(
+                                HttpStatus.BAD_REQUEST,
+                                getErrorDetails(ex),
+                                "user.registration.failed")
+                );
+    }
+
+    @ExceptionHandler(NoUserProfileException.class)
+    public ResponseEntity<GenericResponse<Map<String,String>>> handleNoUserProfileException(NoUserProfileException ex){
+        log.error("No user profile found: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(genericResponseFactory
+                        .errorResponse(
+                                HttpStatus.NOT_FOUND,
+                                getErrorDetails(ex),
+                                "user.profile.not.found")
+                );
+    }
+
+    @ExceptionHandler(PassTokenInvalidException.class)
+    public ResponseEntity<GenericResponse<Map<String,String>>> handlePassTokenInvalidException(PassTokenInvalidException exc){
+        log.error("Pass token invalid: {}", exc.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(genericResponseFactory
+                    .errorResponse(
+                            HttpStatus.BAD_REQUEST,
+                            getErrorDetails(exc),
+                            "user.pass.token.invalid"
+                    )
+                );
+    }
+
+    /**
+     * Extracts error details from the provided exception by recursively traversing
+     * the exception cause chain and returning a map containing an error message.
+     * If no specific details are found in the exception cause, it defaults to the
+     * message of the given exception.
+     *
+     * @param ex the {@link Throwable} instance from which error details are to be extracted
+     * @return a {@link Map} containing error details, typically with a key "message"
+     *         and its corresponding description
+     */
+    private Map<String, String> getErrorDetails(Throwable ex) {
+        Map<String, String> errorDetails = null;
+        if (ex.getCause() != null) {
+            errorDetails = getErrorDetails(ex.getCause());
+        }
+        if (errorDetails == null) {
+            errorDetails = Map.of("message", ex.getMessage());
+        }
+        return errorDetails;
     }
 }

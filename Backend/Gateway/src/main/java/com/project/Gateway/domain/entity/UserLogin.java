@@ -4,6 +4,7 @@ import com.project.E_VEDA.domain.entity.FullUserDetails;
 import com.project.common.common.emuns.Role;
 import com.project.common.common.emuns.Status;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -11,8 +12,8 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.Instant;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Represents a UserLogin entity.
@@ -43,6 +44,7 @@ import java.util.Set;
  * - A one-to-one relationship with the FullUserDetails entity through the "user_id" foreign key.
  */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "user_login")
@@ -61,7 +63,7 @@ public class UserLogin {
     private String password;
 
     @Field(name = "Role")
-    private Set<Role> role;
+    private Role role;
 
     @Field(name = "status")
     private Status status;
@@ -71,7 +73,7 @@ public class UserLogin {
     private FullUserDetails fullUserDetails;
 
     @Field(name = "created_date")
-    private String createdDate;
+    private Instant createdDate;
 
     @Override
     public boolean equals(Object o) {
@@ -108,5 +110,9 @@ public class UserLogin {
                 ", fullUserDetails=" + fullUserDetails +
                 ", createdDate='" + createdDate + '\'' +
                 '}';
+    }
+
+    public void assignCreatedDate() {
+        this.createdDate = Instant.now();
     }
 }

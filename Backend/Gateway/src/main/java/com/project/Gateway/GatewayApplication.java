@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
  * The main method initializes the application using SpringApplication.run.
  */
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.project.common","com.project.Gateway","com.project.E_VEDA"})
+@ComponentScan(basePackages = {"com.project.common","com.project.Gateway", "com.project.E_VEDA"})
 public class GatewayApplication {
 
 	public static void main(String[] args) {
