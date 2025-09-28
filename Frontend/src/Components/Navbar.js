@@ -2,7 +2,7 @@
 import React from 'react';
 import '../Styles/HomePage.css';
 import { useNavigate } from 'react-router-dom';
-import logo from '../Assets/bg remove logo.png';
+// import logo from '../Assets/bg remove logo.png';
 import menuIcon from '../Assets/ham-menu-icon.png';
 import closeIcon from '../Assets/close-icon.png';
 // import LoginPage from '../Styles/LoginPage.css';
@@ -16,9 +16,9 @@ function Navbar({ isNavbarOpen, toggleNavbar }) {
   return (
     <nav className="navbar container flex">
       <>
-        <a href="#home" className="navbar-brand">
+        {/* <a href="#home" className="navbar-brand">
           <img src={logo} alt="Logo" />
-        </a>
+        </a> */}
         <button className="hamburger" onClick={toggleNavbar}>
           <img src={isNavbarOpen ? closeIcon : menuIcon} alt="menu" />
         </button>
