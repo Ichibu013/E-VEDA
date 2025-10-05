@@ -1,17 +1,24 @@
 // Navbar.jsx
 import React from 'react';
 import '../Styles/HomePage.css';
-import logo from '../Assets/bg remove logo.png';
+import { useNavigate } from 'react-router-dom';
+// import logo from '../Assets/bg remove logo.png';
 import menuIcon from '../Assets/ham-menu-icon.png';
 import closeIcon from '../Assets/close-icon.png';
+// import LoginPage from '../Styles/LoginPage.css';
 
 function Navbar({ isNavbarOpen, toggleNavbar }) {
+  const navigate = useNavigate();
+
+  const handleProceedClick = () => {
+    navigate('/Login');
+  };
   return (
     <nav className="navbar container flex">
       <>
-        <a href="#home" className="navbar-brand">
+        {/* <a href="#home" className="navbar-brand">
           <img src={logo} alt="Logo" />
-        </a>
+        </a> */}
         <button className="hamburger" onClick={toggleNavbar}>
           <img src={isNavbarOpen ? closeIcon : menuIcon} alt="menu" />
         </button>
@@ -39,15 +46,15 @@ function Navbar({ isNavbarOpen, toggleNavbar }) {
             </a>
           </li>
           <li className="nav-item">
-            <a href="#login" className="nav-link" onClick={toggleNavbar}>
+            <a href="#login" className="nav-link" onClick={handleProceedClick}>
               Login
             </a>
           </li>
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <a href="#signup" className="nav-link " onClick={toggleNavbar}>
               Sign Up
             </a>
-          </li>
+          </li> */}
         </ul>
       </div>
     </nav>

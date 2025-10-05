@@ -183,7 +183,7 @@ h3 {
 .navbar {
   display: flex;
   background-color: var(--white);
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 1rem 2rem;
   position: fixed;
   top: 0;
@@ -247,6 +247,9 @@ h3 {
   color: var(--white);
   background-color: var(--light-blue);
   border-color: var(--blue);
+  padding-right: 5px;
+  padding-left: 5px;
+  border-radius: 5px;
 }
 
 .navbar-nav a[href='#login'].nav-link:hover,

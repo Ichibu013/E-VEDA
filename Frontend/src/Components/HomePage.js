@@ -5,6 +5,7 @@ import aboutImg from '../Assets/about-img.png';
 import doc1 from '../Assets/doc-1.png';
 import doc2 from '../Assets/doc-2.png';
 import doc3 from '../Assets/doc-3.png';
+import doc4 from '../Assets/doc-4.png';
 
 // Import the new Navbar component
 import Navbar from '../Components/Navbar';
@@ -163,6 +164,16 @@ function HomePage() {
                   <img src={doc3} alt="doc1" />
                   <div className="info text-center bg-blue text-white flex">
                     <p className="lead">Shreeya Shinde</p>
+                    <p className="text-lg">Medicine</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="doc-panel-item">
+                <div className="img flex">
+                  <img src={doc4} alt="doc1" />
+                  <div className="info text-center bg-blue text-white flex">
+                    <p className="lead">Rohini Sharma</p>
                     <p className="text-lg">Medicine</p>
                   </div>
                 </div>
