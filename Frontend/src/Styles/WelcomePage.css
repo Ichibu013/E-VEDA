@@ -1,200 +1,93 @@
 /* src/WelcomePage.css */
 
 .landing-container {
-  background: linear-gradient(135deg, #1a237e 0%, #1976d2 100%);
-  min-height: 100vh;
+  text-align: center;
+  padding: 20px;
+  max-width: 800px;
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 4rem 2rem;
-  position: relative;
+  min-height: 100vh; /* Ensures it takes full height and positions content properly */
   overflow: hidden;
+  /* Add a temporary background here for debugging if needed, remove later */
+  /* background-color: rgba(255, 255, 0, 0.2); */
 }
 
-.welcome-logo-section {
-  position: absolute;
-  top: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-}
-
-.welcome-logo-wrapper {
+.doctor-image-wrapper {
+  margin-bottom: 30px;
+  max-height: 90vh;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.welcome-logo {
-  width: 150px;
+.doctor-image-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
   height: auto;
   display: block;
-  filter: drop-shadow(0 8px 25px rgba(255, 255, 255, 0.5)) brightness(1.2) contrast(1.1);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 10px;
-  border-radius: 15px;
-  backdrop-filter: blur(5px);
-}
-
-.welcome-logo-text {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.welcome-logo-title {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--white);
-  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
-  letter-spacing: 2px;
-}
-
-.welcome-logo-subtitle {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  text-align: center;
-  letter-spacing: 0.5px;
-}
-
-.welcome-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  max-width: 1200px;
-  width: 100%;
-  margin-top: 120px;
-  padding: 0 4rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .welcome-text {
-  font-family: 'Poppins', sans-serif;
-  font-size: 4.5rem;
-  font-weight: 800;
-  color: var(--white);
-  margin-bottom: 2rem;
-  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-  line-height: 1.2;
-}
-
-.welcome-description {
-  font-family: 'Poppins', sans-serif;
-  font-size: 1.2rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.95);
-  line-height: 1.8;
-  margin-bottom: 3rem;
-  max-width: 700px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.8em;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-top: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .proceed-button {
   display: inline-block;
-  padding: 18px 40px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  color: var(--white);
-  font-size: 1.3rem;
+  padding: 15px 30px;
+  border: none;
+  margin-bottom: 25px;
+  border-radius: 8px;
+  background: linear-gradient(
+    to right,
+    var(--veda-blue-light),
+    var(--veda-green-dark)
+  );
+  color: var(--text-light);
+  font-size: 1.2em;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  font-family: 'Poppins', sans-serif;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .proceed-button:hover {
   transform: translateY(-3px);
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
 }
 
 /* Responsive Adjustments */
-@media (max-width: 992px) {
-  .welcome-content {
-    padding: 0 2rem;
-    margin-top: 100px;
-  }
-
-  .welcome-text {
-    font-size: 3.5rem;
-  }
-
-  .welcome-description {
-    font-size: 1.1rem;
-  }
-}
-
 @media (max-width: 768px) {
-  .landing-container {
-    padding: 3rem 1.5rem;
-  }
-
-  .welcome-logo-section {
-    top: 30px;
-  }
-
-  .welcome-logo {
-    width: 120px;
-  }
-
-  .welcome-logo-wrapper {
-    padding: 0.75rem;
-  }
-
-  .welcome-logo-title {
-    font-size: 1.4rem;
-  }
-
-  .welcome-logo-subtitle {
-    font-size: 0.7rem;
-  }
-
-  .welcome-content {
-    padding: 0 1.5rem;
-    margin-top: 80px;
-  }
-
   .welcome-text {
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
+    font-size: 2em;
   }
-
-  .welcome-description {
-    font-size: 1rem;
-    margin-bottom: 2rem;
-  }
-
   .proceed-button {
-    padding: 15px 30px;
-    font-size: 1.1rem;
+    padding: 12px 25px;
+    font-size: 1em;
+  }
+  .doctor-image-wrapper {
+    margin-bottom: 20px;
+    max-height: 50vh;
   }
 }
 
 @media (max-width: 480px) {
   .welcome-text {
-    font-size: 2rem;
+    font-size: 1.6em;
   }
-
-  .welcome-description {
-    font-size: 0.95rem;
-  }
-
   .proceed-button {
-    padding: 12px 25px;
-    font-size: 1rem;
+    padding: 10px 20px;
+    font-size: 0.9em;
   }
 }

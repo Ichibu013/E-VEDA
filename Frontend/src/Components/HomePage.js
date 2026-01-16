@@ -103,57 +103,6 @@ function HomePage() {
           </div>
         </section>
 
-        {/* Services */}
-        {/* <section id="services" className="services py">
-        <div className="container">
-          <div className="section-head text-center">
-            <h2 className="lead">The Best Doctor gives the least medicines</h2>
-            <p className="text text-lg">
-              We offer a comprehensive range of medical services designed to
-              meet your everyday health needs. From advanced diagnostics and
-              cardio monitoring to emergency care and personalized treatment
-              plans, our facility is equipped to handle both routine and
-              critical cases. Our mission is to deliver high-quality, accessible
-              healthcare that puts you first—always.
-            </p>
-            <div className="line-art flex">
-              <div></div>
-              <img src={dots} alt="decor" />
-              <div></div>
-            </div>
-          </div> */}
-
-        {/* <div className="services-inner text-center grid"> */}
-        {/* Repeat for all services with icons */}
-        {/* <article className="service-item">
-              <div className="icon"> */}
-        {/* Image paths need to be fixed here as well */}
-        {/* <img src={icon1} alt="icon1" />
-              </div>
-              <h3>Cardio Monitoring</h3>
-              <p className="text text-sm">
-                pain itself is something to be experienced; it is pursued by
-                those who desire it, because it brings some benefit."
-              </p>
-            </article> */}
-
-        {/* <article className="service-item">
-              <div className="icon"> */}
-        {/* Image paths need to be fixed here as well */}
-        {/* <img src={icon2} alt="icon2" />
-              </div>
-              <h3>Cardio Monitoring</h3>
-              <p className="text text-sm">
-                pain itself is something to be experienced; it is pursued by
-                those who desire it, because it brings some benefit."
-              </p>
-            </article> */}
-        {/* Add other services here */}
-        {/* </div>
-        </div>
-      </section> */}
-
-        {/* Features */}
         <section id="features" className="features py">
           <div className="container">
             <div className="section-head text-center">
