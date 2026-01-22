@@ -17,7 +17,8 @@ function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Login successful (demo)');
+    // Navigate to dashboard after successful login
+    navigate('/dashboard');
   };
 
 
@@ -37,29 +38,29 @@ function LoginPage() {
 
       <div className="right-panel">
         <div className="login-container">
-          <div className="card-brand-section">
-            <img src={logoImage} alt="E-VEDA Logo" className="logo-image" />
-            <span className="site-name">E-VEDA</span>
-          </div>
+            <div className="card-brand-section">
+              <img src={logoImage} alt="E-VEDA Logo" className="logo-image" />
+              <span className="site-name">E-VEDA</span>
+            </div>
 
           {/* Tagline always visible */}
           <p className="tagline">Emotion Video & Audio Diagnosis Assistant</p>
 
           {/* Login Form */}
-          <form onSubmit={handleSubmit}>
-            <div className="input-group">
-              <label htmlFor="username">Username / Email</label>
-              <input
-                type="text"
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-            </div>
+            <form onSubmit={handleSubmit}>
+              <div className="input-group">
+                <label htmlFor="username">Username / Email</label>
+                <input
+                  type="text"
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
+              </div>
 
-            <div className="input-group">
-              <label htmlFor="password">Password</label>
+              <div className="input-group">
+                <label htmlFor="password">Password</label>
               <div className="password-input-wrapper">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -85,39 +86,39 @@ function LoginPage() {
                   )}
                 </span>
               </div>
-            </div>
+              </div>
 
-            <div className="options-group">
-              <label className="remember-me">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                />
-                Remember Me
-              </label>
-              <span
-                className="forgot-password"
-                onClick={() => setShowForgotPassword(true)}
-              >
-                Forgot Password?
-              </span>
-            </div>
+              <div className="options-group">
+                <label className="remember-me">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  Remember Me
+                </label>
+                <span
+                  className="forgot-password"
+                  onClick={() => setShowForgotPassword(true)}
+                >
+                  Forgot Password?
+                </span>
+              </div>
 
-            <button type="submit" className="login-button">
-              Login
-            </button>
+              <button type="submit" className="login-button">
+                Login
+              </button>
 
-            <div className="or-separator">OR</div>
+              <div className="or-separator">OR</div>
 
-            <button
-              type="button"
-              className="login-button"
+              <button
+                type="button"
+                className="login-button"
               onClick={() => navigate('/signup')}
-            >
-              Create Account / Sign Up
-            </button>
-          </form>
+              >
+                Create Account / Sign Up
+              </button>
+            </form>
         </div>
       </div>
 

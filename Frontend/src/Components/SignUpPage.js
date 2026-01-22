@@ -18,9 +18,8 @@ function SignUpPage() {
       alert('Passwords do not match');
       return;
     }
-    alert('Account created successfully (demo)');
-    // Navigate to login page after successful signup
-    navigate('/login');
+    // Navigate to dashboard after successful signup
+    navigate('/dashboard');
   };
 
   return (
