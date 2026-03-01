@@ -1,0 +1,58 @@
+services:
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    environment:
+      - IAM_SERVICE_URL=iam-service:50052
+      - USER_SERVICE_URL=user-service:50051
+    ports:
+      - "8080:8080"
+    networks:
+      - frontend_net
+      - backend_net
+    depends_on:
+      - iam-service
+      - user-service
+
+  # -------------------------------------
+  # Microservices
+  # -------------------------------------
+  iam-service:
+    build:
+      context: .
+      dockerfile: iam-service/Dockerfile
+    environment:
+      # Pulls the common variable from your .env file
+      - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - "50052:50052"
+    networks:
+      - backend_net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    environment:
+      # Pulls the common variable from your .env file
+      - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - "50051:50051"
+    networks:
+      - backend_net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+# -------------------------------------
+# Networks
+# -------------------------------------
+networks:
+  frontend_net:
+    driver: bridge
+  backend_net:
+    driver: bridge
+    internal: true
