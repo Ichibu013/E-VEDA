@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../Styles/WelcomePage.css'; // Ensure this CSS file exists and is linked properly
+import '../Styles/WelcomePage.css';
 import doctImage from '../Assets/doct.PNG';
 import '../Styles/HomePage.css';
 
@@ -8,7 +8,7 @@ function WelcomePage() {
   const navigate = useNavigate();
 
   const handleProceedClick = () => {
-    navigate('/HomePage'); // Corrected route to the login page
+    navigate('/homepage');
   };
 
   return (
