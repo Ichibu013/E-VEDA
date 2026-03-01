@@ -1,0 +1,15 @@
+# Git and IDE
+.git
+.idea
+.vscode/
+
+# Local database volumes
+*_data/
+
+# Build outputs
+bin/
+*.exe
+*.out
+
+# Environment variables
+#.env

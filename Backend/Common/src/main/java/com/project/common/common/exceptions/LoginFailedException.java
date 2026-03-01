@@ -1,7 +1,0 @@
-package com.project.common.common.exceptions;
-
-public class LoginFailedException extends RuntimeException {
-    public LoginFailedException(String message) {
-        super(message);
-    }
-}

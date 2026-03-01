@@ -1,0 +1,37 @@
+// proto/iam.proto
+syntax = "proto3";
+package iam;
+option go_package = "e_veda/proto/iampb";
+
+service IAMService {
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc SignUp (SignUpRequest) returns (SignUpResponse);
+  rpc ValidateToken (TokenRequest) returns (ValidationResponse);
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message SignUpRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+}
+
+message TokenRequest {
+  string token = 1;
+}
+
+message ValidationResponse {
+  bool is_valid = 1;
+  string user_id = 2;
+}
+
+message SignUpResponse {
+  string user_uuid = 1;
+}
