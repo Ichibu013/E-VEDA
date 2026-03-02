@@ -5,6 +5,7 @@ import (
 	pb "e_veda/proto/iampb"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/redis/go-redis/v9"
 )
 
 var jwtSecretKey = []byte("your-e_veda-jwt-secret-key")
@@ -16,9 +17,10 @@ type Claims struct {
 
 type Server struct {
 	pb.UnimplementedIAMServiceServer
-	db *sql.DB
+	db  *sql.DB
+	rdb *redis.Client
 }
 
-func NewIAMServer(db *sql.DB) *Server {
-	return &Server{db: db}
+func NewIAMServer(db *sql.DB, rdb *redis.Client) *Server {
+	return &Server{db: db, rdb: rdb}
 }
