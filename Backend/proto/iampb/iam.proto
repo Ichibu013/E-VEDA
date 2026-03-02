@@ -6,7 +6,24 @@ option go_package = "e_veda/proto/iampb";
 service IAMService {
   rpc Login (LoginRequest) returns (LoginResponse);
   rpc SignUp (SignUpRequest) returns (SignUpResponse);
+  rpc ForgotPassword (ForgotPasswordRequest) returns (ApiResponse);
+  rpc VerifyOtp (VerifyOtpRequest) returns (VerifyOtpResponse);
+  rpc ResetPassword (ResetPasswordRequest) returns (ApiResponse);
   rpc ValidateToken (TokenRequest) returns (ValidationResponse);
+}
+
+message ForgotPasswordRequest {
+  string email = 1;
+}
+
+message VerifyOtpRequest {
+  string email = 1;
+  string otp= 2;
+}
+
+message ResetPasswordRequest {
+  string reset_token = 1;
+  string new_password = 2;
 }
 
 message LoginRequest {
@@ -34,4 +51,12 @@ message ValidationResponse {
 
 message SignUpResponse {
   string user_uuid = 1;
+}
+
+message VerifyOtpResponse {
+  string reset_token = 1;
+}
+
+message ApiResponse {
+  string message = 1;
 }

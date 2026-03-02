@@ -21,9 +21,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	IAMService_Login_FullMethodName         = "/iam.IAMService/Login"
-	IAMService_SignUp_FullMethodName        = "/iam.IAMService/SignUp"
-	IAMService_ValidateToken_FullMethodName = "/iam.IAMService/ValidateToken"
+	IAMService_Login_FullMethodName          = "/iam.IAMService/Login"
+	IAMService_SignUp_FullMethodName         = "/iam.IAMService/SignUp"
+	IAMService_ForgotPassword_FullMethodName = "/iam.IAMService/ForgotPassword"
+	IAMService_VerifyOtp_FullMethodName      = "/iam.IAMService/VerifyOtp"
+	IAMService_ResetPassword_FullMethodName  = "/iam.IAMService/ResetPassword"
+	IAMService_ValidateToken_FullMethodName  = "/iam.IAMService/ValidateToken"
 )
 
 // IAMServiceClient is the client API for IAMService service.
@@ -32,6 +35,9 @@ const (
 type IAMServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	SignUp(ctx context.Context, in *SignUpRequest, opts ...grpc.CallOption) (*SignUpResponse, error)
+	ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...grpc.CallOption) (*ApiResponse, error)
+	VerifyOtp(ctx context.Context, in *VerifyOtpRequest, opts ...grpc.CallOption) (*VerifyOtpResponse, error)
+	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 	ValidateToken(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*ValidationResponse, error)
 }
 
@@ -63,6 +69,36 @@ func (c *iAMServiceClient) SignUp(ctx context.Context, in *SignUpRequest, opts .
 	return out, nil
 }
 
+func (c *iAMServiceClient) ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...grpc.CallOption) (*ApiResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponse)
+	err := c.cc.Invoke(ctx, IAMService_ForgotPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) VerifyOtp(ctx context.Context, in *VerifyOtpRequest, opts ...grpc.CallOption) (*VerifyOtpResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VerifyOtpResponse)
+	err := c.cc.Invoke(ctx, IAMService_VerifyOtp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ApiResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponse)
+	err := c.cc.Invoke(ctx, IAMService_ResetPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *iAMServiceClient) ValidateToken(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*ValidationResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ValidationResponse)
@@ -79,6 +115,9 @@ func (c *iAMServiceClient) ValidateToken(ctx context.Context, in *TokenRequest, 
 type IAMServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	SignUp(context.Context, *SignUpRequest) (*SignUpResponse, error)
+	ForgotPassword(context.Context, *ForgotPasswordRequest) (*ApiResponse, error)
+	VerifyOtp(context.Context, *VerifyOtpRequest) (*VerifyOtpResponse, error)
+	ResetPassword(context.Context, *ResetPasswordRequest) (*ApiResponse, error)
 	ValidateToken(context.Context, *TokenRequest) (*ValidationResponse, error)
 	mustEmbedUnimplementedIAMServiceServer()
 }
@@ -95,6 +134,15 @@ func (UnimplementedIAMServiceServer) Login(context.Context, *LoginRequest) (*Log
 }
 func (UnimplementedIAMServiceServer) SignUp(context.Context, *SignUpRequest) (*SignUpResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SignUp not implemented")
+}
+func (UnimplementedIAMServiceServer) ForgotPassword(context.Context, *ForgotPasswordRequest) (*ApiResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ForgotPassword not implemented")
+}
+func (UnimplementedIAMServiceServer) VerifyOtp(context.Context, *VerifyOtpRequest) (*VerifyOtpResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method VerifyOtp not implemented")
+}
+func (UnimplementedIAMServiceServer) ResetPassword(context.Context, *ResetPasswordRequest) (*ApiResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResetPassword not implemented")
 }
 func (UnimplementedIAMServiceServer) ValidateToken(context.Context, *TokenRequest) (*ValidationResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ValidateToken not implemented")
@@ -156,6 +204,60 @@ func _IAMService_SignUp_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IAMService_ForgotPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ForgotPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).ForgotPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_ForgotPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).ForgotPassword(ctx, req.(*ForgotPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_VerifyOtp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyOtpRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).VerifyOtp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_VerifyOtp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).VerifyOtp(ctx, req.(*VerifyOtpRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_ResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).ResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_ResetPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).ResetPassword(ctx, req.(*ResetPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _IAMService_ValidateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TokenRequest)
 	if err := dec(in); err != nil {
@@ -188,6 +290,18 @@ var IAMService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SignUp",
 			Handler:    _IAMService_SignUp_Handler,
+		},
+		{
+			MethodName: "ForgotPassword",
+			Handler:    _IAMService_ForgotPassword_Handler,
+		},
+		{
+			MethodName: "VerifyOtp",
+			Handler:    _IAMService_VerifyOtp_Handler,
+		},
+		{
+			MethodName: "ResetPassword",
+			Handler:    _IAMService_ResetPassword_Handler,
 		},
 		{
 			MethodName: "ValidateToken",

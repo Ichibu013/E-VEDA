@@ -46,7 +46,7 @@ clean: down ## Stop services and prune all unused Docker data (Use with caution)
 .PHONY: proto
 proto: ## Compile the gRPC Protocol Buffer contracts
 	@echo "Generating Go code from Protobuf definitions..."
-	cd proto && protoc --go_out=paths=source_relative:. --go-grpc_out=paths=source_relative:. iam.proto user.proto
+	cd proto && PATH="$$PATH:$$(go env GOPATH)/bin" && protoc --go_out=paths=source_relative:. --go-grpc_out=paths=source_relative:. iampb/iam.proto userpb/user.proto
 	@echo "Protobuf compilation complete."
 
 .PHONY: tidy

@@ -23,6 +23,154 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type ForgotPasswordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ForgotPasswordRequest) Reset() {
+	*x = ForgotPasswordRequest{}
+	mi := &file_iampb_iam_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ForgotPasswordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ForgotPasswordRequest) ProtoMessage() {}
+
+func (x *ForgotPasswordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_iampb_iam_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ForgotPasswordRequest.ProtoReflect.Descriptor instead.
+func (*ForgotPasswordRequest) Descriptor() ([]byte, []int) {
+	return file_iampb_iam_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *ForgotPasswordRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+type VerifyOtpRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	Otp           string                 `protobuf:"bytes,2,opt,name=otp,proto3" json:"otp,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VerifyOtpRequest) Reset() {
+	*x = VerifyOtpRequest{}
+	mi := &file_iampb_iam_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VerifyOtpRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyOtpRequest) ProtoMessage() {}
+
+func (x *VerifyOtpRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_iampb_iam_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyOtpRequest.ProtoReflect.Descriptor instead.
+func (*VerifyOtpRequest) Descriptor() ([]byte, []int) {
+	return file_iampb_iam_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *VerifyOtpRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *VerifyOtpRequest) GetOtp() string {
+	if x != nil {
+		return x.Otp
+	}
+	return ""
+}
+
+type ResetPasswordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ResetToken    string                 `protobuf:"bytes,1,opt,name=reset_token,json=resetToken,proto3" json:"reset_token,omitempty"`
+	NewPassword   string                 `protobuf:"bytes,2,opt,name=new_password,json=newPassword,proto3" json:"new_password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResetPasswordRequest) Reset() {
+	*x = ResetPasswordRequest{}
+	mi := &file_iampb_iam_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResetPasswordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResetPasswordRequest) ProtoMessage() {}
+
+func (x *ResetPasswordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_iampb_iam_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResetPasswordRequest.ProtoReflect.Descriptor instead.
+func (*ResetPasswordRequest) Descriptor() ([]byte, []int) {
+	return file_iampb_iam_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ResetPasswordRequest) GetResetToken() string {
+	if x != nil {
+		return x.ResetToken
+	}
+	return ""
+}
+
+func (x *ResetPasswordRequest) GetNewPassword() string {
+	if x != nil {
+		return x.NewPassword
+	}
+	return ""
+}
+
 type LoginRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
@@ -33,7 +181,7 @@ type LoginRequest struct {
 
 func (x *LoginRequest) Reset() {
 	*x = LoginRequest{}
-	mi := &file_iampb_iam_proto_msgTypes[0]
+	mi := &file_iampb_iam_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +193,7 @@ func (x *LoginRequest) String() string {
 func (*LoginRequest) ProtoMessage() {}
 
 func (x *LoginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_iampb_iam_proto_msgTypes[0]
+	mi := &file_iampb_iam_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +206,7 @@ func (x *LoginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
 func (*LoginRequest) Descriptor() ([]byte, []int) {
-	return file_iampb_iam_proto_rawDescGZIP(), []int{0}
+	return file_iampb_iam_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *LoginRequest) GetEmail() string {
@@ -85,7 +233,7 @@ type SignUpRequest struct {
 
 func (x *SignUpRequest) Reset() {
 	*x = SignUpRequest{}
-	mi := &file_iampb_iam_proto_msgTypes[1]
+	mi := &file_iampb_iam_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -97,7 +245,7 @@ func (x *SignUpRequest) String() string {
 func (*SignUpRequest) ProtoMessage() {}
 
 func (x *SignUpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_iampb_iam_proto_msgTypes[1]
+	mi := &file_iampb_iam_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -110,7 +258,7 @@ func (x *SignUpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignUpRequest.ProtoReflect.Descriptor instead.
 func (*SignUpRequest) Descriptor() ([]byte, []int) {
-	return file_iampb_iam_proto_rawDescGZIP(), []int{1}
+	return file_iampb_iam_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *SignUpRequest) GetEmail() string {
@@ -136,7 +284,7 @@ type LoginResponse struct {
 
 func (x *LoginResponse) Reset() {
 	*x = LoginResponse{}
-	mi := &file_iampb_iam_proto_msgTypes[2]
+	mi := &file_iampb_iam_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -148,7 +296,7 @@ func (x *LoginResponse) String() string {
 func (*LoginResponse) ProtoMessage() {}
 
 func (x *LoginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_iampb_iam_proto_msgTypes[2]
+	mi := &file_iampb_iam_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -161,7 +309,7 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
 func (*LoginResponse) Descriptor() ([]byte, []int) {
-	return file_iampb_iam_proto_rawDescGZIP(), []int{2}
+	return file_iampb_iam_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *LoginResponse) GetToken() string {
@@ -180,7 +328,7 @@ type TokenRequest struct {
 
 func (x *TokenRequest) Reset() {
 	*x = TokenRequest{}
-	mi := &file_iampb_iam_proto_msgTypes[3]
+	mi := &file_iampb_iam_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -192,7 +340,7 @@ func (x *TokenRequest) String() string {
 func (*TokenRequest) ProtoMessage() {}
 
 func (x *TokenRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_iampb_iam_proto_msgTypes[3]
+	mi := &file_iampb_iam_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -205,7 +353,7 @@ func (x *TokenRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenRequest.ProtoReflect.Descriptor instead.
 func (*TokenRequest) Descriptor() ([]byte, []int) {
-	return file_iampb_iam_proto_rawDescGZIP(), []int{3}
+	return file_iampb_iam_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *TokenRequest) GetToken() string {
@@ -225,7 +373,7 @@ type ValidationResponse struct {
 
 func (x *ValidationResponse) Reset() {
 	*x = ValidationResponse{}
-	mi := &file_iampb_iam_proto_msgTypes[4]
+	mi := &file_iampb_iam_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -237,7 +385,7 @@ func (x *ValidationResponse) String() string {
 func (*ValidationResponse) ProtoMessage() {}
 
 func (x *ValidationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_iampb_iam_proto_msgTypes[4]
+	mi := &file_iampb_iam_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -250,7 +398,7 @@ func (x *ValidationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidationResponse.ProtoReflect.Descriptor instead.
 func (*ValidationResponse) Descriptor() ([]byte, []int) {
-	return file_iampb_iam_proto_rawDescGZIP(), []int{4}
+	return file_iampb_iam_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ValidationResponse) GetIsValid() bool {
@@ -276,7 +424,7 @@ type SignUpResponse struct {
 
 func (x *SignUpResponse) Reset() {
 	*x = SignUpResponse{}
-	mi := &file_iampb_iam_proto_msgTypes[5]
+	mi := &file_iampb_iam_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -288,7 +436,7 @@ func (x *SignUpResponse) String() string {
 func (*SignUpResponse) ProtoMessage() {}
 
 func (x *SignUpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_iampb_iam_proto_msgTypes[5]
+	mi := &file_iampb_iam_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -301,7 +449,7 @@ func (x *SignUpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignUpResponse.ProtoReflect.Descriptor instead.
 func (*SignUpResponse) Descriptor() ([]byte, []int) {
-	return file_iampb_iam_proto_rawDescGZIP(), []int{5}
+	return file_iampb_iam_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *SignUpResponse) GetUserUuid() string {
@@ -311,11 +459,108 @@ func (x *SignUpResponse) GetUserUuid() string {
 	return ""
 }
 
+type VerifyOtpResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ResetToken    string                 `protobuf:"bytes,1,opt,name=reset_token,json=resetToken,proto3" json:"reset_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VerifyOtpResponse) Reset() {
+	*x = VerifyOtpResponse{}
+	mi := &file_iampb_iam_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VerifyOtpResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyOtpResponse) ProtoMessage() {}
+
+func (x *VerifyOtpResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_iampb_iam_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyOtpResponse.ProtoReflect.Descriptor instead.
+func (*VerifyOtpResponse) Descriptor() ([]byte, []int) {
+	return file_iampb_iam_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *VerifyOtpResponse) GetResetToken() string {
+	if x != nil {
+		return x.ResetToken
+	}
+	return ""
+}
+
+type ApiResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ApiResponse) Reset() {
+	*x = ApiResponse{}
+	mi := &file_iampb_iam_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ApiResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ApiResponse) ProtoMessage() {}
+
+func (x *ApiResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_iampb_iam_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ApiResponse.ProtoReflect.Descriptor instead.
+func (*ApiResponse) Descriptor() ([]byte, []int) {
+	return file_iampb_iam_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ApiResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_iampb_iam_proto protoreflect.FileDescriptor
 
 const file_iampb_iam_proto_rawDesc = "" +
 	"\n" +
-	"\x0fiampb/iam.proto\x12\x03iam\"@\n" +
+	"\x0fiampb/iam.proto\x12\x03iam\"-\n" +
+	"\x15ForgotPasswordRequest\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\":\n" +
+	"\x10VerifyOtpRequest\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x10\n" +
+	"\x03otp\x18\x02 \x01(\tR\x03otp\"Z\n" +
+	"\x14ResetPasswordRequest\x12\x1f\n" +
+	"\vreset_token\x18\x01 \x01(\tR\n" +
+	"resetToken\x12!\n" +
+	"\fnew_password\x18\x02 \x01(\tR\vnewPassword\"@\n" +
 	"\fLoginRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"A\n" +
@@ -330,11 +575,19 @@ const file_iampb_iam_proto_rawDesc = "" +
 	"\bis_valid\x18\x01 \x01(\bR\aisValid\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\"-\n" +
 	"\x0eSignUpResponse\x12\x1b\n" +
-	"\tuser_uuid\x18\x01 \x01(\tR\buserUuid2\xac\x01\n" +
+	"\tuser_uuid\x18\x01 \x01(\tR\buserUuid\"4\n" +
+	"\x11VerifyOtpResponse\x12\x1f\n" +
+	"\vreset_token\x18\x01 \x01(\tR\n" +
+	"resetToken\"'\n" +
+	"\vApiResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage2\xe6\x02\n" +
 	"\n" +
 	"IAMService\x12.\n" +
 	"\x05Login\x12\x11.iam.LoginRequest\x1a\x12.iam.LoginResponse\x121\n" +
-	"\x06SignUp\x12\x12.iam.SignUpRequest\x1a\x13.iam.SignUpResponse\x12;\n" +
+	"\x06SignUp\x12\x12.iam.SignUpRequest\x1a\x13.iam.SignUpResponse\x12>\n" +
+	"\x0eForgotPassword\x12\x1a.iam.ForgotPasswordRequest\x1a\x10.iam.ApiResponse\x12:\n" +
+	"\tVerifyOtp\x12\x15.iam.VerifyOtpRequest\x1a\x16.iam.VerifyOtpResponse\x12<\n" +
+	"\rResetPassword\x12\x19.iam.ResetPasswordRequest\x1a\x10.iam.ApiResponse\x12;\n" +
 	"\rValidateToken\x12\x11.iam.TokenRequest\x1a\x17.iam.ValidationResponseB\x14Z\x12e_veda/proto/iampbb\x06proto3"
 
 var (
@@ -349,27 +602,38 @@ func file_iampb_iam_proto_rawDescGZIP() []byte {
 	return file_iampb_iam_proto_rawDescData
 }
 
-var file_iampb_iam_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_iampb_iam_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_iampb_iam_proto_goTypes = []any{
-	(*LoginRequest)(nil),       // 0: iam.LoginRequest
-	(*SignUpRequest)(nil),      // 1: iam.SignUpRequest
-	(*LoginResponse)(nil),      // 2: iam.LoginResponse
-	(*TokenRequest)(nil),       // 3: iam.TokenRequest
-	(*ValidationResponse)(nil), // 4: iam.ValidationResponse
-	(*SignUpResponse)(nil),     // 5: iam.SignUpResponse
+	(*ForgotPasswordRequest)(nil), // 0: iam.ForgotPasswordRequest
+	(*VerifyOtpRequest)(nil),      // 1: iam.VerifyOtpRequest
+	(*ResetPasswordRequest)(nil),  // 2: iam.ResetPasswordRequest
+	(*LoginRequest)(nil),          // 3: iam.LoginRequest
+	(*SignUpRequest)(nil),         // 4: iam.SignUpRequest
+	(*LoginResponse)(nil),         // 5: iam.LoginResponse
+	(*TokenRequest)(nil),          // 6: iam.TokenRequest
+	(*ValidationResponse)(nil),    // 7: iam.ValidationResponse
+	(*SignUpResponse)(nil),        // 8: iam.SignUpResponse
+	(*VerifyOtpResponse)(nil),     // 9: iam.VerifyOtpResponse
+	(*ApiResponse)(nil),           // 10: iam.ApiResponse
 }
 var file_iampb_iam_proto_depIdxs = []int32{
-	0, // 0: iam.IAMService.Login:input_type -> iam.LoginRequest
-	1, // 1: iam.IAMService.SignUp:input_type -> iam.SignUpRequest
-	3, // 2: iam.IAMService.ValidateToken:input_type -> iam.TokenRequest
-	2, // 3: iam.IAMService.Login:output_type -> iam.LoginResponse
-	5, // 4: iam.IAMService.SignUp:output_type -> iam.SignUpResponse
-	4, // 5: iam.IAMService.ValidateToken:output_type -> iam.ValidationResponse
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	3,  // 0: iam.IAMService.Login:input_type -> iam.LoginRequest
+	4,  // 1: iam.IAMService.SignUp:input_type -> iam.SignUpRequest
+	0,  // 2: iam.IAMService.ForgotPassword:input_type -> iam.ForgotPasswordRequest
+	1,  // 3: iam.IAMService.VerifyOtp:input_type -> iam.VerifyOtpRequest
+	2,  // 4: iam.IAMService.ResetPassword:input_type -> iam.ResetPasswordRequest
+	6,  // 5: iam.IAMService.ValidateToken:input_type -> iam.TokenRequest
+	5,  // 6: iam.IAMService.Login:output_type -> iam.LoginResponse
+	8,  // 7: iam.IAMService.SignUp:output_type -> iam.SignUpResponse
+	10, // 8: iam.IAMService.ForgotPassword:output_type -> iam.ApiResponse
+	9,  // 9: iam.IAMService.VerifyOtp:output_type -> iam.VerifyOtpResponse
+	10, // 10: iam.IAMService.ResetPassword:output_type -> iam.ApiResponse
+	7,  // 11: iam.IAMService.ValidateToken:output_type -> iam.ValidationResponse
+	6,  // [6:12] is the sub-list for method output_type
+	0,  // [0:6] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_iampb_iam_proto_init() }
@@ -383,7 +647,7 @@ func file_iampb_iam_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_iampb_iam_proto_rawDesc), len(file_iampb_iam_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
