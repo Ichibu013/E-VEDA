@@ -1,7 +1,9 @@
 import React from 'react';
-import { CHeader, CContainer } from '@coreui/react';
+import { useNavigate } from 'react-router-dom';
+import { CHeader, CContainer, CDropdown, CDropdownToggle, CDropdownMenu, CDropdownItem } from '@coreui/react';
 
 export default function Header() {
+  const navigate = useNavigate();
   return (
     <CHeader className="mb-0 border-b border-surface-container px-8 bg-surface-container-lowest shrink-0 h-16 flex items-center ">
       <CContainer fluid className="flex justify-between items-center px-4">
@@ -38,13 +40,28 @@ export default function Header() {
             </svg>
           </button>
 
-          <button className="rounded-full outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 mr-4">
-            <img 
-               src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80" 
-               alt="User Avatar" 
-               className="w-9 h-9 rounded-full object-cover border border-slate-200"
-            />
-          </button>
+          <CDropdown variant="nav-item" className="list-none">
+            <CDropdownToggle placement="bottom-end" className="py-0 bg-transparent border-none flex items-center" caret={false}>
+              <button className="rounded-full outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 mr-4 cursor-pointer">
+                <img 
+                   src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80" 
+                   alt="User Avatar" 
+                   className="w-9 h-9 rounded-full object-cover border border-slate-200"
+                />
+              </button>
+            </CDropdownToggle>
+            <CDropdownMenu className="min-w-40" placement="bottom-end">
+              <CDropdownItem onClick={() => navigate('/dashboard/settings')} className="cursor-pointer hover:bg-slate-50 !flex !items-center gap-2">
+                <span className="material-symbols-outlined text-[18px]">settings</span>
+                <span className="mb-0.5">Settings</span>
+              </CDropdownItem>
+              <div className="h-px bg-slate-200 my-1 w-full" />
+              <CDropdownItem onClick={() => navigate('/login')} className="cursor-pointer hover:bg-red-100 text-error font-medium !flex !items-center gap-2">
+                <span className="material-symbols-outlined text-[18px]">logout</span>
+                <span className="mb-0.5">Logout</span>
+              </CDropdownItem>
+            </CDropdownMenu>
+          </CDropdown>
         </div>
 
       </CContainer>

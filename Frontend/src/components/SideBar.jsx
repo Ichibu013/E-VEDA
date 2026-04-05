@@ -54,9 +54,11 @@ export const SidebarUnfoldableExample = () => {
 
         <div className="mt-auto"></div>
 
-        <CNavItem href="/dashboard/reports/new" className="bg-primary text-white rounded-xl hover:bg-primary/80 transition-all shadow-md">
+<div className="py-4">
+        <CNavItem href="/dashboard/reports/new" className="bg-primary text-white rounded-xl hover:bg-primary/80 transition-all shadow-md ">
           <CIcon customClassName="nav-icon text-white" icon={cilPlus} /> New Report
         </CNavItem>
+</div>
       </CSidebarNav>
     </CSidebar>
   )
