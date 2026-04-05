@@ -26,7 +26,7 @@ export default function PersonalProfile() {
           </p>
         </div>
         <div className="flex-1 space-y-8">
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
             <div>
               <label className="block text-xs font-bold text-on-surface-variant mb-2 uppercase tracking-widest">
                 Full Name
@@ -45,6 +45,26 @@ export default function PersonalProfile() {
                 className="w-full bg-surface-container p-4 rounded-xl border-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-on-surface"
                 type="text"
                 defaultValue="Srushti"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-on-surface-variant mb-2 uppercase tracking-widest">
+                Gender
+              </label>
+              <input
+                className="w-full bg-surface-container p-4 rounded-xl border-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-on-surface placeholder:text-on-surface-variant/60"
+                type="text"
+                placeholder="Enter gender"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-on-surface-variant mb-2 uppercase tracking-widest">
+                Age
+              </label>
+              <input
+                className="w-full bg-surface-container p-4 rounded-xl border-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-on-surface placeholder:text-on-surface-variant/60"
+                type="text"
+                placeholder="Enter age"
               />
             </div>
           </div>

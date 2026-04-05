@@ -1,7 +1,12 @@
 import React from 'react';
 import { CChart } from '@coreui/react-chartjs';
+import Skeleton from 'react-loading-skeleton';
 
-export default function EmotionalTrendsChart() {
+export default function EmotionalTrendsChart({ isLoading }) {
+  if (isLoading) {
+    return <Skeleton height={350} borderRadius={24} className="shadow-sm" />;
+  }
+
   const bgColors = [
     '#C1D9EE', // Mon
     '#C5D9CE', // Tue 

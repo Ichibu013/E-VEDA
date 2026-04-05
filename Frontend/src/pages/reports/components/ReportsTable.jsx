@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { 
   CTable, 
   CTableHead, 
@@ -11,6 +12,33 @@ import {
 
 export default function ReportsTable() {
   const navigate = useNavigate();
+  const [downloadingId, setDownloadingId] = useState(null);
+  const [sharingId, setSharingId] = useState(null);
+
+  const handleDownload = (report) => {
+    if (downloadingId) return;
+    setDownloadingId(report.id);
+    const downloadPromise = new Promise((resolve) => setTimeout(resolve, 2000));
+    toast.promise(downloadPromise, {
+      loading: `Generating PDF for ${report.name}...`,
+      success: `PDF downloaded successfully!`,
+      error: `Failed to download PDF`,
+    });
+    downloadPromise.then(() => setDownloadingId(null));
+  };
+
+  const handleShare = (report) => {
+    if (sharingId) return;
+    setSharingId(report.id);
+    const sharePromise = new Promise((resolve) => setTimeout(resolve, 1500));
+    toast.promise(sharePromise, {
+      loading: `Preparing share link for ${report.name}...`,
+      success: `Share link copied to clipboard!`,
+      error: `Failed to generate share link`,
+    });
+    sharePromise.then(() => setSharingId(null));
+  };
+
   const reports = [
     {
       id: 1,
@@ -114,11 +142,25 @@ export default function ReportsTable() {
                   >
                     <span className="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
                   </button>
-                  <button className="p-2 text-slate-400 hover:text-primary transition-colors" title="Download PDF">
-                    <span className="material-symbols-outlined text-[20px]" data-icon="download">download</span>
+                  <button 
+                    onClick={() => handleDownload(report)}
+                    disabled={downloadingId === report.id}
+                    className={`p-2 transition-colors ${downloadingId === report.id ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
+                    title="Download PDF"
+                  >
+                    <span className={`material-symbols-outlined text-[20px] ${downloadingId === report.id ? 'animate-bounce' : ''}`}>
+                      {downloadingId === report.id ? 'hourglass_empty' : 'download'}
+                    </span>
                   </button>
-                  <button className="p-2 text-slate-400 hover:text-primary transition-colors" title="Share">
-                    <span className="material-symbols-outlined text-[20px]" data-icon="share">share</span>
+                  <button 
+                    onClick={() => handleShare(report)}
+                    disabled={sharingId === report.id}
+                    className={`p-2 transition-colors ${sharingId === report.id ? 'text-primary' : 'text-slate-400 hover:text-primary'}`} 
+                    title="Share"
+                  >
+                    <span className={`material-symbols-outlined text-[20px] ${sharingId === report.id ? 'animate-spin' : ''}`}>
+                      {sharingId === report.id ? 'progress_activity' : 'share'}
+                    </span>
                   </button>
                 </div>
               </CTableDataCell>

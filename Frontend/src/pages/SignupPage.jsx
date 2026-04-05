@@ -1,7 +1,29 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export default function SignupPage() {
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSignup = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    const signupPromise = new Promise((resolve) => setTimeout(resolve, 2000));
+    
+    toast.promise(signupPromise, {
+      loading: 'Creating account...',
+      success: 'Account created successfully!',
+      error: 'Failed to create account',
+    });
+
+    signupPromise.then(() => {
+      navigate('/login');
+    });
+  };
+
   return (
       <div className="w-full max-w-md space-y-6 xl:space-y-8 py-6 xl:py-10">
         {/* Branding for Mobile */}
@@ -21,7 +43,7 @@ export default function SignupPage() {
             Start your journey into empathetic clinical data.
           </p>
         </header>
-        <form className="space-y-4 xl:space-y-5">
+        <form className="space-y-4 xl:space-y-5" onSubmit={handleSignup}>
           {/* Username Field */}
           <div className="space-y-2">
             <label
@@ -153,10 +175,16 @@ export default function SignupPage() {
           </div>
           {/* Submit Button */}
           <button
-            className="w-full flex justify-center items-center py-4 px-6 rounded-xl text-white font-bold bg-gradient-to-r from-primary to-primary-container shadow-xl shadow-primary/25 hover:shadow-primary/40 active:scale-[0.98] transition-all duration-200 mt-2"
+            className={`w-full flex justify-center items-center py-4 px-6 rounded-xl text-white font-bold bg-gradient-to-r from-primary to-primary-container shadow-xl shadow-primary/25 transition-all duration-200 mt-2 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-primary/40 active:scale-[0.98]'}`}
             type="submit"
+            disabled={isSubmitting}
           >
-            Create Account
+            {isSubmitting ? (
+              <span className="flex items-center gap-2">
+                <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+                Creating Account...
+              </span>
+            ) : 'Create Account'}
           </button>
         </form>
         {/* Secondary Actions */}

@@ -26,8 +26,8 @@ export const SidebarUnfoldableExample = () => {
   }
 
   return (
-    <CSidebar 
-      className="border-end flex flex-col rounded-b-xl top-0 h-screen shrink-0" 
+    <CSidebar
+      className="border-end flex flex-col rounded-b-xl top-0 h-screen shrink-0"
       style={{ position: 'sticky' }}
       position="sticky"
       unfoldable
@@ -37,28 +37,27 @@ export const SidebarUnfoldableExample = () => {
           <img src={logoImage} alt="E-VEDA Logo" className="h-10 w-auto object-contain" />
         </CSidebarBrand>
       </CSidebarHeader>
-      
+
       <CSidebarNav>
-        <CNavTitle>Dashboard</CNavTitle>
         <CNavItem href="/dashboard" className={getNavItemClass('/dashboard')}>
           <CIcon customClassName="nav-icon" icon={cilHome} /> Home
         </CNavItem>
-        
+
         <CNavItem href="/dashboard/reports" className={getNavItemClass('/dashboard/reports')}>
           <CIcon customClassName="nav-icon" icon={cilFile} /> Reports
         </CNavItem>
-        
+
         <CNavItem href="/dashboard/settings" className={getNavItemClass('/dashboard/settings')}>
           <CIcon customClassName="nav-icon" icon={cilSettings} /> Settings
         </CNavItem>
 
         <div className="mt-auto"></div>
 
-<div className="py-4">
-        <CNavItem href="/dashboard/reports/new" className="bg-primary text-white rounded-xl hover:bg-primary/80 transition-all shadow-md ">
-          <CIcon customClassName="nav-icon text-white" icon={cilPlus} /> New Report
-        </CNavItem>
-</div>
+        <div className="py-4">
+          <CNavItem href="/dashboard/reports/new" className="bg-primary text-white rounded-xl hover:bg-primary/80 transition-all shadow-md ">
+            <CIcon customClassName="nav-icon text-white" icon={cilPlus} /> New Report
+          </CNavItem>
+        </div>
       </CSidebarNav>
     </CSidebar>
   )

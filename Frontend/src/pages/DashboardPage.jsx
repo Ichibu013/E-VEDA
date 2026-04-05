@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import 'react-loading-skeleton/dist/skeleton.css';
 import WelcomeBanner from '../components/dashboard/WelcomeBanner';
 import EmotionalTrendsChart from '../components/dashboard/EmotionalTrendsChart';
 import PatientQuickInfo from '../components/dashboard/PatientQuickInfo';
@@ -7,28 +8,38 @@ import AccuracyMetrics from '../components/dashboard/AccuracyMetrics';
 import AIInsightBanner from '../components/dashboard/AIInsightBanner';
 
 export default function DashboardPage() {
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 2000);
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
-        <div className="max-w-6xl mx-auto space-y-8">
-            <WelcomeBanner />
+        <div className="max-w-6xl mx-auto space-y-8 transition-opacity duration-500 ease-in-out opacity-100">
+            <WelcomeBanner isLoading={isLoading} />
 
             {/* Main Data View */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Left Column (Span 8) */}
                 <div className="lg:col-span-8 flex flex-col">
-                    <EmotionalTrendsChart />
+                    <EmotionalTrendsChart isLoading={isLoading} />
                 </div>
                 
                 {/* Right Column (Span 4) */}
                 <div className="lg:col-span-4 flex flex-col gap-8">
-                    <PatientQuickInfo />
-                    <EmotionCalculator />
+                    <PatientQuickInfo isLoading={isLoading} />
+                    <EmotionCalculator isLoading={isLoading} />
                 </div>
             </div>
 
             {/* Circular Progress Metrics */}
-            <AccuracyMetrics />
+            <AccuracyMetrics isLoading={isLoading} />
             {/* AI Notification Footer */}
-            <AIInsightBanner />
+            <AIInsightBanner isLoading={isLoading} />
         </div>
     );
 }
+

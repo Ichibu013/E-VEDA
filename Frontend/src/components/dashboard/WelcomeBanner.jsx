@@ -1,11 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Skeleton from 'react-loading-skeleton';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
-export default function WelcomeBanner() {
-  const progressPercent = 85;
-  const strokeWidth = 5;
-  const radius = 28;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (progressPercent / 100) * circumference;
+export default function WelcomeBanner({ isLoading }) {
+  const targetPercent = 85;
+  const [currentPercent, setCurrentPercent] = useState(0);
+
+  useEffect(() => {
+    if (!isLoading) {
+      const timer = setTimeout(() => {
+        setCurrentPercent(targetPercent);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, targetPercent]);
+
+  if (isLoading) {
+    return <Skeleton height={200} borderRadius={24} className="shadow-sm" />;
+  }
 
   return (
     <div className="w-full bg-primary text-white rounded-[24px] overflow-hidden relative shadow-md">
@@ -50,42 +63,25 @@ export default function WelcomeBanner() {
               Daily Goal
             </span>
             <span className="text-2xl lg:text-3xl font-extrabold tracking-tight">
-              {progressPercent}% Complete
+              {targetPercent}% Complete
             </span>
           </div>
 
           <div className="relative flex items-center justify-center w-[72px] h-[72px]">
-            <svg
-              className="absolute inset-0 w-full h-full -rotate-90"
-              viewBox="0 0 64 64"
-            >
-              {/* Background Track Circle */}
-              <circle
-                cx="32"
-                cy="32"
-                r={radius}
-                className="stroke-black/20"
-                strokeWidth={strokeWidth}
-                fill="none"
+            <div className="absolute inset-0">
+              <CircularProgressbar
+                value={currentPercent}
+                strokeWidth={8}
+                styles={buildStyles({
+                  pathColor: '#5eead4',
+                  trailColor: 'rgba(0,0,0,0.2)',
+                  pathTransitionDuration: 1,
+                })}
               />
-              {/* Progress Arc Circle */}
-              <circle
-                cx="32"
-                cy="32"
-                r={radius}
-                className="stroke-[#5eead4] transition-all duration-1000 ease-out"
-                strokeWidth={strokeWidth}
-                fill="none"
-                strokeLinecap="round"
-                style={{
-                  strokeDasharray: circumference,
-                  strokeDashoffset: strokeDashoffset,
-                }}
-              />
-            </svg>
+            </div>
             
             {/* Center Checkmark Icon */}
-            <div className="relative w-8 h-8 rounded-full border-[2px] border-white flex items-center justify-center bg-transparent">
+            <div className="relative w-8 h-8 rounded-full border-[2px] border-white flex items-center justify-center bg-transparent z-10">
               <svg 
                 className="w-4 h-4 text-white" 
                 fill="none" 

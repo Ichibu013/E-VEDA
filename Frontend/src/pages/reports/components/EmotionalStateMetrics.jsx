@@ -1,6 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function EmotionalStateMetrics() {
+  const [animated, setAnimated] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimated(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <section className="bg-surface-container-lowest rounded-3xl p-8 shadow-sm">
       <h2 className="text-xl font-bold text-on-surface mb-6 flex items-center gap-2">
@@ -15,10 +22,13 @@ export default function EmotionalStateMetrics() {
             <span className="font-bold text-secondary">82%</span>
           </div>
           <div className="h-2.5 w-full bg-surface-container-high rounded-full overflow-hidden">
-            <div className="h-full bg-secondary rounded-full" style={{ width: "82%" }} />
+            <div 
+              className="h-full bg-secondary rounded-full transition-all duration-1000 ease-out" 
+              style={{ width: animated ? "82%" : "0%" }} 
+            />
           </div>
         </div>
-        
+
         {/* Progress Bar: Neutral */}
         <div className="space-y-3">
           <div className="flex justify-between items-center text-base">
@@ -26,12 +36,15 @@ export default function EmotionalStateMetrics() {
             <span className="font-bold text-primary">64%</span>
           </div>
           <div className="h-2.5 w-full bg-surface-container-high rounded-full overflow-hidden">
-            <div className="h-full bg-primary rounded-full" style={{ width: "64%" }} />
+            <div 
+              className="h-full bg-primary rounded-full transition-all duration-1000 ease-out" 
+              style={{ width: animated ? "64%" : "0%" }} 
+            />
           </div>
         </div>
-        
+
       </div>
-      
+
       {/* Detected Features */}
       <div className=" pt-4 border-t border-outline-variant/10">
         <h3 className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-6">
@@ -47,7 +60,7 @@ export default function EmotionalStateMetrics() {
               NORMAL
             </span>
           </div>
-          
+
           <div className="flex items-center justify-between p-4 bg-surface-container rounded-2xl">
             <div className="flex items-center gap-4">
               <span className="material-symbols-outlined text-primary text-xl">mood</span>
@@ -57,7 +70,7 @@ export default function EmotionalStateMetrics() {
               RELAXED
             </span>
           </div>
-          
+
           <div className="flex items-center justify-between p-4 bg-surface-container rounded-2xl">
             <div className="flex items-center gap-4">
               <span className="material-symbols-outlined text-primary text-xl">speed</span>

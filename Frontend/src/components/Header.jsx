@@ -1,9 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CHeader, CContainer, CDropdown, CDropdownToggle, CDropdownMenu, CDropdownItem } from '@coreui/react';
+import { toast } from 'sonner';
+import { CHeader, CContainer } from '@coreui/react';
+import Drawer from 'react-modern-drawer';
+import 'react-modern-drawer/dist/index.css';
 
 export default function Header() {
   const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const toggleDrawer = () => {
+    setIsDrawerOpen((prevState) => !prevState);
+  };
+
+  const handleLogout = () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    
+    const logoutPromise = new Promise((resolve) => setTimeout(resolve, 1500));
+    
+    toast.promise(logoutPromise, {
+      loading: 'Logging out...',
+      success: 'Successfully logged out!',
+      error: 'Failed to logout',
+    });
+
+    logoutPromise.then(() => {
+      navigate('/login');
+    });
+  };
+
   return (
     <CHeader className="mb-0 border-b border-surface-container px-8 bg-surface-container-lowest shrink-0 h-16 flex items-center ">
       <CContainer fluid className="flex justify-between items-center px-4">
@@ -40,31 +67,64 @@ export default function Header() {
             </svg>
           </button>
 
-          <CDropdown variant="nav-item" className="list-none">
-            <CDropdownToggle placement="bottom-end" className="py-0 bg-transparent border-none flex items-center" caret={false}>
-              <button className="rounded-full outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 mr-4 cursor-pointer">
-                <img 
-                   src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80" 
-                   alt="User Avatar" 
-                   className="w-9 h-9 rounded-full object-cover border border-slate-200"
-                />
-              </button>
-            </CDropdownToggle>
-            <CDropdownMenu className="min-w-40" placement="bottom-end">
-              <CDropdownItem onClick={() => navigate('/dashboard/settings')} className="cursor-pointer hover:bg-slate-50 !flex !items-center gap-2">
-                <span className="material-symbols-outlined text-[18px]">settings</span>
-                <span className="mb-0.5">Settings</span>
-              </CDropdownItem>
-              <div className="h-px bg-slate-200 my-1 w-full" />
-              <CDropdownItem onClick={() => navigate('/login')} className="cursor-pointer hover:bg-red-100 text-error font-medium !flex !items-center gap-2">
-                <span className="material-symbols-outlined text-[18px]">logout</span>
-                <span className="mb-0.5">Logout</span>
-              </CDropdownItem>
-            </CDropdownMenu>
-          </CDropdown>
+          <button 
+            onClick={toggleDrawer}
+            className="rounded-full outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 mr-4 cursor-pointer hover:opacity-80 transition-opacity"
+          >
+            <img 
+               src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80" 
+               alt="User Avatar" 
+               className="w-9 h-9 rounded-full object-cover border border-slate-200"
+            />
+          </button>
         </div>
 
       </CContainer>
+
+      {/* User Information Drawer */}
+      <Drawer
+        open={isDrawerOpen}
+        onClose={toggleDrawer}
+        direction='right'
+        zIndex={9999}
+        className='!w-80 border-l border-surface-container bg-surface-container-lowest !z-[99999]'
+      >
+        <div className="p-6 flex flex-col h-full">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl font-bold text-on-surface">Profile</h2>
+            <button onClick={toggleDrawer} className="text-outline hover:text-on-surface transition-colors">
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          
+          <div className="flex flex-col items-center mb-8">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80" className="w-24 h-24 rounded-full object-cover border-4 border-surface shadow-md mb-4" alt="Doctor" />
+            <h3 className="text-lg font-bold text-on-surface tracking-tight">Clinician Alex</h3>
+            <p className="text-sm text-on-surface-variant font-medium">Head of Neurology</p>
+            <span className="mt-3 px-4 py-1.5 bg-primary/10 text-primary font-bold text-[11px] uppercase tracking-wider rounded-full">Pro Account</span>
+          </div>
+
+          <div className="flex-1 space-y-2">
+            <button onClick={() => { navigate('/dashboard/settings'); toggleDrawer(); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container-low transition-colors text-on-surface font-semibold text-sm">
+              <span className="material-symbols-outlined text-primary">settings</span>
+              Account Settings
+            </button>
+          </div>
+
+          <div className="pt-4 border-t border-surface-container">
+            <button 
+              onClick={handleLogout} 
+              disabled={isLoggingOut}
+              className={`w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-red-50 text-red-500 font-bold text-sm hover:bg-red-100 transition-colors ${isLoggingOut ? 'opacity-50 pointer-events-none' : ''}`}
+            >
+              <span className={`material-symbols-outlined text-[18px] ${isLoggingOut ? 'animate-spin' : ''}`}>
+                {isLoggingOut ? 'progress_activity' : 'logout'}
+              </span>
+              {isLoggingOut ? 'Logging out...' : 'Sign Out'}
+            </button>
+          </div>
+        </div>
+      </Drawer>
     </CHeader>
   );
 }

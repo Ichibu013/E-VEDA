@@ -1,6 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function ReportDetailsHeader() {
+  const [offset, setOffset] = useState(213.6); // Full circumference (2 * pi * r=34)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setOffset(25.6); // Target offset for 88/100
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
       <div>
@@ -40,14 +49,14 @@ export default function ReportDetailsHeader() {
               strokeWidth={6}
             />
             <circle
-              className="text-primary"
+              className="text-primary transition-all duration-[1500ms] ease-out"
               cx={40}
               cy={40}
               fill="transparent"
               r={34}
               stroke="currentColor"
               strokeDasharray="213.6"
-              strokeDashoffset="25.6"
+              strokeDashoffset={offset}
               strokeWidth={6}
             />
           </svg>

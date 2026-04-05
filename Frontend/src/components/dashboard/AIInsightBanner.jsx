@@ -1,6 +1,11 @@
 import React from 'react';
+import Skeleton from 'react-loading-skeleton';
 
-export default function AIInsightBanner() {
+export default function AIInsightBanner({ isLoading }) {
+  if (isLoading) {
+    return <Skeleton height={120} borderRadius={32} className="shadow-sm" />;
+  }
+
   return (
     <div className="bg-[#ccf7e2] text-[#0a472e] rounded-[2rem] p-6 lg:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-sm border border-[#aae6cb]/50">
       <div className="flex items-start md:items-center gap-6">

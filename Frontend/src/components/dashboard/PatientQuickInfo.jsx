@@ -1,6 +1,11 @@
 import React from 'react';
+import Skeleton from 'react-loading-skeleton';
 
-export default function PatientQuickInfo() {
+export default function PatientQuickInfo({ isLoading }) {
+  if (isLoading) {
+    return <Skeleton height={180} borderRadius={24} className="shadow-sm" />;
+  }
+
   return (
     <div className="bg-surface-container-lowest rounded-3xl p-6 shadow-sm flex flex-col justify-between overflow-hidden">
       <div className="flex items-center gap-4 mb-6">

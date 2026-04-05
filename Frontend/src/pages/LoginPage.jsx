@@ -1,13 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogin = (e) => {
-    e.preventDefault();
-    // Simulate authentication logic here
-    navigate('/dashboard');
+    if (e && e.preventDefault) e.preventDefault();
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    const loginPromise = new Promise((resolve) => setTimeout(resolve, 2000));
+    
+    toast.promise(loginPromise, {
+      loading: 'Authenticating...',
+      success: 'Successfully logged in!',
+      error: 'Failed to login',
+    });
+
+    loginPromise.then(() => {
+      navigate('/dashboard');
+    });
   };
 
   return (
@@ -110,10 +124,16 @@ export default function LoginPage() {
           </div>
           {/* Submit Button */}
           <button
-            className="w-full flex justify-center items-center py-4 px-6 rounded-xl text-white font-bold bg-gradient-to-r from-primary to-primary-container shadow-xl shadow-primary/25 hover:shadow-primary/40 active:scale-[0.98] transition-all duration-200"
+            className={`w-full flex justify-center items-center py-4 px-6 rounded-xl text-white font-bold bg-gradient-to-r from-primary to-primary-container shadow-xl shadow-primary/25 transition-all duration-200 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-primary/40 active:scale-[0.98]'}`}
             type="submit"
+            disabled={isSubmitting}
           >
-            Login to Dashboard
+            {isSubmitting ? (
+              <span className="flex items-center gap-2">
+                <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+                Authenticating...
+              </span>
+            ) : 'Login to Dashboard'}
           </button>
         </form>
         {/* Separator */}
@@ -135,7 +155,8 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={handleLogin}
-            className="w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-xl border border-transparent bg-surface-container-lowest text-on-surface font-semibold hover:bg-white hover:shadow-sm transition-all duration-200"
+            disabled={isSubmitting}
+            className={`w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-xl border border-transparent bg-surface-container-lowest text-on-surface font-semibold transition-all duration-200 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-white hover:shadow-sm'}`}
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
