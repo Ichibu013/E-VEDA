@@ -143,39 +143,33 @@ class FusionNetwork(nn.Module):
 
 
 # ==============================
-# Master Ensemble Wrapper
-# ==============================
-class UltimateEnsemble(nn.Module):
-    def __init__(self):
-        super().__init__()
-        # Initialize all 3 models internally so the parameter keys match exactly
-        self.model1 = FusionNetwork(num_class=7)
-        self.model2 = FusionNetwork(num_class=7)
-        self.model3 = FusionNetwork(num_class=7)
-
-    def forward(self, skel, face):
-        # Soft voting: Average the logits from all 3 models
-        out1 = self.model1(skel, face)
-        out2 = self.model2(skel, face)
-        out3 = self.model3(skel, face)
-        return (out1 + out2 + out3) / 3.0
-
-
-# ==============================
 # Load Model
 # ==============================
-def load_model(path):
-    # Instantiate the full ensemble wrapper
-    model = UltimateEnsemble()
+def load_model(MODEL_PATH):
+    model = FusionNetwork()
     
+    # Load the state dict from the old ensemble file
     try:
-        # Load the state dict directly. No key replacing needed anymore!
-        full_state_dict = torch.load(path, map_location=DEVICE)
-        model.load_state_dict(full_state_dict)
-        print(f"Successfully loaded FULL MASTER ENSEMBLE from {path}")
+        full_state_dict = torch.load(MODEL_PATH, map_location=DEVICE)
+        
+        # Check if the file has the 'model1.' prefixes (Old Ensemble Style)
+        if any(key.startswith("model1.") for key in full_state_dict.keys()):
+            print("Detected old ensemble format. Stripping 'model1' prefixes...")
+            new_state_dict = {}
+            for key, value in full_state_dict.items():
+                if key.startswith("model1."):
+                    # Remove "model1." to match the FusionNetwork class
+                    new_key = key.replace("model1.", "")
+                    new_state_dict[new_key] = value
+            model.load_state_dict(new_state_dict)
+        else:
+            # If it's already clean, load it normally
+            model.load_state_dict(full_state_dict)
             
+        print(f"Successfully loaded Fusion model from {MODEL_PATH}")
+        
     except Exception as e:
-        print(f"ERROR loading Ensemble model: {e}")
+        print(f"ERROR loading Fusion model: {e}")
 
     model.to(DEVICE)
     model.eval()

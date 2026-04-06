@@ -1,132 +1,75 @@
 import cv2
-import torch
-import torch.nn.functional as F
 import numpy as np
+import tensorflow as tf
+import os
 
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# Suppress TensorFlow logging spam
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-# Emotion labels
-EMOTIONS = [
-    "Neutral", "Happy", "Sad",
-    "Anger", "Fear", "Disgust", "Surprise"
-]
+# -------------------------------\n
+# 1. Configuration & Label Mapping
+# -------------------------------\n
+MODEL_PATH = "aiSystem/models/ferplus_model_pd_best.h5"
 
-MODEL_PATH = "aiSystem/models/fer_cnn.pth"
+# The exact order your PyTorch Fusion model expects (DO NOT CHANGE)
+FUSION_EMOTIONS = ['Neutral', 'Happy', 'Sad', 'Anger', 'Fear', 'Disgust', 'Surprise']
 
+# The standard output order for FER+/FER2013 models. 
+# NOTE: If your specific .h5 model was trained with a different order, change this list!
+FERPLUS_EMOTIONS = ['Anger', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
 
-# -------------------------------
-# 1. Base CNN Architecture
-# -------------------------------
-class SimpleFER(torch.nn.Module):
+# Create a mapping array. This finds the index in the FER+ output and moves it to the Fusion position.
+MAPPING_INDICES = [FERPLUS_EMOTIONS.index(emo) for emo in FUSION_EMOTIONS]
 
-    def __init__(self):
-        super(SimpleFER, self).__init__()
-
-        self.conv1 = torch.nn.Conv2d(1, 32, 3)
-        self.conv2 = torch.nn.Conv2d(32, 64, 3)
-        self.pool = torch.nn.MaxPool2d(2)
-
-        self.fc1 = torch.nn.Linear(64 * 10 * 10, 128)
-        self.fc2 = torch.nn.Linear(128, 7)
-
-    def forward(self, x):
-
-        x = torch.relu(self.conv1(x))
-        x = self.pool(x)
-
-        x = torch.relu(self.conv2(x))
-        x = self.pool(x)
-
-        x = x.view(x.size(0), -1)
-
-        x = torch.relu(self.fc1(x))
-        x = self.fc2(x)
-
-        return x
-
-
-# -------------------------------
-# 2. Load Model Safely
-# -------------------------------
+# -------------------------------\n
+# 2. Load Keras Model Safely
+# -------------------------------\n
 def load_face_model():
-
     try:
-
-        loaded = torch.load(MODEL_PATH, map_location=DEVICE)
-
-        # Case 1: Full model saved
-        if isinstance(loaded, torch.nn.Module):
-            print("Loaded full FER model.")
-            model = loaded
-
-        # Case 2: state_dict saved
-        else:
-            model = SimpleFER()
-
-            try:
-                model.load_state_dict(loaded)
-                print("Loaded FER state_dict successfully.")
-
-            except Exception:
-
-                # Fix Sequential-style keys: 0.weight → conv1.weight
-                new_state = {}
-
-                key_map = {
-                    "0.weight": "conv1.weight",
-                    "0.bias": "conv1.bias",
-                    "2.weight": "conv2.weight",
-                    "2.bias": "conv2.bias",
-                    "5.weight": "fc1.weight",
-                    "5.bias": "fc1.bias",
-                    "7.weight": "fc2.weight",
-                    "7.bias": "fc2.bias",
-                }
-
-                for k, v in loaded.items():
-                    if k in key_map:
-                        new_state[key_map[k]] = v
-
-                model.load_state_dict(new_state)
-                print("Loaded FER weights after key remapping.")
-
+        print(f"Loading Keras FER+ model from {MODEL_PATH}...")
+        model = tf.keras.models.load_model(MODEL_PATH)
+        print("Successfully loaded Keras FER+ model.")
+        return model
     except Exception as e:
-
-        print("CRITICAL ERROR loading FER model.")
+        print("CRITICAL ERROR loading Keras FER+ model.")
         print("Actual error:", e)
+        return None
 
-        model = SimpleFER()
-        print("Using randomly initialized FER model.")
-
-    model.to(DEVICE)
-    model.eval()
-
-    return model
-
-
-# Load model once
+# Load model once when the file starts
 model = load_face_model()
 
-
-# -------------------------------
-# 3. Prediction Function
-# -------------------------------
+# -------------------------------\n
+# 3. Prediction & Reordering Function
+# -------------------------------\n
 def predict_face_prob(face_img):
-
-    if face_img is None or face_img.size == 0:
-        return np.zeros(7)
+    # Fallback to zeros if no face is detected or model failed to load
+    if face_img is None or face_img.size == 0 or model is None:
+        return np.zeros(7, dtype=np.float32)
 
     # Preprocessing
+    # Standard FER models expect 48x48. Change to 64x64 if your model requires it.
     face = cv2.resize(face_img, (48, 48))
-    face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+    
+    # Standard FER expects Grayscale. 
+    # (If your .h5 expects RGB, remove this line and use cv2.cvtColor(face, cv2.COLOR_BGR2RGB))
+    if len(face.shape) == 3:
+        face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+    
+    # Normalize to [0, 1]
     face = face / 255.0
 
-    face_tensor = torch.tensor(face).float().unsqueeze(0).unsqueeze(0).to(DEVICE)
+    # Keras expects input shape: (batch_size, height, width, channels)
+    # For a single 48x48 grayscale image, shape must be (1, 48, 48, 1)
+    face_input = np.expand_dims(face, axis=-1)  # Add channel dimension
+    face_input = np.expand_dims(face_input, axis=0) # Add batch dimension
 
-    with torch.no_grad():
+    # Get predictions
+    # verbose=0 stops Keras from printing a progress bar to the console on every single frame
+    preds = model.predict(face_input, verbose=0)[0] 
 
-        logits = model(face_tensor)
+    # REORDER the predictions to match the Fusion model's expectations
+    # If the h5 outputs 8 classes (FER+ sometimes includes 'Contempt'), you will need to handle that here.
+    reordered_preds = preds[MAPPING_INDICES]
 
-        probs = F.softmax(logits, dim=1)
-
-    return probs.cpu().numpy()[0]
+    # Return as a float32 numpy array, which predict_face_gest.py will convert to a tensor
+    return reordered_preds.astype(np.float32)
