@@ -1,0 +1,36 @@
+.venv/
+.vscode/
+__pycache__/
+*.pyc
+*.wav
+*.csv
+.ipynb_checkpoints
+*.keras
+*.pth
+*.pkl
+*.npz
+
+# vscode
+.vscode/
+
+# notebooks
+*.ipynb
+
+# models
+*.pth
+*.pt
+*.h5
+*.pkl
+*.npz
+*.ckpt
+*.keras
+*.npz
+
+# generated images
+*.png
+
+# environment
+.venv/
+
+# vscode
+.vscode/
