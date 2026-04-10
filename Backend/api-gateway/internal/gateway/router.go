@@ -25,6 +25,7 @@ func NewRouter(iamClient iampb.IAMServiceClient, userClient userpb.UserServiceCl
 	// User Routes (Protected)
 	mux.Handle("/api/user/profile-picture", h.AuthMiddleware(http.HandlerFunc(h.UploadProfilePicture)))
 	mux.Handle("/api/user/completion", h.AuthMiddleware(http.HandlerFunc(h.GetProfileCompletion)))
+	mux.Handle("/api/user/picture-name", h.AuthMiddleware(http.HandlerFunc(h.GetPictureWithName)))
 
 	mux.Handle("/api/user", h.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {

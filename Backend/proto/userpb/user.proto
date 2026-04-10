@@ -9,6 +9,7 @@ service UserService {
   rpc UpdateUser (ProfileUpdateRequest) returns (ApiResponse);
   rpc UploadProfilePicture (UploadProfilePictureRequest) returns (ApiResponse);
   rpc GetProfileCompleteness(GetUserRequest) returns (ProfileCompletenessResponse) ;
+  rpc GetPictureAndName (GetUserRequest) returns (NameAndPictureResponse);
 }
 
 message CreateUserRequest {
@@ -55,4 +56,9 @@ message ProfileCompletenessResponse {
   bool isCompleted = 1;
   double percentage_completed = 2;
   string name = 3;
+}
+
+message NameAndPictureResponse {
+  string name = 1;
+  string profile_picture = 2;
 }

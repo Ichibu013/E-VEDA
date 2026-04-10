@@ -459,3 +459,39 @@ func (h *Handler) GetProfileCompletion(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
 	}
 }
+
+func (h *Handler) GetPictureWithName(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be GET")
+		return
+	}
+
+	// Extract the authenticated user's ID from the JWT middleware
+	userUUID, ok := r.Context().Value(userUUIDKey).(string)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found in request context")
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
+	defer cancel()
+
+	// Call the User Service
+	res, err := h.userClient.GetPictureAndName(ctx, &userpb.GetUserRequest{
+		UserId: userUUID,
+	})
+	if err != nil {
+		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
+		"user_name":           res.Name,
+		"profile_picture_url": res.ProfilePicture,
+	})
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
+	}
+}

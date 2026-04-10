@@ -26,6 +26,7 @@ const (
 	UserService_UpdateUser_FullMethodName             = "/user.UserService/UpdateUser"
 	UserService_UploadProfilePicture_FullMethodName   = "/user.UserService/UploadProfilePicture"
 	UserService_GetProfileCompleteness_FullMethodName = "/user.UserService/GetProfileCompleteness"
+	UserService_GetPictureAndName_FullMethodName      = "/user.UserService/GetPictureAndName"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -37,6 +38,7 @@ type UserServiceClient interface {
 	UpdateUser(ctx context.Context, in *ProfileUpdateRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 	UploadProfilePicture(ctx context.Context, in *UploadProfilePictureRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 	GetProfileCompleteness(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*ProfileCompletenessResponse, error)
+	GetPictureAndName(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*NameAndPictureResponse, error)
 }
 
 type userServiceClient struct {
@@ -97,6 +99,16 @@ func (c *userServiceClient) GetProfileCompleteness(ctx context.Context, in *GetU
 	return out, nil
 }
 
+func (c *userServiceClient) GetPictureAndName(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*NameAndPictureResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NameAndPictureResponse)
+	err := c.cc.Invoke(ctx, UserService_GetPictureAndName_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -106,6 +118,7 @@ type UserServiceServer interface {
 	UpdateUser(context.Context, *ProfileUpdateRequest) (*ApiResponse, error)
 	UploadProfilePicture(context.Context, *UploadProfilePictureRequest) (*ApiResponse, error)
 	GetProfileCompleteness(context.Context, *GetUserRequest) (*ProfileCompletenessResponse, error)
+	GetPictureAndName(context.Context, *GetUserRequest) (*NameAndPictureResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -130,6 +143,9 @@ func (UnimplementedUserServiceServer) UploadProfilePicture(context.Context, *Upl
 }
 func (UnimplementedUserServiceServer) GetProfileCompleteness(context.Context, *GetUserRequest) (*ProfileCompletenessResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetProfileCompleteness not implemented")
+}
+func (UnimplementedUserServiceServer) GetPictureAndName(context.Context, *GetUserRequest) (*NameAndPictureResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetPictureAndName not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -242,6 +258,24 @@ func _UserService_GetProfileCompleteness_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetPictureAndName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetPictureAndName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetPictureAndName_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetPictureAndName(ctx, req.(*GetUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -268,6 +302,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProfileCompleteness",
 			Handler:    _UserService_GetProfileCompleteness_Handler,
+		},
+		{
+			MethodName: "GetPictureAndName",
+			Handler:    _UserService_GetPictureAndName_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

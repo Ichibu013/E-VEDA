@@ -11,20 +11,25 @@ import { userService } from '../api/user';
 export default function DashboardPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [completionData, setCompletionData] = useState(null);
+    const [profileData, setProfileData] = useState(null);
 
     useEffect(() => {
-        const fetchCompletion = async () => {
+        const fetchData = async () => {
             try {
-                const data = await userService.getCompletionStatus();
-                setCompletionData(data);
+                const [completion, profile] = await Promise.all([
+                    userService.getCompletionStatus(),
+                    userService.getProfile()
+                ]);
+                setCompletionData(completion);
+                setProfileData(profile);
             } catch (error) {
-                console.error('Failed to fetch completion status:', error);
+                console.error('Failed to fetch dashboard data:', error);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchCompletion();
+        fetchData();
     }, []);
 
     return (
@@ -47,7 +52,10 @@ export default function DashboardPage() {
                 
                 {/* Right Column (Span 4) */}
                 <div className="lg:col-span-4 flex flex-col gap-8">
-                    <PatientQuickInfo isLoading={isLoading} />
+                    <PatientQuickInfo 
+                        isLoading={isLoading} 
+                        data={profileData}
+                    />
                     <EmotionCalculator isLoading={isLoading} />
                 </div>
             </div>
