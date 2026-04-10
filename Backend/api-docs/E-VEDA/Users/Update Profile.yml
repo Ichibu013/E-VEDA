@@ -1,0 +1,83 @@
+info:
+  name: Update Profile
+  type: http
+  seq: 3
+
+http:
+  method: PUT
+  url: "{{base_url}}/api/user"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Jane Doe",
+        "nickname": "Janie",
+        "age": 28
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 500 error
+    request:
+      url: "{{base_url}}/api/user"
+      method: PUT
+      body:
+        type: json
+        data: |-
+          {
+            "name": "Jane Doe",
+            "nickname": "Janie",
+            "age": 28
+          }
+    response:
+      status: 500
+      statusText: Internal Server Error
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 11:35:22 GMT
+        - name: content-length
+          value: "89"
+      body:
+        type: json
+        data: |-
+          {
+            "error": "Internal Server Error",
+            "message": "Failed to update user profile",
+            "status": 500
+          }
+  - name: Success Response
+    request:
+      url: "{{base_url}}/api/user"
+      method: PUT
+      body:
+        type: json
+        data: |-
+          {
+            "name": "Jane Doe",
+            "nickname": "Janie",
+            "age": 28
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 11:37:38 GMT
+        - name: content-length
+          value: "48"
+      body:
+        type: json
+        data: |-
+          {
+            "message": "User Profile Updated Successfully"
+          }

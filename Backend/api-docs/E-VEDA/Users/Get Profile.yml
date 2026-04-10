@@ -1,0 +1,85 @@
+info:
+  name: Get Profile
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{base_url}}/api/user"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Not Found Error
+    request:
+      url: "{{base_url}}/api/user"
+      method: GET
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 11:26:38 GMT
+        - name: content-length
+          value: "69"
+      body:
+        type: json
+        data: |-
+          {
+            "error": "Not Found",
+            "message": "Internal server error",
+            "status": 404
+          }
+  - name: Sucess response for new user
+    request:
+      url: "{{base_url}}/api/user"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 11:33:12 GMT
+        - name: content-length
+          value: "65"
+      body:
+        type: json
+        data: |-
+          {
+            "age": "0",
+            "name": "Jane Doe",
+            "nickname": "",
+            "profile_picture": ""
+          }
+  - name: Complete Response
+    request:
+      url: "{{base_url}}/api/user"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 11:42:47 GMT
+        - name: content-length
+          value: "158"
+      body:
+        type: json
+        data: |-
+          {
+            "age": "28",
+            "name": "Jane Doe",
+            "nickname": "Janie",
+            "profile_picture": "http://localhost:9000/e-veda-profiles/d808c229-a47d-406f-85b1-8629f0500523-f7c662aa.jpg"
+          }

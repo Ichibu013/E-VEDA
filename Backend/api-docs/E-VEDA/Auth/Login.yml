@@ -1,0 +1,80 @@
+info:
+  name: Login
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{base_url}}/api/login"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "jane.doe@example.com",
+        "password": "securePassword123!"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: "{{base_url}}/api/login"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "email": "jane.doe@example.com",
+            "password": "securePassword123!"
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 11:23:36 GMT
+        - name: content-length
+          value: "245"
+      body:
+        type: json
+        data: |-
+          {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX3V1aWQiOiJkODA4YzIyOS1hNDdkLTQwNmYtODViMS04NjI5ZjA1MDA1MjMiLCJpc3MiOiJFLVZFREEtaWFtLXNlcnZpY2UiLCJleHAiOjE3NzU5MDY2MTYsImlhdCI6MTc3NTgyMDIxNn0.-hXM3xnplZkOafTumK17qF3UrwSKnsDjvoY_qhGqEEk"
+          }
+  - name: Error Response
+    request:
+      url: "{{base_url}}/api/login"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "email": "jane.doe@example.com",
+            "password": "securePassword!"
+          }
+    response:
+      status: 401
+      statusText: Unauthorized
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 11:23:57 GMT
+        - name: content-length
+          value: "70"
+      body:
+        type: json
+        data: |-
+          {
+            "error": "Unauthorized",
+            "message": "Invalid credentials",
+            "status": 401
+          }
