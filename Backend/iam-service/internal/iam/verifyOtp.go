@@ -33,7 +33,7 @@ func (s *Server) VerifyOTP(ctx context.Context, req *pb.VerifyOtpRequest) (*pb.V
 		log.Println("Error saving reset token")
 	}
 
-	_ = s.rdb.Del(ctx, resetToken).Err()
+	_ = s.rdb.Del(ctx, "otp:"+req.GetEmail()).Err()
 
 	return &pb.VerifyOtpResponse{
 		ResetToken: resetToken,

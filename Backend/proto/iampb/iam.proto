@@ -10,6 +10,7 @@ service IAMService {
   rpc VerifyOtp (VerifyOtpRequest) returns (VerifyOtpResponse);
   rpc ResetPassword (ResetPasswordRequest) returns (ApiResponse);
   rpc ValidateToken (TokenRequest) returns (ValidationResponse);
+  rpc DeleteUser (DeleteUserRequest) returns (ApiResponse);
 }
 
 message ForgotPasswordRequest {
@@ -42,6 +43,10 @@ message LoginResponse {
 
 message TokenRequest {
   string token = 1;
+}
+
+message DeleteUserRequest {
+  string user_uuid = 1;
 }
 
 message ValidationResponse {
