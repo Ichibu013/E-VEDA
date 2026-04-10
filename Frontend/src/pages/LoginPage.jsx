@@ -1,27 +1,43 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { authService } from '../api/auth';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = (e) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleLogin = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (isSubmitting) return;
     
-    setIsSubmitting(true);
-    const loginPromise = new Promise((resolve) => setTimeout(resolve, 2000));
+    if (!email || !password) {
+      toast.error('Please enter both email and password');
+      return;
+    }
     
-    toast.promise(loginPromise, {
-      loading: 'Authenticating...',
-      success: 'Successfully logged in!',
-      error: 'Failed to login',
-    });
+    setIsSubmitting(true);
+    
+    try {
+      const loginPromise = authService.login(email, password);
+      
+      toast.promise(loginPromise, {
+        loading: 'Authenticating...',
+        success: 'Successfully logged in!',
+        error: (err) => err.message || 'Failed to login',
+      });
 
-    loginPromise.then(() => {
+      await loginPromise;
       navigate('/dashboard');
-    });
+    } catch (error) {
+      // toast.promise already handles the error toast
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -63,7 +79,10 @@ export default function LoginPage() {
                 id="username"
                 name="username"
                 placeholder="name@example.com"
-                type="text"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -94,14 +113,18 @@ export default function LoginPage() {
                 id="password"
                 name="password"
                 placeholder="••••••••"
-                type="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
               <button
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-outline-variant hover:text-outline"
+                className={`absolute inset-y-0 right-0 pr-4 flex items-center transition-colors ${showPassword ? 'text-primary' : 'text-outline-variant hover:text-outline'}`}
                 type="button"
+                onClick={() => setShowPassword(!showPassword)}
               >
                 <span className="material-symbols-outlined text-[20px]">
-                  visibility
+                  {showPassword ? 'visibility_off' : 'visibility'}
                 </span>
               </button>
             </div>

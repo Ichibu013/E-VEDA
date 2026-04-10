@@ -1,27 +1,51 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { authService } from '../api/auth';
 
 export default function SignupPage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSignup = (e) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handleSignup = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (isSubmitting) return;
 
-    setIsSubmitting(true);
-    const signupPromise = new Promise((resolve) => setTimeout(resolve, 2000));
-    
-    toast.promise(signupPromise, {
-      loading: 'Creating account...',
-      success: 'Account created successfully!',
-      error: 'Failed to create account',
-    });
+    if (!name || !email || !password || !confirmPassword) {
+      toast.error('Please fill in all fields');
+      return;
+    }
 
-    signupPromise.then(() => {
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const signupPromise = authService.signup(name, email, password);
+      
+      toast.promise(signupPromise, {
+        loading: 'Creating account...',
+        success: 'Account created successfully!',
+        error: (err) => err.message || 'Failed to create account',
+      });
+
+      await signupPromise;
       navigate('/login');
-    });
+    } catch (error) {
+      // toast.promise handles the error UI
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -63,8 +87,10 @@ export default function SignupPage() {
                 id="username"
                 name="username"
                 placeholder="clinician_alex"
-                required=""
                 type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -87,8 +113,10 @@ export default function SignupPage() {
                 id="email"
                 name="email"
                 placeholder="name@e-veda.health"
-                required=""
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -111,15 +139,18 @@ export default function SignupPage() {
                 id="password"
                 name="password"
                 placeholder="••••••••"
-                required=""
-                type="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
               <button
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-outline-variant hover:text-outline"
+                className={`absolute inset-y-0 right-0 pr-4 flex items-center transition-colors ${showPassword ? 'text-primary' : 'text-outline-variant hover:text-outline'}`}
                 type="button"
+                onClick={() => setShowPassword(!showPassword)}
               >
                 <span className="material-symbols-outlined text-[20px]">
-                  visibility
+                  {showPassword ? 'visibility_off' : 'visibility'}
                 </span>
               </button>
             </div>
@@ -139,13 +170,24 @@ export default function SignupPage() {
                 </span>
               </div>
               <input
-                className="block w-full pl-11 pr-4 py-3.5 bg-surface-container-lowest border-0 rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all duration-200 placeholder:text-outline-variant text-on-surface shadow-sm shadow-black/5"
+                className="block w-full pl-11 pr-12 py-3.5 bg-surface-container-lowest border-0 rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all duration-200 placeholder:text-outline-variant text-on-surface shadow-sm shadow-black/5"
                 id="confirm-password"
                 name="confirm-password"
                 placeholder="••••••••"
-                required=""
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
               />
+              <button
+                className={`absolute inset-y-0 right-0 pr-4 flex items-center transition-colors ${showConfirmPassword ? 'text-primary' : 'text-outline-variant hover:text-outline'}`}
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <span className="material-symbols-outlined text-[20px]">
+                  {showConfirmPassword ? 'visibility_off' : 'visibility'}
+                </span>
+              </button>
             </div>
           </div>
           {/* Terms and Conditions */}
