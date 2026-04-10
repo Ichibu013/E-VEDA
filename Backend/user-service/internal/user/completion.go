@@ -6,6 +6,7 @@ import (
 	pb "e_veda/proto/userpb"
 	"errors" // Added for modern error checking
 	"log"
+	"math"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -22,8 +23,10 @@ func (s *Server) GetProfileCompleteness(ctx context.Context, request *pb.GetUser
              (CASE WHEN name IS NULL OR TRIM(name) = '' THEN 1.0 ELSE 0.0 END) +
              (CASE WHEN nickname IS NULL OR TRIM(nickname) = '' THEN 1.0 ELSE 0.0 END) +
              (CASE WHEN age IS NULL THEN 1.0 ELSE 0.0 END) +
-             (CASE WHEN profile_picture IS NULL OR TRIM(profile_picture) = '' THEN 1.0 ELSE 0.0 END) 
-          ) * 100.0 / 4.0 AS null_percentage,
+             (CASE WHEN profile_picture IS NULL OR TRIM(profile_picture) = '' THEN 1.0 ELSE 0.0 END) +
+             (CASE WHEN height IS NULL THEN 1.0 ELSE 0.0 END) + 
+             (CASE WHEN weight IS NULL THEN 1.0 ELSE 0.0 END)
+          ) * 100.0 / 6.0 AS null_percentage,
            name
        FROM e_veda_users
        WHERE iam_id = $1;
@@ -46,7 +49,7 @@ func (s *Server) GetProfileCompleteness(ctx context.Context, request *pb.GetUser
 
 	return &pb.ProfileCompletenessResponse{
 		IsCompleted:         completedPercentage == 100.0,
-		PercentageCompleted: completedPercentage,
+		PercentageCompleted: math.Round(completedPercentage),
 		Name:                name,
 	}, nil
 }

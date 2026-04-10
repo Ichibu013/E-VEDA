@@ -10,9 +10,11 @@ http:
     type: json
     data: |-
       {
-        "name": "Jane Doe",
-        "nickname": "Janie",
-        "age": 28
+        "name": "Ansh Sharma",
+        "nickname": "Ansh",
+        "age": 28,
+        "height" : 158,
+        "weight" : 54.5
       }
   auth: inherit
 
@@ -61,18 +63,28 @@ examples:
         type: json
         data: |-
           {
-            "name": "Jane Doe",
-            "nickname": "Janie",
-            "age": 28
+            "name": "Ansh Sharma",
+            "nickname": "Ansh",
+            "age": 28,
+            "height" : 158,
+            "weight" : 54.5
           }
     response:
       status: 200
       statusText: OK
       headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Authorization
+        - name: access-control-allow-methods
+          value: GET, POST, PUT, DELETE, OPTIONS
+        - name: access-control-allow-origin
+          value: http://localhost:5173
         - name: content-type
           value: application/json
         - name: date
-          value: Fri, 10 Apr 2026 11:37:38 GMT
+          value: Fri, 10 Apr 2026 13:40:10 GMT
         - name: content-length
           value: "48"
       body:

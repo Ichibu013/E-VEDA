@@ -45,20 +45,30 @@ examples:
       status: 200
       statusText: OK
       headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Authorization
+        - name: access-control-allow-methods
+          value: GET, POST, PUT, DELETE, OPTIONS
+        - name: access-control-allow-origin
+          value: http://localhost:5173
         - name: content-type
           value: application/json
         - name: date
-          value: Fri, 10 Apr 2026 11:33:12 GMT
+          value: Fri, 10 Apr 2026 13:38:34 GMT
         - name: content-length
-          value: "65"
+          value: "88"
       body:
         type: json
         data: |-
           {
-            "age": "0",
-            "name": "Jane Doe",
+            "age": 0,
+            "height": 0,
+            "name": "Ansh Sharma",
             "nickname": "",
-            "profile_picture": ""
+            "profile_picture": "",
+            "weight": 0
           }
   - name: Complete Response
     request:
@@ -68,18 +78,28 @@ examples:
       status: 200
       statusText: OK
       headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Authorization
+        - name: access-control-allow-methods
+          value: GET, POST, PUT, DELETE, OPTIONS
+        - name: access-control-allow-origin
+          value: http://localhost:5173
         - name: content-type
           value: application/json
         - name: date
-          value: Fri, 10 Apr 2026 11:42:47 GMT
+          value: Fri, 10 Apr 2026 13:41:59 GMT
         - name: content-length
-          value: "158"
+          value: "185"
       body:
         type: json
         data: |-
           {
-            "age": "28",
-            "name": "Jane Doe",
-            "nickname": "Janie",
-            "profile_picture": "http://localhost:9000/e-veda-profiles/d808c229-a47d-406f-85b1-8629f0500523-f7c662aa.jpg"
+            "age": 28,
+            "height": 158,
+            "name": "Ansh Sharma",
+            "nickname": "Ansh",
+            "profile_picture": "http://localhost:9000/e-veda-profiles/4caca9f3-8252-4f70-ae98-8dff36381380-5757f376.jpg",
+            "weight": 54.5
           }

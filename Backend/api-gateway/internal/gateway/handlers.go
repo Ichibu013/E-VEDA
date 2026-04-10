@@ -10,7 +10,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"path/filepath"
-	"strconv"
 	"time"
 
 	"google.golang.org/grpc/status" // Required to unpack gRPC errors
@@ -46,9 +45,11 @@ type ResetPasswordPayload struct {
 }
 
 type ProfileUpdatePayload struct {
-	Name     string `json:"name"`
-	Nickname string `json:"nickname"`
-	Age      int64  `json:"age"`
+	Name     string  `json:"name"`
+	Nickname string  `json:"nickname"`
+	Age      int64   `json:"age"`
+	Height   int64   `json:"height"`
+	Weight   float64 `json:"weight"`
 }
 
 // ==========================================
@@ -137,11 +138,13 @@ func (h *Handler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(map[string]string{
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
 		"name":            res.Name,
 		"nickname":        res.Nickname,
-		"age":             strconv.FormatInt(res.Age, 10),
+		"age":             res.Age,
 		"profile_picture": res.ProfilePicture,
+		"height":          res.Height,
+		"weight":          res.Weight,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
@@ -332,6 +335,8 @@ func (h *Handler) UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 		Name:     payload.Name,
 		Nickname: payload.Nickname,
 		Age:      payload.Age,
+		Height:   payload.Height,
+		Weight:   payload.Weight,
 	})
 	if err != nil {
 		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)

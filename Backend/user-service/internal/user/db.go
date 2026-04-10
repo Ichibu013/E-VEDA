@@ -26,6 +26,8 @@ func InitDB(connStr string) (*sql.DB, error) {
 		nickname VARCHAR(255),
 		age INT,
 		profile_picture TEXT,
+    	height INT,
+    	weight FLOAT,
 		created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 	);`

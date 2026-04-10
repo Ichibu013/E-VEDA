@@ -36,6 +36,8 @@ message ProfileUpdateRequest {
   string name = 2;
   string nickname = 3;
   int64 age = 4;
+  int64 height = 5;
+  double weight = 6;
 }
 
 message UserResponse {
@@ -43,6 +45,8 @@ message UserResponse {
   string nickname = 2;
   int64 age = 3;
   string profile_picture = 4;
+  int64 height = 5;
+  double weight = 6;
 }
 
 message ProfileCompletenessResponse {

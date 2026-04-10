@@ -12,11 +12,18 @@ import (
 func (s *Server) UpdateUser(ctx context.Context, req *pb.ProfileUpdateRequest) (*pb.ApiResponse, error) {
 	log.Printf("Updating user profile for id: %s", req.GetUserId())
 
-	// FIXED: Corrected the SQL syntax to map each column to its own placeholder
-	query := `UPDATE e_veda_users SET name = $1, nickname = $2, age = $3 WHERE iam_id = $4`
+	// Corrected the SQL syntax to map each column to its own placeholder
+	query := `UPDATE e_veda_users SET name = $1, nickname = $2, age = $3, height = $4, weight = $5 WHERE iam_id = $6`
 
 	// Passed the 4 variables to match $1, $2, $3, and $4 in exact order
-	res, err := s.db.ExecContext(ctx, query, req.GetName(), req.GetNickname(), req.GetAge(), req.GetUserId())
+	res, err := s.db.ExecContext(ctx, query,
+		req.GetName(),
+		req.GetNickname(),
+		req.GetAge(),
+		req.GetHeight(),
+		req.GetWeight(),
+		req.GetUserId(),
+	)
 	if err != nil {
 		log.Printf("Database error during user update: %s", err)
 		return nil, status.Error(codes.Internal, "Failed to update user profile")
