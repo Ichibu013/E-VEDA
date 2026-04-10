@@ -3,8 +3,8 @@ import Skeleton from 'react-loading-skeleton';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
-export default function WelcomeBanner({ isLoading }) {
-  const targetPercent = 85;
+export default function WelcomeBanner({ isLoading, userName, completionPercentage }) {
+  const targetPercent = completionPercentage || 0;
   const [currentPercent, setCurrentPercent] = useState(0);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function WelcomeBanner({ isLoading }) {
         {/* Left Content Area */}
         <div className="flex-1 text-center lg:text-left">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-3 tracking-tight">
-            Hello, Srushti Shinde
+            Hello, {userName || 'User'}
           </h2>
           <p className="text-white/90 text-base md:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed mb-8">
             Your emotional intelligence metrics have improved by 12% this week.

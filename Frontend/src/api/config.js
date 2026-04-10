@@ -1,31 +1,43 @@
+import axios from 'axios';
+import { getCookie } from '../utils/cookies';
+
 export const BASE_URL = 'http://localhost:8080/api';
 
 /**
- * Base fetch wrapper to handle JSON and errors
+ * Centered Axios instance
  */
-export const apiClient = async (endpoint, options = {}) => {
-  const { body, headers, ...customConfig } = options;
-  
-  const config = {
-    method: body ? 'POST' : 'GET',
-    ...customConfig,
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers,
-    },
-  };
+export const apiClient = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
-  if (body) {
-    config.body = JSON.stringify(body);
+/**
+ * Request Interceptor: Inject Auth Token
+ */
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = getCookie('auth_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
+);
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, config);
-
-  const data = await response.json();
-
-  if (response.ok) {
-    return data;
-  } else {
-    throw new Error(data.message || 'Request failed');
+/**
+ * Response Interceptor: Handle Errors Globally
+ */
+apiClient.interceptors.response.use(
+  (response) => {
+    return response.data;
+  },
+  (error) => {
+    const message = error.response?.data?.message || error.message || 'An unexpected error occurred';
+    return Promise.reject(new Error(message));
   }
-};
+);

@@ -9,9 +9,7 @@ export const authService = {
    * Login user and store token in cookies
    */
   async login(email, password) {
-    const data = await apiClient('/login', {
-      body: { email, password },
-    });
+    const data = await apiClient.post('/login', { email, password });
 
     if (data.token) {
       setCookie('auth_token', data.token);
@@ -24,8 +22,6 @@ export const authService = {
    * Register a new user
    */
   async signup(name, email, password) {
-    return apiClient('/signup', {
-      body: { name, email, password },
-    });
+    return apiClient.post('/signup', { name, email, password });
   },
 };
