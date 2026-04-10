@@ -1,0 +1,57 @@
+info:
+  name: Upload profile Picture
+  type: http
+  seq: 4
+
+http:
+  method: post
+  url: http://localhost:8080/api/user/profile-picture
+  headers:
+    - name: Content-Type
+      value: multipart/form-data
+  body:
+    type: multipart-form
+    data:
+      - name: profile_picture
+        type: file
+        value: &a1
+          - C:\Users\Ansh\Downloads\photo3.jpg
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Sucess Response
+    request:
+      url: http://localhost:8080/api/user/profile-picture
+      method: post
+      headers:
+        - name: Content-Type
+          value: multipart/form-data
+      body:
+        type: multipart-form
+        data:
+          - name: profile_picture
+            type: file
+            value: *a1
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 11:40:58 GMT
+        - name: content-length
+          value: "153"
+      body:
+        type: json
+        data: |-
+          {
+            "image_url": "http://localhost:9000/e-veda-profiles/d808c229-a47d-406f-85b1-8629f0500523-f7c662aa.jpg",
+            "message": "Profile picture updated successfully"
+          }

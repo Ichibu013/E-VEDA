@@ -1,0 +1,106 @@
+info:
+  name: Get Completion
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{base_url}}/api/user/completion"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 25% completion
+    description: Completion Status for new user
+    request:
+      url: "{{base_url}}/api/user/completion"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 12:01:05 GMT
+        - name: content-length
+          value: "71"
+      body:
+        type: json
+        data: |-
+          {
+            "completion_percentage": 25,
+            "isComplete": false,
+            "user_name": "Jane Doe"
+          }
+  - name: 50% Completion
+    request:
+      url: "{{base_url}}/api/user/completion"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 12:01:51 GMT
+        - name: content-length
+          value: "71"
+      body:
+        type: json
+        data: |-
+          {
+            "completion_percentage": 50,
+            "isComplete": false,
+            "user_name": "Jane Doe"
+          }
+  - name: 100% Completion
+    request:
+      url: "{{base_url}}/api/user/completion"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 12:02:15 GMT
+        - name: content-length
+          value: "71"
+      body:
+        type: json
+        data: |-
+          {
+            "completion_percentage": 100,
+            "isComplete": true,
+            "user_name": "Jane Doe"
+          }
+  - name: 75% Completion
+    request:
+      url: "{{base_url}}/api/user/completion"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 12:03:03 GMT
+        - name: content-length
+          value: "71"
+      body:
+        type: json
+        data: |-
+          {
+            "completion_percentage": 75,
+            "isComplete": false,
+            "user_name": "Jane Doe"
+          }

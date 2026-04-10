@@ -1,0 +1,84 @@
+info:
+  name: SignUp
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}/api/signup"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Jane Doe",
+        "email": "jane.doe@example.com",
+        "password": "securePassword123!"
+      }  
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: "{{base_url}}/api/signup"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "name": "Jane Doe",
+            "email": "jane.doe@example.com",
+            "password": "securePassword123!"
+          }  
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 11:19:08 GMT
+        - name: content-length
+          value: "91"
+      body:
+        type: json
+        data: |-
+          {
+            "message": "User created Successfully",
+            "user_uuid": "d808c229-a47d-406f-85b1-8629f0500523"
+          }
+  - name: Already Exisits Error
+    request:
+      url: "{{base_url}}/api/signup"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "name": "Jane Doe",
+            "email": "jane.doe@example.com",
+            "password": "securePassword123!"
+          }  
+    response:
+      status: 409
+      statusText: Conflict
+      headers:
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Fri, 10 Apr 2026 11:22:32 GMT
+        - name: content-length
+          value: "88"
+      body:
+        type: json
+        data: |-
+          {
+            "error": "Conflict",
+            "message": "Email jane.doe@example.com already exists",
+            "status": 409
+          }
