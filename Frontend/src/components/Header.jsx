@@ -1,14 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import Skeleton from 'react-loading-skeleton';
 import { CHeader, CContainer } from '@coreui/react';
 import Drawer from 'react-modern-drawer';
 import 'react-modern-drawer/dist/index.css';
+import { userService } from '../api/user';
 
 export default function Header() {
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [userData, setUserData] = useState({ name: '', profile_picture_url: '' });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const data = await userService.getNameAndPicture();
+        // Defensive mapping to support different API response formats
+        setUserData({
+          user_name: data.user_name || '',
+          profile_picture_url: data.profile_picture_url || ''
+        });
+      } catch (error) {
+        console.error('Failed to fetch user data for header:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   const toggleDrawer = () => {
     setIsDrawerOpen((prevState) => !prevState);
@@ -69,13 +92,20 @@ export default function Header() {
 
           <button 
             onClick={toggleDrawer}
+            disabled={isLoading}
             className="rounded-full outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 mr-4 cursor-pointer hover:opacity-80 transition-opacity"
           >
-            <img 
-               src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80" 
-               alt="User Avatar" 
-               className="w-9 h-9 rounded-full object-cover border border-slate-200"
-            />
+            {isLoading ? (
+              <div className="w-9 h-9 flex items-center justify-center">
+                <span className="material-symbols-outlined animate-spin text-[20px] text-primary">progress_activity</span>
+              </div>
+            ) : (
+              <img 
+                 src={userData.profile_picture_url || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80"} 
+                 alt={userData.user_name || "User"} 
+                 className="w-9 h-9 rounded-full object-cover border border-slate-200"
+              />
+            )}
           </button>
         </div>
 
@@ -98,20 +128,35 @@ export default function Header() {
           </div>
           
           <div className="flex flex-col items-center mb-8">
-            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80" className="w-24 h-24 rounded-full object-cover border-4 border-surface shadow-md mb-4" alt="Doctor" />
-            <h3 className="text-lg font-bold text-on-surface tracking-tight">Clinician Alex</h3>
-            <p className="text-sm text-on-surface-variant font-medium">Head of Neurology</p>
-            <span className="mt-3 px-4 py-1.5 bg-primary/10 text-primary font-bold text-[11px] uppercase tracking-wider rounded-full">Pro Account</span>
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-10">
+                <span className="material-symbols-outlined animate-spin text-[40px] text-primary mb-4">progress_activity</span>
+                <p className="text-sm text-on-surface-variant animate-pulse">Loading identity...</p>
+              </div>
+            ) : (
+              <>
+                <img 
+                  src={userData.profile_picture_url || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80"} 
+                  className="w-24 h-24 rounded-full object-cover border-4 border-surface shadow-md mb-4" 
+                    alt={userData.user_name || "User"} 
+                />
+                <h3 className="text-xl font-bold text-on-surface tracking-tight">{userData.user_name || "Clinician Alex"}</h3>
+              </>
+            )}
           </div>
 
-          <div className="flex-1 space-y-2">
-            <button onClick={() => { navigate('/dashboard/settings'); toggleDrawer(); }} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container-low transition-colors text-on-surface font-semibold text-sm">
+          <div className="flex-1">
+            {/* Main content area (currently empty, spacing maintained by flex-1) */}
+          </div>
+
+          <div className="pt-4 space-y-2">
+            <button 
+              onClick={() => { navigate('/dashboard/settings'); toggleDrawer(); }} 
+              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-surface-container-low transition-colors text-on-surface font-semibold text-sm"
+            >
               <span className="material-symbols-outlined text-primary">settings</span>
               Account Settings
             </button>
-          </div>
-
-          <div className="pt-4 border-t border-surface-container">
             <button 
               onClick={handleLogout} 
               disabled={isLoggingOut}

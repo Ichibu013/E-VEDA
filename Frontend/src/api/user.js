@@ -35,4 +35,11 @@ export const userService = {
       },
     });
   },
+
+  /**
+   * Get user's name and profile picture
+   */
+  async getNameAndPicture() {
+    return apiClient.get('/user/picture-name');
+  },
 };
