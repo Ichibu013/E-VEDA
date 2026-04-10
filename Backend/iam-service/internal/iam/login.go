@@ -17,7 +17,7 @@ import (
 func (s *Server) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginResponse, error) {
 	var userUUID, passwordHash string
 
-	err := s.db.QueryRowContext(ctx, "SELECT user_uuid, password_hash FROM iam_users WHERE email =$1", in.Email).Scan(&userUUID, &passwordHash)
+	err := s.db.QueryRowContext(ctx, "SELECT user_uuid, password_hash FROM e_veda_iam_users WHERE email =$1", in.Email).Scan(&userUUID, &passwordHash)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, status.Error(codes.Unauthenticated, "Invalid credentials")

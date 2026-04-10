@@ -31,7 +31,7 @@ func (s *Server) ResetPassword(ctx context.Context, req *pb.ResetPasswordRequest
 	}
 
 	// 3. Update the password in PostgreSQL
-	query := `UPDATE iam_users SET password_hash = $1 WHERE email = $2`
+	query := `UPDATE e_veda_iam_users SET password_hash = $1 WHERE email = $2`
 	result, err := s.db.ExecContext(ctx, query, string(hashedPassword), email)
 	if err != nil {
 		log.Printf("CRITICAL: Database error updating password: %v", err)

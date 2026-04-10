@@ -12,7 +12,13 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"google.golang.org/grpc/status" // Required to unpack gRPC errors
 )
+
+// ==========================================
+// Struct Definitions
+// ==========================================
 
 type LoginPayload struct {
 	Email    string `json:"email"`
@@ -45,15 +51,43 @@ type ProfileUpdatePayload struct {
 	Age      int64  `json:"age"`
 }
 
+// ==========================================
+// JSON Error Helpers
+// ==========================================
+
+// respondWithError sends a standard JSON formatted error
+func respondWithError(w http.ResponseWriter, statusCode int, errorType string, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"error":   errorType,
+		"status":  statusCode,
+		"message": message,
+	})
+}
+
+// respondWithGrpcError extracts the clean message from a gRPC error and formats it as JSON
+func respondWithGrpcError(w http.ResponseWriter, statusCode int, errorType string, err error) {
+	message := err.Error()
+	if st, ok := status.FromError(err); ok {
+		message = st.Message() // Extract the clean message without the gRPC wrapper
+	}
+	respondWithError(w, statusCode, errorType, message)
+}
+
+// ==========================================
+// Handlers
+// ==========================================
+
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed .. most be POST", http.StatusMethodNotAllowed)
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be POST")
 		return
 	}
 
 	var payload LoginPayload
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		http.Error(w, "Invalid JSON request", http.StatusBadRequest)
+		respondWithError(w, http.StatusBadRequest, "Bad Request", "Invalid JSON request")
 		return
 	}
 
@@ -66,7 +100,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		Password: payload.Password,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+		respondWithGrpcError(w, http.StatusUnauthorized, "Unauthorized", err)
 		return
 	}
 
@@ -75,20 +109,19 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		"token": res.Token,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
 	}
 }
 
 func (h *Handler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed .. most be GET", http.StatusMethodNotAllowed)
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be GET")
 		return
 	}
 
 	userUUID, ok := r.Context().Value(userUUIDKey).(string)
 	if !ok {
-		http.Error(w, "User UUID not found in request context", http.StatusUnauthorized)
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found in request context")
 		return
 	}
 
@@ -99,7 +132,7 @@ func (h *Handler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 		UserId: userUUID,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+		respondWithGrpcError(w, http.StatusNotFound, "Not Found", err)
 		return
 	}
 
@@ -111,20 +144,19 @@ func (h *Handler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 		"profile_picture": res.ProfilePicture,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
 	}
 }
 
 func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed .. most be POST", http.StatusMethodNotAllowed)
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be POST")
 		return
 	}
 
 	var payload SignupPayload
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		http.Error(w, "Invalid JSON request", http.StatusBadRequest)
+		respondWithError(w, http.StatusBadRequest, "Bad Request", "Invalid JSON request")
 		return
 	}
 
@@ -136,7 +168,7 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 		Password: payload.Password,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusConflict)
+		respondWithGrpcError(w, http.StatusConflict, "Conflict", err)
 		return
 	}
 
@@ -144,7 +176,8 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 		UserId: iamRes.GetUserUuid(),
 		Name:   payload.Name,
 	})
-	// 3. THE FIX: Compensating Transaction (Rollback)
+
+	// THE FIX: Compensating Transaction (Rollback)
 	if err != nil {
 		log.Printf("User Service failed, rolling back IAM for %s", payload.Email)
 
@@ -154,12 +187,11 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 		})
 
 		if rollbackErr != nil {
-			// In a real enterprise app, you'd send this to a Dead Letter Queue or alerting system
 			log.Printf("CRITICAL ALERT: Rollback failed for %s. Manual intervention required. Err: %v", iamRes.GetUserUuid(), rollbackErr)
 		}
 
 		// Return a clean error to the client so they can try again
-		http.Error(w, "Failed to create account. Please try again.", http.StatusInternalServerError)
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", "Failed to create account. Please try again.")
 		return
 	}
 
@@ -169,20 +201,19 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 		"user_uuid": iamRes.GetUserUuid(),
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
 	}
 }
 
 func (h *Handler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed .. most be POST", http.StatusMethodNotAllowed)
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be POST")
 		return
 	}
 
 	var payload ForgotPasswordPayload
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		http.Error(w, "Invalid JSON request", http.StatusBadRequest)
+		respondWithError(w, http.StatusBadRequest, "Bad Request", "Invalid JSON request")
 		return
 	}
 
@@ -193,7 +224,7 @@ func (h *Handler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		Email: payload.Email,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+		respondWithGrpcError(w, http.StatusNotFound, "Not Found", err)
 		return
 	}
 
@@ -202,20 +233,19 @@ func (h *Handler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		"message": res.Message,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
 	}
 }
 
 func (h *Handler) VerifyOtp(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed .. most be POST", http.StatusMethodNotAllowed)
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be POST")
 		return
 	}
 
 	var payload VerifyOtpPayload
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		http.Error(w, "Invalid JSON request", http.StatusBadRequest)
+		respondWithError(w, http.StatusBadRequest, "Bad Request", "Invalid JSON request")
 		return
 	}
 
@@ -227,7 +257,7 @@ func (h *Handler) VerifyOtp(w http.ResponseWriter, r *http.Request) {
 		Otp:   payload.Otp,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+		respondWithGrpcError(w, http.StatusUnauthorized, "Unauthorized", err)
 		return
 	}
 
@@ -236,20 +266,19 @@ func (h *Handler) VerifyOtp(w http.ResponseWriter, r *http.Request) {
 		"reset_token": res.ResetToken,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
 	}
 }
 
 func (h *Handler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed .. most be POST", http.StatusMethodNotAllowed)
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be POST")
 		return
 	}
 
 	var payload ResetPasswordPayload
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		http.Error(w, "Invalid JSON request", http.StatusBadRequest)
+		respondWithError(w, http.StatusBadRequest, "Bad Request", "Invalid JSON request")
 		return
 	}
 
@@ -261,7 +290,7 @@ func (h *Handler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		NewPassword: payload.ResetPassword,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+		respondWithGrpcError(w, http.StatusUnauthorized, "Unauthorized", err)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -269,29 +298,28 @@ func (h *Handler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		"message": res.Message,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
 	}
 }
 
 func (h *Handler) UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 	// Standard REST convention is to use PUT or PATCH for updates
 	if r.Method != http.MethodPut {
-		http.Error(w, "Method not allowed .. must be PUT", http.StatusMethodNotAllowed)
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be PUT")
 		return
 	}
 
 	// Extract the authenticated user's ID from the JWT middleware
 	userUUID, ok := r.Context().Value(userUUIDKey).(string)
 	if !ok {
-		http.Error(w, "User UUID not found in request context", http.StatusUnauthorized)
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found in request context")
 		return
 	}
 
 	// Parse the JSON request body
 	var payload ProfileUpdatePayload
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		http.Error(w, "Invalid JSON request", http.StatusBadRequest)
+		respondWithError(w, http.StatusBadRequest, "Bad Request", "Invalid JSON request")
 		return
 	}
 
@@ -306,7 +334,7 @@ func (h *Handler) UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 		Age:      payload.Age,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
 		return
 	}
 
@@ -316,33 +344,32 @@ func (h *Handler) UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 		"message": res.Message,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
 	}
 }
 
 func (h *Handler) UploadProfilePicture(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be POST")
 		return
 	}
 
 	userUUID, ok := r.Context().Value(userUUIDKey).(string)
 	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "Unauthorized request")
 		return
 	}
 
 	// Parse multipart form, max 5MB
 	err := r.ParseMultipartForm(5 << 20)
 	if err != nil {
-		http.Error(w, "File is too large or invalid", http.StatusBadRequest)
+		respondWithError(w, http.StatusBadRequest, "Bad Request", "File is too large or invalid")
 		return
 	}
 
 	file, header, err := r.FormFile("profile_picture")
 	if err != nil {
-		http.Error(w, "Could not get uploaded file", http.StatusBadRequest)
+		respondWithError(w, http.StatusBadRequest, "Bad Request", "Could not get uploaded file")
 		return
 	}
 	defer func(file multipart.File) {
@@ -355,7 +382,7 @@ func (h *Handler) UploadProfilePicture(w http.ResponseWriter, r *http.Request) {
 	// Read file to bytes
 	fileBytes, err := io.ReadAll(file)
 	if err != nil {
-		http.Error(w, "Could not read file", http.StatusInternalServerError)
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", "Could not read file")
 		return
 	}
 
@@ -373,7 +400,7 @@ func (h *Handler) UploadProfilePicture(w http.ResponseWriter, r *http.Request) {
 		FileExtension: extension,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
 		return
 	}
 
@@ -383,8 +410,44 @@ func (h *Handler) UploadProfilePicture(w http.ResponseWriter, r *http.Request) {
 		"image_url": res.Message,
 	})
 	if err != nil {
-		log.Printf("Error uploading file: %v", err)
-		http.Error(w, "Failed to response body ", http.StatusInternalServerError)
+		log.Printf("Error encoding response: %v", err)
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", "Failed to encode response body")
+	}
+}
+
+func (h *Handler) GetProfileCompletion(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be GET")
 		return
+	}
+
+	// Extract the authenticated user's ID from the JWT middleware
+	userUUID, ok := r.Context().Value(userUUIDKey).(string)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found in request context")
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
+	defer cancel()
+
+	// Call the User Service
+	res, err := h.userClient.GetProfileCompleteness(ctx, &userpb.GetUserRequest{
+		UserId: userUUID,
+	})
+	if err != nil {
+		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
+		"isComplete":            res.IsCompleted,
+		"completion_percentage": res.PercentageCompleted,
+		"user_name":             res.Name,
+	})
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
 	}
 }

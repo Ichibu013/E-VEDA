@@ -21,10 +21,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_CreateUser_FullMethodName           = "/user.UserService/CreateUser"
-	UserService_GetUser_FullMethodName              = "/user.UserService/GetUser"
-	UserService_UpdateUser_FullMethodName           = "/user.UserService/UpdateUser"
-	UserService_UploadProfilePicture_FullMethodName = "/user.UserService/UploadProfilePicture"
+	UserService_CreateUser_FullMethodName             = "/user.UserService/CreateUser"
+	UserService_GetUser_FullMethodName                = "/user.UserService/GetUser"
+	UserService_UpdateUser_FullMethodName             = "/user.UserService/UpdateUser"
+	UserService_UploadProfilePicture_FullMethodName   = "/user.UserService/UploadProfilePicture"
+	UserService_GetProfileCompleteness_FullMethodName = "/user.UserService/GetProfileCompleteness"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -35,6 +36,7 @@ type UserServiceClient interface {
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	UpdateUser(ctx context.Context, in *ProfileUpdateRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 	UploadProfilePicture(ctx context.Context, in *UploadProfilePictureRequest, opts ...grpc.CallOption) (*ApiResponse, error)
+	GetProfileCompleteness(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*ProfileCompletenessResponse, error)
 }
 
 type userServiceClient struct {
@@ -85,6 +87,16 @@ func (c *userServiceClient) UploadProfilePicture(ctx context.Context, in *Upload
 	return out, nil
 }
 
+func (c *userServiceClient) GetProfileCompleteness(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*ProfileCompletenessResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ProfileCompletenessResponse)
+	err := c.cc.Invoke(ctx, UserService_GetProfileCompleteness_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -93,6 +105,7 @@ type UserServiceServer interface {
 	GetUser(context.Context, *GetUserRequest) (*UserResponse, error)
 	UpdateUser(context.Context, *ProfileUpdateRequest) (*ApiResponse, error)
 	UploadProfilePicture(context.Context, *UploadProfilePictureRequest) (*ApiResponse, error)
+	GetProfileCompleteness(context.Context, *GetUserRequest) (*ProfileCompletenessResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -114,6 +127,9 @@ func (UnimplementedUserServiceServer) UpdateUser(context.Context, *ProfileUpdate
 }
 func (UnimplementedUserServiceServer) UploadProfilePicture(context.Context, *UploadProfilePictureRequest) (*ApiResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UploadProfilePicture not implemented")
+}
+func (UnimplementedUserServiceServer) GetProfileCompleteness(context.Context, *GetUserRequest) (*ProfileCompletenessResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetProfileCompleteness not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -208,6 +224,24 @@ func _UserService_UploadProfilePicture_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetProfileCompleteness_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetProfileCompleteness(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetProfileCompleteness_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetProfileCompleteness(ctx, req.(*GetUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -230,6 +264,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UploadProfilePicture",
 			Handler:    _UserService_UploadProfilePicture_Handler,
+		},
+		{
+			MethodName: "GetProfileCompleteness",
+			Handler:    _UserService_GetProfileCompleteness_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

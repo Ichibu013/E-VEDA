@@ -22,9 +22,10 @@ func NewRouter(iamClient iampb.IAMServiceClient, userClient userpb.UserServiceCl
 	mux.HandleFunc("/api/verify-otp", h.VerifyOtp)
 	mux.HandleFunc("/api/reset-password", h.ResetPassword)
 
-	mux.Handle("/api/user/profile-picture", h.AuthMiddleware(http.HandlerFunc(h.UploadProfilePicture)))
-
 	// User Routes (Protected)
+	mux.Handle("/api/user/profile-picture", h.AuthMiddleware(http.HandlerFunc(h.UploadProfilePicture)))
+	mux.Handle("/api/user/completion", h.AuthMiddleware(http.HandlerFunc(h.GetProfileCompletion)))
+
 	mux.Handle("/api/user", h.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:

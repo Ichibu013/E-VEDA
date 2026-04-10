@@ -4,9 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/google/uuid"
 	_ "github.com/lib/pq"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func InitDB(connStr string) (*sql.DB, error) {
@@ -29,17 +27,6 @@ func InitDB(connStr string) (*sql.DB, error) {
 
 	if _, err = db.Exec(createUserTableQuery); err != nil {
 		log.Println("Error creating IAM users table")
-	}
-
-	// Set a test user
-	seedEmail := "ansharma013@gmail.com"
-	seedUUID := uuid.New().String()
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("ansh2004"), bcrypt.DefaultCost)
-
-	insertSeedQuery := `INSERT INTO iam_users (user_uuid, email, password_hash) VALUES ($1, $2, $3) ON CONFLICT (email) DO NOTHING;`
-
-	if _, err = db.Exec(insertSeedQuery, seedUUID, seedEmail, hashedPassword); err != nil {
-		log.Println("WARNING: Error inserting seed record")
 	}
 
 	return db, nil

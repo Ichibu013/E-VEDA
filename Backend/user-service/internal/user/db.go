@@ -3,9 +3,11 @@ package user
 import (
 	"database/sql"
 	"log"
+
+	_ "github.com/lib/pq"
 )
 
-func InitUsersDB(connStr string) (*sql.DB, error) {
+func InitDB(connStr string) (*sql.DB, error) {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, err
@@ -32,35 +34,9 @@ func InitUsersDB(connStr string) (*sql.DB, error) {
 		log.Fatalf("Failed to create users table: %v\n", err)
 	}
 
-	// Updated seed query utilizing the new schema fields
-	insertSeedQuery := `
-		INSERT INTO users (iam_id, name, nickname, age, profile_picture) 
-		VALUES ('12345', 'Ansh R Sharma', 'Ansharma013', 22, 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ansh') 
-		ON CONFLICT (iam_id) DO NOTHING;
-	`
-
-	if _, err = db.Exec(insertSeedQuery); err != nil {
-		log.Fatalf("WARNING: Failed to insert seed data: %v\n", err)
-	}
-
-	return db, nil
-}
-
-func InitReportsTable(connStr string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = db.Ping(); err != nil {
-		return nil, err
-	}
-
-	log.Println("Successfully connected to User database")
-
 	createReportsTableQuery := `CREATE TABLE IF NOT EXISTS reports_history (
 		id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-		user_uuid VARCHAR(255) REFERENCES users(iam_id) ON DELETE CASCADE,
+		user_uuid VARCHAR(255) REFERENCES e_veda_users(iam_id) ON DELETE CASCADE,
 		report_creation_date DATE NOT NULL,
 		report_creation_time TIME NOT NULL,
 		minio_audio_file_url TEXT,
@@ -75,7 +51,7 @@ func InitReportsTable(connStr string) (*sql.DB, error) {
 		log.Fatalf("Failed to create reports_history table: %v\n", err)
 	}
 
-	log.Println("Successfully verified reports_history table schema")
+	log.Println("Successfully verified users and reports_history table schemas")
 
 	return db, nil
 }
