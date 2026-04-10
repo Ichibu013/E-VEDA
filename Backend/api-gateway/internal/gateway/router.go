@@ -11,7 +11,7 @@ type Handler struct {
 	userClient userpb.UserServiceClient
 }
 
-func NewRouter(iamClient iampb.IAMServiceClient, userClient userpb.UserServiceClient) *http.ServeMux {
+func NewRouter(iamClient iampb.IAMServiceClient, userClient userpb.UserServiceClient) http.Handler {
 	h := &Handler{iamClient: iamClient, userClient: userClient}
 
 	mux := http.NewServeMux()
@@ -37,5 +37,5 @@ func NewRouter(iamClient iampb.IAMServiceClient, userClient userpb.UserServiceCl
 		}
 	})))
 
-	return mux
+	return CorsMiddleware(mux)
 }
