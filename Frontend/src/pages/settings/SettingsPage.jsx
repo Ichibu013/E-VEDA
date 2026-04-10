@@ -5,33 +5,75 @@ import PersonalProfile from './components/PersonalProfile';
 import SecuritySettings from './components/SecuritySettings';
 import WellnessPreferences from './components/WellnessPreferences';
 import HealthPrivacy from './components/HealthPrivacy';
+import { userService } from '../../api/user';
 
 export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [profileData, setProfileData] = useState({
+    name: '',
+    nickname: '',
+    age: '',
+    gender: '', // Added for UI consistency
+    height: '',
+    weight: '',
+    profile_picture: ''
+  });
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
+    const fetchProfile = async () => {
+      try {
+        const data = await userService.getProfile();
+        setProfileData({
+          ...profileData,
+          ...data,
+          // Ensure fields are strings for input handling
+          age: data.age?.toString() || '',
+          height: data.height?.toString() || '',
+          weight: data.weight?.toString() || '',
+          gender: data.gender || ''
+        });
+      } catch (error) {
+        console.error('Failed to fetch profile:', error);
+        toast.error('Failed to load profile data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
   }, []);
 
-  const handleSave = () => {
+  const handleProfileChange = (newData) => {
+    setProfileData(prev => ({ ...prev, ...newData }));
+  };
+
+  const handleSave = async () => {
     if (isSaving) return;
     setIsSaving(true);
     
-    const savePromise = new Promise((resolve) => setTimeout(resolve, 2000));
-    
-    toast.promise(savePromise, {
-      loading: 'Saving preferences...',
-      success: 'Preferences saved successfully!',
-      error: 'Failed to save preferences',
-    });
+    try {
+      const updatePromise = userService.updateProfile({
+        name: profileData.name,
+        nickname: profileData.nickname,
+        age: parseInt(profileData.age) || 0,
+        height: parseInt(profileData.height) || 0,
+        weight: parseFloat(profileData.weight) || 0,
+        gender: profileData.gender
+      });
+      
+      toast.promise(updatePromise, {
+        loading: 'Saving preferences...',
+        success: 'Preferences saved successfully!',
+        error: (err) => err.message || 'Failed to save preferences',
+      });
 
-    savePromise.then(() => {
+      await updatePromise;
+    } catch (error) {
+      // toast.promise handles the UI
+    } finally {
       setIsSaving(false);
-    });
+    }
   };
 
   return (
@@ -63,7 +105,11 @@ export default function SettingsPage() {
           </>
         ) : (
           <>
-            <PersonalProfile />
+             <PersonalProfile 
+               data={profileData} 
+               onChange={handleProfileChange}
+               isSaving={isSaving}
+             />
             <SecuritySettings />
             <WellnessPreferences />
             <HealthPrivacy />

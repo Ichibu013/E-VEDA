@@ -38,6 +38,7 @@ message ProfileUpdateRequest {
   int64 age = 4;
   int64 height = 5;
   double weight = 6;
+  string gender = 7;
 }
 
 message UserResponse {
@@ -47,6 +48,7 @@ message UserResponse {
   string profile_picture = 4;
   int64 height = 5;
   double weight = 6;
+  string gender = 7;
 }
 
 message ProfileCompletenessResponse {

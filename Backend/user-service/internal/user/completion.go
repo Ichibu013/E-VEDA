@@ -25,8 +25,9 @@ func (s *Server) GetProfileCompleteness(ctx context.Context, request *pb.GetUser
              (CASE WHEN age IS NULL THEN 1.0 ELSE 0.0 END) +
              (CASE WHEN profile_picture IS NULL OR TRIM(profile_picture) = '' THEN 1.0 ELSE 0.0 END) +
              (CASE WHEN height IS NULL THEN 1.0 ELSE 0.0 END) + 
-             (CASE WHEN weight IS NULL THEN 1.0 ELSE 0.0 END)
-          ) * 100.0 / 6.0 AS null_percentage,
+             (CASE WHEN weight IS NULL THEN 1.0 ELSE 0.0 END) +
+             (CASE WHEN gender IS NULL THEN 1.0 ELSE 0.0 END) 
+          ) * 100.0 / 7.0 AS null_percentage,
            name
        FROM e_veda_users
        WHERE iam_id = $1;

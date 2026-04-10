@@ -24,6 +24,7 @@ func InitDB(connStr string) (*sql.DB, error) {
 		iam_id VARCHAR(255) PRIMARY KEY,
 		name VARCHAR(255) NOT NULL,
 		nickname VARCHAR(255),
+    	gender VARCHAR(10),
 		age INT,
 		profile_picture TEXT,
     	height INT,

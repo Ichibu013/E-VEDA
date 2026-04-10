@@ -21,16 +21,18 @@ func (s *Server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.UserR
 	var nickname sql.NullString
 	var profilePicture sql.NullString
 	var age sql.NullInt64
+	var gender sql.NullString
 	var height sql.NullInt64
 	var weight sql.NullFloat64
 
-	err := s.db.QueryRowContext(ctx, "SELECT name, nickname, age, profile_picture,height,weight FROM e_veda_users WHERE iam_id = $1", req.UserId).Scan(
+	err := s.db.QueryRowContext(ctx, "SELECT name, nickname, age, profile_picture, height, weight, gender FROM e_veda_users WHERE iam_id = $1", req.UserId).Scan(
 		&name,
 		&nickname,
 		&age,
 		&profilePicture,
 		&height,
 		&weight,
+		&gender,
 	)
 
 	if err != nil {
@@ -45,6 +47,7 @@ func (s *Server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.UserR
 		Name:           name,
 		Nickname:       nickname.String,
 		Age:            age.Int64,
+		Gender:         gender.String,
 		ProfilePicture: profilePicture.String,
 		Height:         height.Int64,
 		Weight:         weight.Float64,

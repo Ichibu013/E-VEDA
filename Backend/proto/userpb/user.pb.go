@@ -239,6 +239,7 @@ type ProfileUpdateRequest struct {
 	Age           int64                  `protobuf:"varint,4,opt,name=age,proto3" json:"age,omitempty"`
 	Height        int64                  `protobuf:"varint,5,opt,name=height,proto3" json:"height,omitempty"`
 	Weight        float64                `protobuf:"fixed64,6,opt,name=weight,proto3" json:"weight,omitempty"`
+	Gender        string                 `protobuf:"bytes,7,opt,name=gender,proto3" json:"gender,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -315,6 +316,13 @@ func (x *ProfileUpdateRequest) GetWeight() float64 {
 	return 0
 }
 
+func (x *ProfileUpdateRequest) GetGender() string {
+	if x != nil {
+		return x.Gender
+	}
+	return ""
+}
+
 type UserResponse struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Name           string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -323,6 +331,7 @@ type UserResponse struct {
 	ProfilePicture string                 `protobuf:"bytes,4,opt,name=profile_picture,json=profilePicture,proto3" json:"profile_picture,omitempty"`
 	Height         int64                  `protobuf:"varint,5,opt,name=height,proto3" json:"height,omitempty"`
 	Weight         float64                `protobuf:"fixed64,6,opt,name=weight,proto3" json:"weight,omitempty"`
+	Gender         string                 `protobuf:"bytes,7,opt,name=gender,proto3" json:"gender,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -397,6 +406,13 @@ func (x *UserResponse) GetWeight() float64 {
 		return x.Weight
 	}
 	return 0
+}
+
+func (x *UserResponse) GetGender() string {
+	if x != nil {
+		return x.Gender
+	}
+	return ""
 }
 
 type ProfileCompletenessResponse struct {
@@ -475,21 +491,23 @@ const file_userpb_user_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
 	"\tfile_data\x18\x02 \x01(\fR\bfileData\x12!\n" +
 	"\fcontent_type\x18\x03 \x01(\tR\vcontentType\x12%\n" +
-	"\x0efile_extension\x18\x04 \x01(\tR\rfileExtension\"\xa1\x01\n" +
+	"\x0efile_extension\x18\x04 \x01(\tR\rfileExtension\"\xb9\x01\n" +
 	"\x14ProfileUpdateRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
 	"\bnickname\x18\x03 \x01(\tR\bnickname\x12\x10\n" +
 	"\x03age\x18\x04 \x01(\x03R\x03age\x12\x16\n" +
 	"\x06height\x18\x05 \x01(\x03R\x06height\x12\x16\n" +
-	"\x06weight\x18\x06 \x01(\x01R\x06weight\"\xa9\x01\n" +
+	"\x06weight\x18\x06 \x01(\x01R\x06weight\x12\x16\n" +
+	"\x06gender\x18\a \x01(\tR\x06gender\"\xc1\x01\n" +
 	"\fUserResponse\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
 	"\bnickname\x18\x02 \x01(\tR\bnickname\x12\x10\n" +
 	"\x03age\x18\x03 \x01(\x03R\x03age\x12'\n" +
 	"\x0fprofile_picture\x18\x04 \x01(\tR\x0eprofilePicture\x12\x16\n" +
 	"\x06height\x18\x05 \x01(\x03R\x06height\x12\x16\n" +
-	"\x06weight\x18\x06 \x01(\x01R\x06weight\"\x86\x01\n" +
+	"\x06weight\x18\x06 \x01(\x01R\x06weight\x12\x16\n" +
+	"\x06gender\x18\a \x01(\tR\x06gender\"\x86\x01\n" +
 	"\x1bProfileCompletenessResponse\x12 \n" +
 	"\visCompleted\x18\x01 \x01(\bR\visCompleted\x121\n" +
 	"\x14percentage_completed\x18\x02 \x01(\x01R\x13percentageCompleted\x12\x12\n" +

@@ -50,6 +50,7 @@ type ProfileUpdatePayload struct {
 	Age      int64   `json:"age"`
 	Height   int64   `json:"height"`
 	Weight   float64 `json:"weight"`
+	Gender   string  `json:"gender"`
 }
 
 // ==========================================
@@ -145,6 +146,7 @@ func (h *Handler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 		"profile_picture": res.ProfilePicture,
 		"height":          res.Height,
 		"weight":          res.Weight,
+		"gender":          res.Gender,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
@@ -337,6 +339,7 @@ func (h *Handler) UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 		Age:      payload.Age,
 		Height:   payload.Height,
 		Weight:   payload.Weight,
+		Gender:   payload.Gender,
 	})
 	if err != nil {
 		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)

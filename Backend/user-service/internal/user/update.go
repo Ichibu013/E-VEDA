@@ -13,7 +13,7 @@ func (s *Server) UpdateUser(ctx context.Context, req *pb.ProfileUpdateRequest) (
 	log.Printf("Updating user profile for id: %s", req.GetUserId())
 
 	// Corrected the SQL syntax to map each column to its own placeholder
-	query := `UPDATE e_veda_users SET name = $1, nickname = $2, age = $3, height = $4, weight = $5 WHERE iam_id = $6`
+	query := `UPDATE e_veda_users SET name = $1, nickname = $2, age = $3, height = $4, weight = $5, gender = $6 WHERE iam_id = $7`
 
 	// Passed the 4 variables to match $1, $2, $3, and $4 in exact order
 	res, err := s.db.ExecContext(ctx, query,
@@ -22,6 +22,7 @@ func (s *Server) UpdateUser(ctx context.Context, req *pb.ProfileUpdateRequest) (
 		req.GetAge(),
 		req.GetHeight(),
 		req.GetWeight(),
+		req.GetGender(),
 		req.GetUserId(),
 	)
 	if err != nil {
