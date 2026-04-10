@@ -10,10 +10,10 @@ import (
 )
 
 func (s *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.ApiResponse, error) {
-	log.Printf("Creating user profile for email: %s", req.GetEmail())
+	log.Printf("Creating user profile for id: %s", req.GetUserId())
 
-	query := `INSERT INTO users (id,name,email) VALUES ($1, $2, $3)`
-	_, err := s.db.ExecContext(ctx, query, req.GetUserId(), req.GetName(), req.GetEmail())
+	query := `INSERT INTO e_veda_users (iam_id,name) VALUES ($1, $2)`
+	_, err := s.db.ExecContext(ctx, query, req.GetUserId(), req.GetName())
 	if err != nil {
 		log.Printf("Database error during user creation: %s", err)
 		return nil, status.Error(codes.Internal, "Failed to Create user profile")

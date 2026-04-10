@@ -17,8 +17,8 @@ func main() {
 	if dbURL == "" {
 		dbURL = "postgres://postgres:root@localhost:5432/e_veda?sslmode=disable"
 	}
-	log.Println("Initializing IAM database...")
-	db, err := user.InitDB(dbURL)
+	log.Println("Initializing User database...")
+	usersDB, err := user.InitUsersDB(dbURL)
 	if err != nil {
 		// If the DB is down or tables fail to create, the app stops here
 		log.Fatalf("Database initialization failed for user: %v", err)
@@ -28,7 +28,17 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-	}(db)
+	}(usersDB)
+	historyDB, err := user.InitReportsTable(dbURL)
+	if err != nil {
+		log.Fatalf("Database initialization failed for reports_history: %v", err)
+	}
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(historyDB)
 
 	// Start Server
 	lis, err := net.Listen("tcp", ":50051")
@@ -40,7 +50,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 
 	// Instantiate server
-	pb.RegisterUserServiceServer(grpcServer, user.NewUserServer(db))
+	pb.RegisterUserServiceServer(grpcServer, user.NewUserServer(usersDB))
 
 	log.Printf("User Service listening at %v", lis.Addr())
 	if err := grpcServer.Serve(lis); err != nil {

@@ -13,7 +13,11 @@ import (
 
 func (s *Server) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequest) (*pb.ApiResponse, error) {
 	var exists bool
-	s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM iam_users WHERE email = $1)", req.Email).Scan(&exists)
+	err := s.db.QueryRow("SELECT EXISTS(SELECT 1 FROM iam_users WHERE email = $1)", req.Email).Scan(&exists)
+	if err != nil {
+		log.Printf("Database error checking email: %v", err)
+		return nil, status.Error(codes.Internal, "Internal database error")
+	}
 	if !exists {
 		return nil, status.Error(codes.NotFound, "Email not found")
 	}

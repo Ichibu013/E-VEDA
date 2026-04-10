@@ -21,7 +21,7 @@ func InitDB(connStr string) (*sql.DB, error) {
 
 	log.Println("Connected to IAM database")
 
-	createUserTableQuery := `CREATE TABLE IF NOT EXISTS iam_users (
+	createUserTableQuery := `CREATE TABLE IF NOT EXISTS e_veda_iam_users (
     user_uuid UUID PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL

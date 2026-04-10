@@ -22,7 +22,19 @@ func NewRouter(iamClient iampb.IAMServiceClient, userClient userpb.UserServiceCl
 	mux.HandleFunc("/api/verify-otp", h.VerifyOtp)
 	mux.HandleFunc("/api/reset-password", h.ResetPassword)
 
-	mux.Handle("/api/user", h.AuthMiddleware(http.HandlerFunc(h.GetUserProfile)))
+	mux.Handle("/api/user/profile-picture", h.AuthMiddleware(http.HandlerFunc(h.UploadProfilePicture)))
+
+	// User Routes (Protected)
+	mux.Handle("/api/user", h.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			h.GetUserProfile(w, r)
+		case http.MethodPut:
+			h.UpdateUserProfile(w, r) // Directs PUT requests to your new handler
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})))
 
 	return mux
 }

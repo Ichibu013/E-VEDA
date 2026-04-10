@@ -12,17 +12,19 @@ import (
 func (s *Server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.UserResponse, error) {
 	log.Printf("Fetching user form database: %s", req.UserId)
 
-	var id, name, email string
+	var name, nickname, profilePicture string
+	var age int64
 
-	err := s.db.QueryRowContext(ctx, "SELECT id, name, email FROM users WHERE id= $1", req.UserId).Scan(&id, &name, &email)
+	err := s.db.QueryRowContext(ctx, "SELECT name, nickname, age, profile_picture FROM users WHERE iam_id= $1", req.UserId).Scan(&name, &nickname, &age, &profilePicture)
 	if err != nil {
 		log.Printf("Error fetching user: %s", err.Error())
 		return nil, status.Error(codes.Internal, "Internal server error")
 	}
 
 	return &pb.UserResponse{
-		Id:    id,
-		Name:  name,
-		Email: email,
+		Name:           name,
+		Nickname:       nickname,
+		Age:            age,
+		ProfilePicture: profilePicture,
 	}, nil
 }

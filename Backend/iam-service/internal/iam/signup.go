@@ -26,7 +26,7 @@ func (s *Server) SignUp(_ context.Context, req *pb.SignUpRequest) (*pb.SignUpRes
 	// Generate new UUID
 	userUUID := uuid.New().String()
 
-	// Insert to Database
+	// 1. Create User in IAM
 	query := `INSERT INTO iam_users (user_uuid, email, password_hash) VALUES ($1, $2, $3)`
 	_, err = s.db.Exec(query, userUUID, req.GetEmail(), string(hashedPassword))
 	if err != nil {
@@ -44,4 +44,19 @@ func (s *Server) SignUp(_ context.Context, req *pb.SignUpRequest) (*pb.SignUpRes
 		UserUuid: userUUID,
 	}, nil
 
+}
+
+func (s *Server) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*pb.ApiResponse, error) {
+	log.Printf("Rolling back user creation for UUID: %s", req.GetUserUuid())
+
+	query := `DELETE FROM iam_users WHERE user_uuid = $1`
+	_, err := s.db.ExecContext(ctx, query, req.GetUserUuid())
+	if err != nil {
+		log.Printf("CRITICAL: Failed to rollback user %s: %v", req.GetUserUuid(), err)
+		return nil, status.Errorf(codes.Internal, "Failed to delete user: %v", err)
+	}
+
+	return &pb.ApiResponse{
+		Message: "User successfully rolled back",
+	}, nil
 }
