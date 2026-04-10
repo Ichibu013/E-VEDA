@@ -15,7 +15,7 @@ import (
 func main() {
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://postgres:root@localhost:5432/e_veda?sslmode=disable"
+		dbURL = "postgres://postgres:root@postgres-db:5432/e_veda?sslmode=disable"
 	}
 
 	redisURL := os.Getenv("REDIS_URL")

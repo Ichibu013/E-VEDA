@@ -367,6 +367,66 @@ func (x *UserResponse) GetProfilePicture() string {
 	return ""
 }
 
+type ProfileCompletenessResponse struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	IsCompleted         bool                   `protobuf:"varint,1,opt,name=isCompleted,proto3" json:"isCompleted,omitempty"`
+	PercentageCompleted float64                `protobuf:"fixed64,2,opt,name=percentage_completed,json=percentageCompleted,proto3" json:"percentage_completed,omitempty"`
+	Name                string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *ProfileCompletenessResponse) Reset() {
+	*x = ProfileCompletenessResponse{}
+	mi := &file_userpb_user_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProfileCompletenessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProfileCompletenessResponse) ProtoMessage() {}
+
+func (x *ProfileCompletenessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_userpb_user_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProfileCompletenessResponse.ProtoReflect.Descriptor instead.
+func (*ProfileCompletenessResponse) Descriptor() ([]byte, []int) {
+	return file_userpb_user_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ProfileCompletenessResponse) GetIsCompleted() bool {
+	if x != nil {
+		return x.IsCompleted
+	}
+	return false
+}
+
+func (x *ProfileCompletenessResponse) GetPercentageCompleted() float64 {
+	if x != nil {
+		return x.PercentageCompleted
+	}
+	return 0
+}
+
+func (x *ProfileCompletenessResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
 var File_userpb_user_proto protoreflect.FileDescriptor
 
 const file_userpb_user_proto_rawDesc = "" +
@@ -393,14 +453,19 @@ const file_userpb_user_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
 	"\bnickname\x18\x02 \x01(\tR\bnickname\x12\x10\n" +
 	"\x03age\x18\x03 \x01(\x03R\x03age\x12'\n" +
-	"\x0fprofile_picture\x18\x04 \x01(\tR\x0eprofilePicture2\x87\x02\n" +
+	"\x0fprofile_picture\x18\x04 \x01(\tR\x0eprofilePicture\"\x86\x01\n" +
+	"\x1bProfileCompletenessResponse\x12 \n" +
+	"\visCompleted\x18\x01 \x01(\bR\visCompleted\x121\n" +
+	"\x14percentage_completed\x18\x02 \x01(\x01R\x13percentageCompleted\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name2\xda\x02\n" +
 	"\vUserService\x128\n" +
 	"\n" +
 	"CreateUser\x12\x17.user.CreateUserRequest\x1a\x11.user.ApiResponse\x123\n" +
 	"\aGetUser\x12\x14.user.GetUserRequest\x1a\x12.user.UserResponse\x12;\n" +
 	"\n" +
 	"UpdateUser\x12\x1a.user.ProfileUpdateRequest\x1a\x11.user.ApiResponse\x12L\n" +
-	"\x14UploadProfilePicture\x12!.user.UploadProfilePictureRequest\x1a\x11.user.ApiResponseB\x15Z\x13e_veda/proto/userpbb\x06proto3"
+	"\x14UploadProfilePicture\x12!.user.UploadProfilePictureRequest\x1a\x11.user.ApiResponse\x12Q\n" +
+	"\x16GetProfileCompleteness\x12\x14.user.GetUserRequest\x1a!.user.ProfileCompletenessResponseB\x15Z\x13e_veda/proto/userpbb\x06proto3"
 
 var (
 	file_userpb_user_proto_rawDescOnce sync.Once
@@ -414,7 +479,7 @@ func file_userpb_user_proto_rawDescGZIP() []byte {
 	return file_userpb_user_proto_rawDescData
 }
 
-var file_userpb_user_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_userpb_user_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_userpb_user_proto_goTypes = []any{
 	(*CreateUserRequest)(nil),           // 0: user.CreateUserRequest
 	(*ApiResponse)(nil),                 // 1: user.ApiResponse
@@ -422,18 +487,21 @@ var file_userpb_user_proto_goTypes = []any{
 	(*UploadProfilePictureRequest)(nil), // 3: user.UploadProfilePictureRequest
 	(*ProfileUpdateRequest)(nil),        // 4: user.ProfileUpdateRequest
 	(*UserResponse)(nil),                // 5: user.UserResponse
+	(*ProfileCompletenessResponse)(nil), // 6: user.ProfileCompletenessResponse
 }
 var file_userpb_user_proto_depIdxs = []int32{
 	0, // 0: user.UserService.CreateUser:input_type -> user.CreateUserRequest
 	2, // 1: user.UserService.GetUser:input_type -> user.GetUserRequest
 	4, // 2: user.UserService.UpdateUser:input_type -> user.ProfileUpdateRequest
 	3, // 3: user.UserService.UploadProfilePicture:input_type -> user.UploadProfilePictureRequest
-	1, // 4: user.UserService.CreateUser:output_type -> user.ApiResponse
-	5, // 5: user.UserService.GetUser:output_type -> user.UserResponse
-	1, // 6: user.UserService.UpdateUser:output_type -> user.ApiResponse
-	1, // 7: user.UserService.UploadProfilePicture:output_type -> user.ApiResponse
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
+	2, // 4: user.UserService.GetProfileCompleteness:input_type -> user.GetUserRequest
+	1, // 5: user.UserService.CreateUser:output_type -> user.ApiResponse
+	5, // 6: user.UserService.GetUser:output_type -> user.UserResponse
+	1, // 7: user.UserService.UpdateUser:output_type -> user.ApiResponse
+	1, // 8: user.UserService.UploadProfilePicture:output_type -> user.ApiResponse
+	6, // 9: user.UserService.GetProfileCompleteness:output_type -> user.ProfileCompletenessResponse
+	5, // [5:10] is the sub-list for method output_type
+	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -450,7 +518,7 @@ func file_userpb_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_userpb_user_proto_rawDesc), len(file_userpb_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

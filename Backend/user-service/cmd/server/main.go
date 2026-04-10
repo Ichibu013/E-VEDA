@@ -15,10 +15,10 @@ func main() {
 	// Start DB
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://postgres:root@localhost:5432/e_veda?sslmode=disable"
+		dbURL = "postgres://postgres:root@postgres-db:5432/e_veda?sslmode=disable"
 	}
 	log.Println("Initializing User database...")
-	usersDB, err := user.InitUsersDB(dbURL)
+	usersDB, err := user.InitDB(dbURL)
 	if err != nil {
 		// If the DB is down or tables fail to create, the app stops here
 		log.Fatalf("Database initialization failed for user: %v", err)
@@ -29,16 +29,6 @@ func main() {
 			panic(err)
 		}
 	}(usersDB)
-	historyDB, err := user.InitReportsTable(dbURL)
-	if err != nil {
-		log.Fatalf("Database initialization failed for reports_history: %v", err)
-	}
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(historyDB)
 
 	// Start Server
 	lis, err := net.Listen("tcp", ":50051")

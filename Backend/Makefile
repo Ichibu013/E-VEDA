@@ -15,7 +15,7 @@ COMPOSE_FILE=docker-compose.yml
 .PHONY: up
 up: ## Start the entire microservice stack in the background
 	@echo "Starting the microservices cluster..."
-	docker compose -f $(COMPOSE_FILE) up -d
+	docker compose -f $(COMPOSE_FILE) up -d --build
 
 .PHONY: down
 down: ## Stop and remove all containers, networks, and volumes

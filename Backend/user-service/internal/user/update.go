@@ -12,8 +12,10 @@ import (
 func (s *Server) UpdateUser(ctx context.Context, req *pb.ProfileUpdateRequest) (*pb.ApiResponse, error) {
 	log.Printf("Updating user profile for id: %s", req.GetUserId())
 
-	query := `UPDATE e_veda_users SET name, nickname, age = $1 WHERE iam_id = $2`
+	// FIXED: Corrected the SQL syntax to map each column to its own placeholder
+	query := `UPDATE e_veda_users SET name = $1, nickname = $2, age = $3 WHERE iam_id = $4`
 
+	// Passed the 4 variables to match $1, $2, $3, and $4 in exact order
 	res, err := s.db.ExecContext(ctx, query, req.GetName(), req.GetNickname(), req.GetAge(), req.GetUserId())
 	if err != nil {
 		log.Printf("Database error during user update: %s", err)
