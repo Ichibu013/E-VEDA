@@ -232,13 +232,19 @@ func (x *UploadProfilePictureRequest) GetFileExtension() string {
 }
 
 type ProfileUpdateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Nickname      string                 `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
-	Age           int64                  `protobuf:"varint,4,opt,name=age,proto3" json:"age,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	UserId           string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	FullName         string                 `protobuf:"bytes,2,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
+	Nickname         string                 `protobuf:"bytes,3,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	Age              int64                  `protobuf:"varint,4,opt,name=age,proto3" json:"age,omitempty"`
+	DateOfBirth      string                 `protobuf:"bytes,5,opt,name=date_of_birth,json=dateOfBirth,proto3" json:"date_of_birth,omitempty"`
+	Gender           string                 `protobuf:"bytes,6,opt,name=gender,proto3" json:"gender,omitempty"`
+	PhoneNumber      string                 `protobuf:"bytes,7,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`
+	Address          string                 `protobuf:"bytes,8,opt,name=address,proto3" json:"address,omitempty"`
+	MedicalHistory   string                 `protobuf:"bytes,9,opt,name=medical_history,json=medicalHistory,proto3" json:"medical_history,omitempty"`
+	EmergencyContact string                 `protobuf:"bytes,10,opt,name=emergency_contact,json=emergencyContact,proto3" json:"emergency_contact,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *ProfileUpdateRequest) Reset() {
@@ -278,9 +284,9 @@ func (x *ProfileUpdateRequest) GetUserId() string {
 	return ""
 }
 
-func (x *ProfileUpdateRequest) GetName() string {
+func (x *ProfileUpdateRequest) GetFullName() string {
 	if x != nil {
-		return x.Name
+		return x.FullName
 	}
 	return ""
 }
@@ -299,14 +305,63 @@ func (x *ProfileUpdateRequest) GetAge() int64 {
 	return 0
 }
 
+func (x *ProfileUpdateRequest) GetDateOfBirth() string {
+	if x != nil {
+		return x.DateOfBirth
+	}
+	return ""
+}
+
+func (x *ProfileUpdateRequest) GetGender() string {
+	if x != nil {
+		return x.Gender
+	}
+	return ""
+}
+
+func (x *ProfileUpdateRequest) GetPhoneNumber() string {
+	if x != nil {
+		return x.PhoneNumber
+	}
+	return ""
+}
+
+func (x *ProfileUpdateRequest) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *ProfileUpdateRequest) GetMedicalHistory() string {
+	if x != nil {
+		return x.MedicalHistory
+	}
+	return ""
+}
+
+func (x *ProfileUpdateRequest) GetEmergencyContact() string {
+	if x != nil {
+		return x.EmergencyContact
+	}
+	return ""
+}
+
 type UserResponse struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Name           string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Nickname       string                 `protobuf:"bytes,2,opt,name=nickname,proto3" json:"nickname,omitempty"`
-	Age            int64                  `protobuf:"varint,3,opt,name=age,proto3" json:"age,omitempty"`
-	ProfilePicture string                 `protobuf:"bytes,4,opt,name=profile_picture,json=profilePicture,proto3" json:"profile_picture,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	FullName         string                 `protobuf:"bytes,1,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
+	Nickname         string                 `protobuf:"bytes,2,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	Age              int64                  `protobuf:"varint,3,opt,name=age,proto3" json:"age,omitempty"`
+	ProfilePicture   string                 `protobuf:"bytes,4,opt,name=profile_picture,json=profilePicture,proto3" json:"profile_picture,omitempty"`
+	DateOfBirth      string                 `protobuf:"bytes,5,opt,name=date_of_birth,json=dateOfBirth,proto3" json:"date_of_birth,omitempty"`
+	Gender           string                 `protobuf:"bytes,6,opt,name=gender,proto3" json:"gender,omitempty"`
+	PhoneNumber      string                 `protobuf:"bytes,7,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`
+	Address          string                 `protobuf:"bytes,8,opt,name=address,proto3" json:"address,omitempty"`
+	MedicalHistory   string                 `protobuf:"bytes,9,opt,name=medical_history,json=medicalHistory,proto3" json:"medical_history,omitempty"`
+	EmergencyContact string                 `protobuf:"bytes,10,opt,name=emergency_contact,json=emergencyContact,proto3" json:"emergency_contact,omitempty"`
+	CreatedAt        string                 `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *UserResponse) Reset() {
@@ -339,9 +394,9 @@ func (*UserResponse) Descriptor() ([]byte, []int) {
 	return file_userpb_user_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *UserResponse) GetName() string {
+func (x *UserResponse) GetFullName() string {
 	if x != nil {
-		return x.Name
+		return x.FullName
 	}
 	return ""
 }
@@ -363,6 +418,55 @@ func (x *UserResponse) GetAge() int64 {
 func (x *UserResponse) GetProfilePicture() string {
 	if x != nil {
 		return x.ProfilePicture
+	}
+	return ""
+}
+
+func (x *UserResponse) GetDateOfBirth() string {
+	if x != nil {
+		return x.DateOfBirth
+	}
+	return ""
+}
+
+func (x *UserResponse) GetGender() string {
+	if x != nil {
+		return x.Gender
+	}
+	return ""
+}
+
+func (x *UserResponse) GetPhoneNumber() string {
+	if x != nil {
+		return x.PhoneNumber
+	}
+	return ""
+}
+
+func (x *UserResponse) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *UserResponse) GetMedicalHistory() string {
+	if x != nil {
+		return x.MedicalHistory
+	}
+	return ""
+}
+
+func (x *UserResponse) GetEmergencyContact() string {
+	if x != nil {
+		return x.EmergencyContact
+	}
+	return ""
+}
+
+func (x *UserResponse) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
 	}
 	return ""
 }
@@ -443,17 +547,33 @@ const file_userpb_user_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
 	"\tfile_data\x18\x02 \x01(\fR\bfileData\x12!\n" +
 	"\fcontent_type\x18\x03 \x01(\tR\vcontentType\x12%\n" +
-	"\x0efile_extension\x18\x04 \x01(\tR\rfileExtension\"q\n" +
+	"\x0efile_extension\x18\x04 \x01(\tR\rfileExtension\"\xc9\x02\n" +
 	"\x14ProfileUpdateRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
+	"\tfull_name\x18\x02 \x01(\tR\bfullName\x12\x1a\n" +
 	"\bnickname\x18\x03 \x01(\tR\bnickname\x12\x10\n" +
-	"\x03age\x18\x04 \x01(\x03R\x03age\"y\n" +
-	"\fUserResponse\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
+	"\x03age\x18\x04 \x01(\x03R\x03age\x12\"\n" +
+	"\rdate_of_birth\x18\x05 \x01(\tR\vdateOfBirth\x12\x16\n" +
+	"\x06gender\x18\x06 \x01(\tR\x06gender\x12!\n" +
+	"\fphone_number\x18\a \x01(\tR\vphoneNumber\x12\x18\n" +
+	"\aaddress\x18\b \x01(\tR\aaddress\x12'\n" +
+	"\x0fmedical_history\x18\t \x01(\tR\x0emedicalHistory\x12+\n" +
+	"\x11emergency_contact\x18\n" +
+	" \x01(\tR\x10emergencyContact\"\xf0\x02\n" +
+	"\fUserResponse\x12\x1b\n" +
+	"\tfull_name\x18\x01 \x01(\tR\bfullName\x12\x1a\n" +
 	"\bnickname\x18\x02 \x01(\tR\bnickname\x12\x10\n" +
 	"\x03age\x18\x03 \x01(\x03R\x03age\x12'\n" +
-	"\x0fprofile_picture\x18\x04 \x01(\tR\x0eprofilePicture\"\x86\x01\n" +
+	"\x0fprofile_picture\x18\x04 \x01(\tR\x0eprofilePicture\x12\"\n" +
+	"\rdate_of_birth\x18\x05 \x01(\tR\vdateOfBirth\x12\x16\n" +
+	"\x06gender\x18\x06 \x01(\tR\x06gender\x12!\n" +
+	"\fphone_number\x18\a \x01(\tR\vphoneNumber\x12\x18\n" +
+	"\aaddress\x18\b \x01(\tR\aaddress\x12'\n" +
+	"\x0fmedical_history\x18\t \x01(\tR\x0emedicalHistory\x12+\n" +
+	"\x11emergency_contact\x18\n" +
+	" \x01(\tR\x10emergencyContact\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\v \x01(\tR\tcreatedAt\"\x86\x01\n" +
 	"\x1bProfileCompletenessResponse\x12 \n" +
 	"\visCompleted\x18\x01 \x01(\bR\visCompleted\x121\n" +
 	"\x14percentage_completed\x18\x02 \x01(\x01R\x13percentageCompleted\x12\x12\n" +

@@ -5,6 +5,7 @@ import (
 	pb "e_veda/proto/iampb"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -14,7 +15,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *Server) SignUp(_ context.Context, req *pb.SignUpRequest) (*pb.SignUpResponse, error) {
+func (s *Server) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.SignUpResponse, error) {
 	log.Printf("Processing signup request for email: %s", req.Email)
 
 	// Hash Password
@@ -32,7 +33,6 @@ func (s *Server) SignUp(_ context.Context, req *pb.SignUpRequest) (*pb.SignUpRes
 	if err != nil {
 		var pqErr *pq.Error
 		if errors.As(err, &pqErr) {
-			// Code 23505 is PostgreSQL's official "unique_violation" error code
 			if pqErr.Code == "23505" {
 				return nil, status.Errorf(codes.AlreadyExists, "Email %s already exists", req.GetEmail())
 			}
@@ -40,10 +40,30 @@ func (s *Server) SignUp(_ context.Context, req *pb.SignUpRequest) (*pb.SignUpRes
 		return nil, status.Errorf(codes.Internal, "Failed to insert user: %v", err)
 	}
 
-	return &pb.SignUpResponse{
-		UserUuid: userUUID,
-	}, nil
+	// Generate Access Token (1 hour)
+	accessToken, err := s.generateToken(userUUID, 1*time.Hour)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "Failed to generate access token")
+	}
 
+	// Generate Refresh Token (7 days)
+	refreshToken, err := s.generateToken(userUUID, 7*24*time.Hour)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "Failed to generate refresh token")
+	}
+
+	// Save Refresh Token in Redis
+	err = s.rdb.Set(ctx, "refresh_token:"+userUUID, refreshToken, 7*24*time.Hour).Err()
+	if err != nil {
+		log.Printf("Error saving refresh token in Redis: %v", err)
+	}
+
+	return &pb.SignUpResponse{
+		UserUuid:     userUUID,
+		Token:        accessToken,
+		RefreshToken: refreshToken,
+		ExpiresIn:    3600,
+	}, nil
 }
 
 func (s *Server) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*pb.ApiResponse, error) {

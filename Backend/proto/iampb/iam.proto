@@ -6,11 +6,45 @@ option go_package = "e_veda/proto/iampb";
 service IAMService {
   rpc Login (LoginRequest) returns (LoginResponse);
   rpc SignUp (SignUpRequest) returns (SignUpResponse);
+  rpc Logout (LogoutRequest) returns (ApiResponse);
+  rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc GetUserInfo (GetUserInfoRequest) returns (GetUserInfoResponse);
+  rpc ChangePassword (ChangePasswordRequest) returns (ApiResponse);
   rpc ForgotPassword (ForgotPasswordRequest) returns (ApiResponse);
   rpc VerifyOtp (VerifyOtpRequest) returns (VerifyOtpResponse);
   rpc ResetPassword (ResetPasswordRequest) returns (ApiResponse);
   rpc ValidateToken (TokenRequest) returns (ValidationResponse);
   rpc DeleteUser (DeleteUserRequest) returns (ApiResponse);
+}
+
+message GetUserInfoRequest {
+  string user_id = 1;
+}
+
+message GetUserInfoResponse {
+  string email = 1;
+  string username = 2;
+  string last_login = 3;
+}
+
+message ChangePasswordRequest {
+  string user_id = 1;
+  string current_password = 2;
+  string new_password = 3;
+}
+
+message LogoutRequest {
+  string token = 1;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string token = 1;
+  string refresh_token = 2;
+  int32 expires_in = 3;
 }
 
 message ForgotPasswordRequest {
@@ -39,6 +73,12 @@ message SignUpRequest {
 
 message LoginResponse {
   string token = 1;
+  string refresh_token = 2;
+  string user_id = 3;
+  string email = 4;
+  string username = 5;
+  string full_name = 6;
+  int32 expires_in = 7;
 }
 
 message TokenRequest {
@@ -56,6 +96,9 @@ message ValidationResponse {
 
 message SignUpResponse {
   string user_uuid = 1;
+  string token = 2;
+  string refresh_token = 3;
+  int32 expires_in = 4;
 }
 
 message VerifyOtpResponse {

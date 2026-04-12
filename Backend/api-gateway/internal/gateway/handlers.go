@@ -10,7 +10,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"path/filepath"
-	"strconv"
+	_ "strconv"
 	"time"
 
 	"google.golang.org/grpc/status" // Required to unpack gRPC errors
@@ -105,8 +105,18 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(map[string]string{
-		"token": res.Token,
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":  "success",
+		"message": "Login successful",
+		"data": map[string]interface{}{
+			"userId":       res.UserId,
+			"username":     res.Username,
+			"email":        res.Email,
+			"fullName":     res.FullName,
+			"token":        res.Token,
+			"refreshToken": res.RefreshToken,
+			"expiresIn":    res.ExpiresIn,
+		},
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
@@ -128,7 +138,8 @@ func (h *Handler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
 	defer cancel()
 
-	res, err := h.userClient.GetUser(ctx, &userpb.GetUserRequest{
+	// 1. Fetch data from User Service
+	userRes, err := h.userClient.GetUser(ctx, &userpb.GetUserRequest{
 		UserId: userUUID,
 	})
 	if err != nil {
@@ -136,12 +147,43 @@ func (h *Handler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 2. Fetch data from IAM Service
+	iamRes, err := h.iamClient.GetUserInfo(ctx, &iampb.GetUserInfoRequest{
+		UserId: userUUID,
+	})
+	if err != nil {
+		log.Printf("Warning: Failed to fetch IAM info for user %s: %v", userUUID, err)
+		// We still return user profile even if IAM info fails
+	}
+
+	var email, username, lastLogin string
+	if iamRes != nil {
+		email = iamRes.Email
+		username = iamRes.Username
+		lastLogin = iamRes.LastLogin
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(map[string]string{
-		"name":            res.Name,
-		"nickname":        res.Nickname,
-		"age":             strconv.FormatInt(res.Age, 10),
-		"profile_picture": res.ProfilePicture,
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":  "success",
+		"message": "Profile retrieved successfully",
+		"data": map[string]interface{}{
+			"userId":           userUUID,
+			"username":         username,
+			"email":            email,
+			"fullName":         userRes.FullName,
+			"nickname":         userRes.Nickname,
+			"age":              userRes.Age,
+			"dateOfBirth":      userRes.DateOfBirth,
+			"gender":           userRes.Gender,
+			"phoneNumber":      userRes.PhoneNumber,
+			"address":          userRes.Address,
+			"medicalHistory":   json.RawMessage(userRes.MedicalHistory),
+			"emergencyContact": json.RawMessage(userRes.EmergencyContact),
+			"profilePicture":   userRes.ProfilePicture,
+			"createdAt":        userRes.CreatedAt,
+			"lastLogin":        lastLogin,
+		},
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
@@ -177,28 +219,26 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 		Name:   payload.Name,
 	})
 
-	// THE FIX: Compensating Transaction (Rollback)
 	if err != nil {
 		log.Printf("User Service failed, rolling back IAM for %s", payload.Email)
-
-		// Tell IAM to delete the user we just created
-		_, rollbackErr := h.iamClient.DeleteUser(ctx, &iampb.DeleteUserRequest{
-			UserUuid: iamRes.GetUserUuid(),
-		})
-
-		if rollbackErr != nil {
-			log.Printf("CRITICAL ALERT: Rollback failed for %s. Manual intervention required. Err: %v", iamRes.GetUserUuid(), rollbackErr)
-		}
-
-		// Return a clean error to the client so they can try again
+		_, _ = h.iamClient.DeleteUser(ctx, &iampb.DeleteUserRequest{UserUuid: iamRes.GetUserUuid()})
 		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", "Failed to create account. Please try again.")
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(map[string]string{
-		"message":   "User created Successfully",
-		"user_uuid": iamRes.GetUserUuid(),
+	w.WriteHeader(http.StatusCreated)
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":  "success",
+		"message": "Account created successfully",
+		"data": map[string]interface{}{
+			"userId":       iamRes.UserUuid,
+			"username":     payload.Email, // Simplified
+			"email":        payload.Email,
+			"token":        iamRes.Token,
+			"refreshToken": iamRes.RefreshToken,
+			"expiresIn":    iamRes.ExpiresIn,
+		},
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
@@ -229,8 +269,12 @@ func (h *Handler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(map[string]string{
-		"message": res.Message,
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":  "success",
+		"message": "Reset link sent to your email",
+		"data": map[string]string{
+			"message": res.Message,
+		},
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
@@ -285,7 +329,7 @@ func (h *Handler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
 	defer cancel()
 
-	res, err := h.iamClient.ResetPassword(ctx, &iampb.ResetPasswordRequest{
+	_, err := h.iamClient.ResetPassword(ctx, &iampb.ResetPasswordRequest{
 		ResetToken:  payload.Token,
 		NewPassword: payload.ResetPassword,
 	})
@@ -294,30 +338,54 @@ func (h *Handler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(map[string]string{
-		"message": res.Message,
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":  "success",
+		"message": "Password reset successfully",
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
 	}
 }
 
-func (h *Handler) UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
-	// Standard REST convention is to use PUT or PATCH for updates
-	if r.Method != http.MethodPut {
-		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be PUT")
+func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be POST")
 		return
 	}
 
-	// Extract the authenticated user's ID from the JWT middleware
-	userUUID, ok := r.Context().Value(userUUIDKey).(string)
-	if !ok {
-		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found in request context")
+	token := r.Header.Get("Authorization")
+	if len(token) > 7 && token[:7] == "Bearer " {
+		token = token[7:]
+	} else {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "Missing or invalid Authorization header")
 		return
 	}
 
-	// Parse the JSON request body
-	var payload ProfileUpdatePayload
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
+	defer cancel()
+
+	_, err := h.iamClient.Logout(ctx, &iampb.LogoutRequest{Token: token})
+	if err != nil {
+		respondWithGrpcError(w, http.StatusUnauthorized, "Unauthorized", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":  "success",
+		"message": "Logged out successfully",
+	})
+}
+
+func (h *Handler) RefreshToken(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be POST")
+		return
+	}
+
+	var payload struct {
+		RefreshToken string `json:"refreshToken"`
+	}
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Bad Request", "Invalid JSON request")
 		return
@@ -326,26 +394,142 @@ func (h *Handler) UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
 	defer cancel()
 
+	res, err := h.iamClient.RefreshToken(ctx, &iampb.RefreshTokenRequest{RefreshToken: payload.RefreshToken})
+	if err != nil {
+		respondWithGrpcError(w, http.StatusUnauthorized, "Unauthorized", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":  "success",
+		"message": "Token refreshed",
+		"data": map[string]interface{}{
+			"token":        res.Token,
+			"refreshToken": res.RefreshToken,
+			"expiresIn":    res.ExpiresIn,
+		},
+	})
+}
+
+func (h *Handler) UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be PUT")
+		return
+	}
+
+	userUUID, ok := r.Context().Value(userUUIDKey).(string)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found in request context")
+		return
+	}
+
+	var payload struct {
+		FullName         string      `json:"fullName"`
+		Nickname         string      `json:"nickname"`
+		Age              int64       `json:"age"`
+		PhoneNumber      string      `json:"phoneNumber"`
+		Address          string      `json:"address"`
+		Gender           string      `json:"gender"`
+		DateOfBirth      string      `json:"dateOfBirth"`
+		MedicalHistory   interface{} `json:"medicalHistory"`
+		EmergencyContact interface{} `json:"emergencyContact"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Bad Request", "Invalid JSON request")
+		return
+	}
+
+	medicalHistoryJson, _ := json.Marshal(payload.MedicalHistory)
+	emergencyContactJson, _ := json.Marshal(payload.EmergencyContact)
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
+	defer cancel()
+
 	// Call the User Service gRPC method
 	res, err := h.userClient.UpdateUser(ctx, &userpb.ProfileUpdateRequest{
-		UserId:   userUUID,
-		Name:     payload.Name,
-		Nickname: payload.Nickname,
-		Age:      payload.Age,
+		UserId:           userUUID,
+		FullName:         payload.FullName,
+		Nickname:         payload.Nickname,
+		Age:              payload.Age,
+		DateOfBirth:      payload.DateOfBirth,
+		Gender:           payload.Gender,
+		PhoneNumber:      payload.PhoneNumber,
+		Address:          payload.Address,
+		MedicalHistory:   string(medicalHistoryJson),
+		EmergencyContact: string(emergencyContactJson),
 	})
 	if err != nil {
 		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
 		return
 	}
 
-	// Return success response
+	// Fetch updated data from IAM for complete response
+	iamRes, _ := h.iamClient.GetUserInfo(ctx, &iampb.GetUserInfoRequest{UserId: userUUID})
+
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(map[string]string{
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":  "success",
 		"message": res.Message,
+		"data": map[string]interface{}{
+			"userId":      userUUID,
+			"username":    iamRes.GetUsername(),
+			"email":       iamRes.GetEmail(),
+			"fullName":    payload.FullName,
+			"phoneNumber": payload.PhoneNumber,
+			"address":     payload.Address,
+			"updatedAt":   time.Now().Format(time.RFC3339),
+		},
+	})
+}
+
+func (h *Handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be POST")
+		return
+	}
+
+	userUUID, ok := r.Context().Value(userUUIDKey).(string)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found in request context")
+		return
+	}
+
+	var payload struct {
+		CurrentPassword string `json:"currentPassword"`
+		NewPassword     string `json:"newPassword"`
+		ConfirmPassword string `json:"confirmPassword"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Bad Request", "Invalid JSON request")
+		return
+	}
+
+	if payload.NewPassword != payload.ConfirmPassword {
+		respondWithError(w, http.StatusBadRequest, "Bad Request", "New passwords do not match")
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
+	defer cancel()
+
+	_, err := h.iamClient.ChangePassword(ctx, &iampb.ChangePasswordRequest{
+		UserId:          userUUID,
+		CurrentPassword: payload.CurrentPassword,
+		NewPassword:     payload.NewPassword,
 	})
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
+		respondWithGrpcError(w, http.StatusBadRequest, "Bad Request", err)
+		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":  "success",
+		"message": "Password changed successfully",
+	})
 }
 
 func (h *Handler) UploadProfilePicture(w http.ResponseWriter, r *http.Request) {

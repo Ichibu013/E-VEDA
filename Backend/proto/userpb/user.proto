@@ -33,16 +33,29 @@ message UploadProfilePictureRequest {
 
 message ProfileUpdateRequest {
   string user_id = 1;
-  string name = 2;
+  string full_name = 2;
   string nickname = 3;
   int64 age = 4;
+  string date_of_birth = 5;
+  string gender = 6;
+  string phone_number = 7;
+  string address = 8;
+  string medical_history = 9;
+  string emergency_contact = 10;
 }
 
 message UserResponse {
-  string name = 1;
+  string full_name = 1;
   string nickname = 2;
   int64 age = 3;
   string profile_picture = 4;
+  string date_of_birth = 5;
+  string gender = 6;
+  string phone_number = 7;
+  string address = 8;
+  string medical_history = 9;
+  string emergency_contact = 10;
+  string created_at = 11;
 }
 
 message ProfileCompletenessResponse {
