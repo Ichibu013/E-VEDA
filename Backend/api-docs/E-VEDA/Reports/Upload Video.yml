@@ -1,0 +1,64 @@
+info:
+  name: Upload Video
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: "{{base_url}}/api/report/upload/video"
+  headers:
+    - name: Content-Type
+      value: multipart/form-data
+  body:
+    type: multipart-form
+    data:
+      - name: file
+        type: file
+        value:
+          - C:\Users\Ansh\Downloads\file_example_MP4_1920_18MG.mp4
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: "{{base_url}}/api/report/upload/video"
+      method: POST
+      headers:
+        - name: Content-Type
+          value: multipart/form-data
+      body:
+        type: multipart-form
+        data:
+          - name: file
+            type: file
+            value: "[Circular]"
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Authorization
+        - name: access-control-allow-methods
+          value: GET, POST, PUT, DELETE, OPTIONS
+        - name: access-control-allow-origin
+          value: http://localhost:5173
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Sun, 12 Apr 2026 11:27:44 GMT
+        - name: content-length
+          value: "100"
+      body:
+        type: json
+        data: |-
+          {
+            "message": "http://localhost:9000/e-veda-videos/7b56c431-c292-47f8-ba8e-95a5a6a46339-fcf725d0.mp4"
+          }

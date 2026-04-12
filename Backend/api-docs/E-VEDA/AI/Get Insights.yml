@@ -1,11 +1,11 @@
 info:
-  name: Get Name and Picture
+  name: Get Insights
   type: http
-  seq: 5
+  seq: 4
 
 http:
   method: GET
-  url: "{{base_url}}/api/user/picture-name"
+  url: "{{base_url}}/api/ai/insight"
   auth: inherit
 
 settings:
@@ -17,7 +17,7 @@ settings:
 examples:
   - name: Success
     request:
-      url: "{{base_url}}/api/user/picture-name"
+      url: "{{base_url}}/api/ai/insight"
       method: GET
     response:
       status: 200
@@ -34,13 +34,13 @@ examples:
         - name: content-type
           value: application/json
         - name: date
-          value: Sun, 12 Apr 2026 11:07:32 GMT
+          value: Sun, 12 Apr 2026 11:12:22 GMT
         - name: content-length
-          value: "140"
+          value: "302"
       body:
         type: json
         data: |-
           {
-            "profile_picture_url": "http://localhost:9000/e-veda-profiles/7b56c431-c292-47f8-ba8e-95a5a6a46339-3faa1b5f.jpg",
-            "user_name": "Ansh Sharma"
+            "details": "By logging your daily emotional state, the AI can detect patterns and correlations, offering you customized advice to help stabilize and improve your overall wellbeing.",
+            "insight": "Welcome to your emotional journey. Start recording your daily updates to receive personalized AI insights."
           }

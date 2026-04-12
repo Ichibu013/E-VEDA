@@ -1,0 +1,114 @@
+info:
+  name: Get trends
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{base_url}}/api/ai/global-trends"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: "{{base_url}}/api/ai/global-trends"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Authorization
+        - name: access-control-allow-methods
+          value: GET, POST, PUT, DELETE, OPTIONS
+        - name: access-control-allow-origin
+          value: http://localhost:5173
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Sun, 12 Apr 2026 11:11:18 GMT
+        - name: content-length
+          value: "723"
+      body:
+        type: json
+        data: |-
+          [
+            {
+              "day": "Mon",
+              "date": "2026-04-06",
+              "joy": 35,
+              "anger": 10,
+              "sadness": 15,
+              "fear": 10,
+              "surprise": 20,
+              "disgust": 10
+            },
+            {
+              "day": "Tue",
+              "date": "2026-04-07",
+              "joy": 32,
+              "anger": 12,
+              "sadness": 17,
+              "fear": 9,
+              "surprise": 18,
+              "disgust": 12
+            },
+            {
+              "day": "Wed",
+              "date": "2026-04-08",
+              "joy": 30,
+              "anger": 15,
+              "sadness": 18,
+              "fear": 11,
+              "surprise": 15,
+              "disgust": 11
+            },
+            {
+              "day": "Thu",
+              "date": "2026-04-09",
+              "joy": 33,
+              "anger": 13,
+              "sadness": 16,
+              "fear": 10,
+              "surprise": 17,
+              "disgust": 11
+            },
+            {
+              "day": "Fri",
+              "date": "2026-04-10",
+              "joy": 38,
+              "anger": 9,
+              "sadness": 12,
+              "fear": 8,
+              "surprise": 20,
+              "disgust": 13
+            },
+            {
+              "day": "Sat",
+              "date": "2026-04-11",
+              "joy": 42,
+              "anger": 7,
+              "sadness": 10,
+              "fear": 7,
+              "surprise": 22,
+              "disgust": 12
+            },
+            {
+              "day": "Sun",
+              "date": "2026-04-12",
+              "joy": 40,
+              "anger": 8,
+              "sadness": 11,
+              "fear": 8,
+              "surprise": 20,
+              "disgust": 13
+            }
+          ]

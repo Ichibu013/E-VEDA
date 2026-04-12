@@ -1,0 +1,61 @@
+info:
+  name: Create Report
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{base_url}}/api/report/create"
+  body:
+    type: json
+    data: |-
+      {
+        "report_id" : "#EV-00001",
+        "audio_url" : "http://localhost:9000/e-veda-audios/7b56c431-c292-47f8-ba8e-95a5a6a46339-d31e2fa7.wav",
+        "video_url" : "http://localhost:9000/e-veda-videos/7b56c431-c292-47f8-ba8e-95a5a6a46339-fcf725d0.mp4"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: "{{base_url}}/api/report/create"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "report_id" : "#EV-00001",
+            "audio_url" : "http://localhost:9000/e-veda-audios/7b56c431-c292-47f8-ba8e-95a5a6a46339-d31e2fa7.wav",
+            "video_url" : "http://localhost:9000/e-veda-videos/7b56c431-c292-47f8-ba8e-95a5a6a46339-fcf725d0.mp4"
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Authorization
+        - name: access-control-allow-methods
+          value: GET, POST, PUT, DELETE, OPTIONS
+        - name: access-control-allow-origin
+          value: http://localhost:5173
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Sun, 12 Apr 2026 11:52:22 GMT
+        - name: content-length
+          value: "54"
+      body:
+        type: json
+        data: |-
+          {
+            "message": "Report #EV-00001 generated Successfully"
+          }

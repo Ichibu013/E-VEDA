@@ -14,7 +14,7 @@ http:
     data:
       - name: profile_picture
         type: file
-        value: &a1
+        value:
           - C:\Users\Ansh\Downloads\photo3.jpg
   auth: inherit
 
@@ -37,7 +37,7 @@ examples:
         data:
           - name: profile_picture
             type: file
-            value: *a1
+            value: "[Circular]"
     response:
       status: 200
       statusText: OK
