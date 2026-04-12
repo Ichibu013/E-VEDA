@@ -12,6 +12,9 @@ service UserService {
   rpc GetPictureAndName (GetUserRequest) returns (NameAndPictureResponse);
   rpc GetGlobalEmotionalTrends (GetGlobalTrendsRequest) returns (GetEmotionalTrendsResponse);
   rpc GetDailyInsight (GetUserRequest) returns (GetDailyInsightResponse);
+  rpc UploadAudio (UploadProfilePictureRequest) returns (ApiResponse);
+  rpc UploadVideo (UploadProfilePictureRequest) returns (ApiResponse);
+  rpc CreateReport (CreateNewReportRequest) returns (ApiResponse);
 }
 
 message CreateUserRequest {
@@ -34,6 +37,7 @@ message UploadProfilePictureRequest {
   string file_extension = 4; // e.g., ".jpg"
 }
 
+
 message ProfileUpdateRequest {
   string user_id = 1;
   string name = 2;
@@ -55,6 +59,13 @@ message DailyEmotion {
   double fear = 6;
   double surprise = 7;
   double disgust = 8;
+}
+
+message CreateNewReportRequest {
+  string report_id = 1;
+  string user_id = 2;
+  string audio_url = 3;
+  string video_url = 4;
 }
 
 message UserResponse {

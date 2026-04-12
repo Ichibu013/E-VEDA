@@ -459,6 +459,74 @@ func (x *DailyEmotion) GetDisgust() float64 {
 	return 0
 }
 
+type CreateNewReportRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ReportId      string                 `protobuf:"bytes,1,opt,name=report_id,json=reportId,proto3" json:"report_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AudioUrl      string                 `protobuf:"bytes,3,opt,name=audio_url,json=audioUrl,proto3" json:"audio_url,omitempty"`
+	VideoUrl      string                 `protobuf:"bytes,4,opt,name=video_url,json=videoUrl,proto3" json:"video_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateNewReportRequest) Reset() {
+	*x = CreateNewReportRequest{}
+	mi := &file_userpb_user_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateNewReportRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateNewReportRequest) ProtoMessage() {}
+
+func (x *CreateNewReportRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_userpb_user_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateNewReportRequest.ProtoReflect.Descriptor instead.
+func (*CreateNewReportRequest) Descriptor() ([]byte, []int) {
+	return file_userpb_user_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *CreateNewReportRequest) GetReportId() string {
+	if x != nil {
+		return x.ReportId
+	}
+	return ""
+}
+
+func (x *CreateNewReportRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CreateNewReportRequest) GetAudioUrl() string {
+	if x != nil {
+		return x.AudioUrl
+	}
+	return ""
+}
+
+func (x *CreateNewReportRequest) GetVideoUrl() string {
+	if x != nil {
+		return x.VideoUrl
+	}
+	return ""
+}
+
 type UserResponse struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Name           string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -474,7 +542,7 @@ type UserResponse struct {
 
 func (x *UserResponse) Reset() {
 	*x = UserResponse{}
-	mi := &file_userpb_user_proto_msgTypes[7]
+	mi := &file_userpb_user_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -486,7 +554,7 @@ func (x *UserResponse) String() string {
 func (*UserResponse) ProtoMessage() {}
 
 func (x *UserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_userpb_user_proto_msgTypes[7]
+	mi := &file_userpb_user_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -499,7 +567,7 @@ func (x *UserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserResponse.ProtoReflect.Descriptor instead.
 func (*UserResponse) Descriptor() ([]byte, []int) {
-	return file_userpb_user_proto_rawDescGZIP(), []int{7}
+	return file_userpb_user_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UserResponse) GetName() string {
@@ -562,7 +630,7 @@ type ProfileCompletenessResponse struct {
 
 func (x *ProfileCompletenessResponse) Reset() {
 	*x = ProfileCompletenessResponse{}
-	mi := &file_userpb_user_proto_msgTypes[8]
+	mi := &file_userpb_user_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -574,7 +642,7 @@ func (x *ProfileCompletenessResponse) String() string {
 func (*ProfileCompletenessResponse) ProtoMessage() {}
 
 func (x *ProfileCompletenessResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_userpb_user_proto_msgTypes[8]
+	mi := &file_userpb_user_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -587,7 +655,7 @@ func (x *ProfileCompletenessResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileCompletenessResponse.ProtoReflect.Descriptor instead.
 func (*ProfileCompletenessResponse) Descriptor() ([]byte, []int) {
-	return file_userpb_user_proto_rawDescGZIP(), []int{8}
+	return file_userpb_user_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ProfileCompletenessResponse) GetIsCompleted() bool {
@@ -621,7 +689,7 @@ type NameAndPictureResponse struct {
 
 func (x *NameAndPictureResponse) Reset() {
 	*x = NameAndPictureResponse{}
-	mi := &file_userpb_user_proto_msgTypes[9]
+	mi := &file_userpb_user_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -633,7 +701,7 @@ func (x *NameAndPictureResponse) String() string {
 func (*NameAndPictureResponse) ProtoMessage() {}
 
 func (x *NameAndPictureResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_userpb_user_proto_msgTypes[9]
+	mi := &file_userpb_user_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -646,7 +714,7 @@ func (x *NameAndPictureResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NameAndPictureResponse.ProtoReflect.Descriptor instead.
 func (*NameAndPictureResponse) Descriptor() ([]byte, []int) {
-	return file_userpb_user_proto_rawDescGZIP(), []int{9}
+	return file_userpb_user_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *NameAndPictureResponse) GetName() string {
@@ -672,7 +740,7 @@ type GetEmotionalTrendsResponse struct {
 
 func (x *GetEmotionalTrendsResponse) Reset() {
 	*x = GetEmotionalTrendsResponse{}
-	mi := &file_userpb_user_proto_msgTypes[10]
+	mi := &file_userpb_user_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -684,7 +752,7 @@ func (x *GetEmotionalTrendsResponse) String() string {
 func (*GetEmotionalTrendsResponse) ProtoMessage() {}
 
 func (x *GetEmotionalTrendsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_userpb_user_proto_msgTypes[10]
+	mi := &file_userpb_user_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -697,7 +765,7 @@ func (x *GetEmotionalTrendsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetEmotionalTrendsResponse.ProtoReflect.Descriptor instead.
 func (*GetEmotionalTrendsResponse) Descriptor() ([]byte, []int) {
-	return file_userpb_user_proto_rawDescGZIP(), []int{10}
+	return file_userpb_user_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetEmotionalTrendsResponse) GetTrends() []*DailyEmotion {
@@ -717,7 +785,7 @@ type GetDailyInsightResponse struct {
 
 func (x *GetDailyInsightResponse) Reset() {
 	*x = GetDailyInsightResponse{}
-	mi := &file_userpb_user_proto_msgTypes[11]
+	mi := &file_userpb_user_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -729,7 +797,7 @@ func (x *GetDailyInsightResponse) String() string {
 func (*GetDailyInsightResponse) ProtoMessage() {}
 
 func (x *GetDailyInsightResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_userpb_user_proto_msgTypes[11]
+	mi := &file_userpb_user_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -742,7 +810,7 @@ func (x *GetDailyInsightResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDailyInsightResponse.ProtoReflect.Descriptor instead.
 func (*GetDailyInsightResponse) Descriptor() ([]byte, []int) {
-	return file_userpb_user_proto_rawDescGZIP(), []int{11}
+	return file_userpb_user_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetDailyInsightResponse) GetInsight() string {
@@ -793,7 +861,12 @@ const file_userpb_user_proto_rawDesc = "" +
 	"\asadness\x18\x05 \x01(\x01R\asadness\x12\x12\n" +
 	"\x04fear\x18\x06 \x01(\x01R\x04fear\x12\x1a\n" +
 	"\bsurprise\x18\a \x01(\x01R\bsurprise\x12\x18\n" +
-	"\adisgust\x18\b \x01(\x01R\adisgust\"\xc1\x01\n" +
+	"\adisgust\x18\b \x01(\x01R\adisgust\"\x88\x01\n" +
+	"\x16CreateNewReportRequest\x12\x1b\n" +
+	"\treport_id\x18\x01 \x01(\tR\breportId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1b\n" +
+	"\taudio_url\x18\x03 \x01(\tR\baudioUrl\x12\x1b\n" +
+	"\tvideo_url\x18\x04 \x01(\tR\bvideoUrl\"\xc1\x01\n" +
 	"\fUserResponse\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
 	"\bnickname\x18\x02 \x01(\tR\bnickname\x12\x10\n" +
@@ -813,7 +886,7 @@ const file_userpb_user_proto_rawDesc = "" +
 	"\x06trends\x18\x01 \x03(\v2\x12.user.DailyEmotionR\x06trends\"M\n" +
 	"\x17GetDailyInsightResponse\x12\x18\n" +
 	"\ainsight\x18\x01 \x01(\tR\ainsight\x12\x18\n" +
-	"\adetails\x18\x02 \x01(\tR\adetails2\xc7\x04\n" +
+	"\adetails\x18\x02 \x01(\tR\adetails2\x92\x06\n" +
 	"\vUserService\x128\n" +
 	"\n" +
 	"CreateUser\x12\x17.user.CreateUserRequest\x1a\x11.user.ApiResponse\x123\n" +
@@ -824,7 +897,10 @@ const file_userpb_user_proto_rawDesc = "" +
 	"\x16GetProfileCompleteness\x12\x14.user.GetUserRequest\x1a!.user.ProfileCompletenessResponse\x12G\n" +
 	"\x11GetPictureAndName\x12\x14.user.GetUserRequest\x1a\x1c.user.NameAndPictureResponse\x12Z\n" +
 	"\x18GetGlobalEmotionalTrends\x12\x1c.user.GetGlobalTrendsRequest\x1a .user.GetEmotionalTrendsResponse\x12F\n" +
-	"\x0fGetDailyInsight\x12\x14.user.GetUserRequest\x1a\x1d.user.GetDailyInsightResponseB\x15Z\x13e_veda/proto/userpbb\x06proto3"
+	"\x0fGetDailyInsight\x12\x14.user.GetUserRequest\x1a\x1d.user.GetDailyInsightResponse\x12C\n" +
+	"\vUploadAudio\x12!.user.UploadProfilePictureRequest\x1a\x11.user.ApiResponse\x12C\n" +
+	"\vUploadVideo\x12!.user.UploadProfilePictureRequest\x1a\x11.user.ApiResponse\x12?\n" +
+	"\fCreateReport\x12\x1c.user.CreateNewReportRequest\x1a\x11.user.ApiResponseB\x15Z\x13e_veda/proto/userpbb\x06proto3"
 
 var (
 	file_userpb_user_proto_rawDescOnce sync.Once
@@ -838,7 +914,7 @@ func file_userpb_user_proto_rawDescGZIP() []byte {
 	return file_userpb_user_proto_rawDescData
 }
 
-var file_userpb_user_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_userpb_user_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_userpb_user_proto_goTypes = []any{
 	(*CreateUserRequest)(nil),           // 0: user.CreateUserRequest
 	(*ApiResponse)(nil),                 // 1: user.ApiResponse
@@ -847,11 +923,12 @@ var file_userpb_user_proto_goTypes = []any{
 	(*ProfileUpdateRequest)(nil),        // 4: user.ProfileUpdateRequest
 	(*GetGlobalTrendsRequest)(nil),      // 5: user.GetGlobalTrendsRequest
 	(*DailyEmotion)(nil),                // 6: user.DailyEmotion
-	(*UserResponse)(nil),                // 7: user.UserResponse
-	(*ProfileCompletenessResponse)(nil), // 8: user.ProfileCompletenessResponse
-	(*NameAndPictureResponse)(nil),      // 9: user.NameAndPictureResponse
-	(*GetEmotionalTrendsResponse)(nil),  // 10: user.GetEmotionalTrendsResponse
-	(*GetDailyInsightResponse)(nil),     // 11: user.GetDailyInsightResponse
+	(*CreateNewReportRequest)(nil),      // 7: user.CreateNewReportRequest
+	(*UserResponse)(nil),                // 8: user.UserResponse
+	(*ProfileCompletenessResponse)(nil), // 9: user.ProfileCompletenessResponse
+	(*NameAndPictureResponse)(nil),      // 10: user.NameAndPictureResponse
+	(*GetEmotionalTrendsResponse)(nil),  // 11: user.GetEmotionalTrendsResponse
+	(*GetDailyInsightResponse)(nil),     // 12: user.GetDailyInsightResponse
 }
 var file_userpb_user_proto_depIdxs = []int32{
 	6,  // 0: user.GetEmotionalTrendsResponse.trends:type_name -> user.DailyEmotion
@@ -863,16 +940,22 @@ var file_userpb_user_proto_depIdxs = []int32{
 	2,  // 6: user.UserService.GetPictureAndName:input_type -> user.GetUserRequest
 	5,  // 7: user.UserService.GetGlobalEmotionalTrends:input_type -> user.GetGlobalTrendsRequest
 	2,  // 8: user.UserService.GetDailyInsight:input_type -> user.GetUserRequest
-	1,  // 9: user.UserService.CreateUser:output_type -> user.ApiResponse
-	7,  // 10: user.UserService.GetUser:output_type -> user.UserResponse
-	1,  // 11: user.UserService.UpdateUser:output_type -> user.ApiResponse
-	1,  // 12: user.UserService.UploadProfilePicture:output_type -> user.ApiResponse
-	8,  // 13: user.UserService.GetProfileCompleteness:output_type -> user.ProfileCompletenessResponse
-	9,  // 14: user.UserService.GetPictureAndName:output_type -> user.NameAndPictureResponse
-	10, // 15: user.UserService.GetGlobalEmotionalTrends:output_type -> user.GetEmotionalTrendsResponse
-	11, // 16: user.UserService.GetDailyInsight:output_type -> user.GetDailyInsightResponse
-	9,  // [9:17] is the sub-list for method output_type
-	1,  // [1:9] is the sub-list for method input_type
+	3,  // 9: user.UserService.UploadAudio:input_type -> user.UploadProfilePictureRequest
+	3,  // 10: user.UserService.UploadVideo:input_type -> user.UploadProfilePictureRequest
+	7,  // 11: user.UserService.CreateReport:input_type -> user.CreateNewReportRequest
+	1,  // 12: user.UserService.CreateUser:output_type -> user.ApiResponse
+	8,  // 13: user.UserService.GetUser:output_type -> user.UserResponse
+	1,  // 14: user.UserService.UpdateUser:output_type -> user.ApiResponse
+	1,  // 15: user.UserService.UploadProfilePicture:output_type -> user.ApiResponse
+	9,  // 16: user.UserService.GetProfileCompleteness:output_type -> user.ProfileCompletenessResponse
+	10, // 17: user.UserService.GetPictureAndName:output_type -> user.NameAndPictureResponse
+	11, // 18: user.UserService.GetGlobalEmotionalTrends:output_type -> user.GetEmotionalTrendsResponse
+	12, // 19: user.UserService.GetDailyInsight:output_type -> user.GetDailyInsightResponse
+	1,  // 20: user.UserService.UploadAudio:output_type -> user.ApiResponse
+	1,  // 21: user.UserService.UploadVideo:output_type -> user.ApiResponse
+	1,  // 22: user.UserService.CreateReport:output_type -> user.ApiResponse
+	12, // [12:23] is the sub-list for method output_type
+	1,  // [1:12] is the sub-list for method input_type
 	1,  // [1:1] is the sub-list for extension type_name
 	1,  // [1:1] is the sub-list for extension extendee
 	0,  // [0:1] is the sub-list for field type_name
@@ -889,7 +972,7 @@ func file_userpb_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_userpb_user_proto_rawDesc), len(file_userpb_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

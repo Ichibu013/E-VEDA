@@ -29,6 +29,9 @@ func NewRouter(iamClient iampb.IAMServiceClient, userClient userpb.UserServiceCl
 	mux.Handle("/api/user/update-password", h.AuthMiddleware(http.HandlerFunc(h.UpdatePassword)))
 	mux.Handle("/api/ai/global-trends", h.AuthMiddleware(http.HandlerFunc(h.GetGlobalEmotionalTrends)))
 	mux.Handle("/api/ai/insight", h.AuthMiddleware(http.HandlerFunc(h.GetDailyInsight)))
+	mux.Handle("/api/report/upload/audio", h.AuthMiddleware(http.HandlerFunc(h.UploadAudio)))
+	mux.Handle("/api//report/upload/video", h.AuthMiddleware(http.HandlerFunc(h.UploadVideo)))
+	mux.Handle("/api/report/create", h.AuthMiddleware(http.HandlerFunc(h.CreateReport)))
 
 	mux.Handle("/api/user", h.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {

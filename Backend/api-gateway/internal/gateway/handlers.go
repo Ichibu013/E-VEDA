@@ -5,6 +5,7 @@ import (
 	"e_veda/proto/iampb"
 	"e_veda/proto/userpb"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
@@ -58,6 +59,12 @@ type UpdatePasswordPayload struct {
 	NewPassword string `json:"new_password"`
 }
 
+type CreateReportPayload struct {
+	ReportId string `json:"report_id"`
+	AudioUrl string `json:"audio_url"`
+	VideoUrl string `json:"video_url"`
+}
+
 // ==========================================
 // JSON Error Helpers
 // ==========================================
@@ -66,11 +73,15 @@ type UpdatePasswordPayload struct {
 func respondWithError(w http.ResponseWriter, statusCode int, errorType string, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	err := json.NewEncoder(w).Encode(map[string]interface{}{
 		"error":   errorType,
 		"status":  statusCode,
 		"message": message,
 	})
+	if err != nil {
+		log.Printf("Error Encoding message")
+		return
+	}
 }
 
 // respondWithGrpcError extracts the clean message from a gRPC error and formats it as JSON
@@ -593,5 +604,162 @@ func (h *Handler) GetDailyInsight(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", "Failed to encode response")
+	}
+}
+
+func (h *Handler) UploadAudio(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be POST")
+		return
+	}
+
+	userUUID, ok := r.Context().Value(userUUIDKey).(string)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found")
+		return
+	}
+
+	// Parse the audio file (Allowing up to 50MB)
+	fileBytes, contentType, extension, err := parseFileUpload(r, 50<<20)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Bad Request", err.Error())
+		return
+	}
+
+	// Give the upload a slightly longer timeout since media files are large
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*30)
+	defer cancel()
+
+	res, err := h.userClient.UploadAudio(ctx, &userpb.UploadProfilePictureRequest{
+		UserId:        userUUID,
+		FileData:      fileBytes,
+		ContentType:   contentType,
+		FileExtension: extension,
+	})
+	if err != nil {
+		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(map[string]string{
+		"message": res.Message, // This contains the MinIO Audio URL
+	})
+	if err != nil {
+		return
+	}
+}
+
+func (h *Handler) UploadVideo(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be POST")
+		return
+	}
+
+	userUUID, ok := r.Context().Value(userUUIDKey).(string)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found")
+		return
+	}
+
+	// Parse the video file (Allowing up to 200MB)
+	fileBytes, contentType, extension, err := parseFileUpload(r, 200<<20)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Bad Request", err.Error())
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Minute*1) // 1 minute timeout for video
+	defer cancel()
+
+	res, err := h.userClient.UploadVideo(ctx, &userpb.UploadProfilePictureRequest{
+		UserId:        userUUID,
+		FileData:      fileBytes,
+		ContentType:   contentType,
+		FileExtension: extension,
+	})
+	if err != nil {
+		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(map[string]string{
+		"message": res.Message, // This contains the MinIO Video URL
+	})
+	if err != nil {
+		return
+	}
+}
+
+func parseFileUpload(r *http.Request, maxMemory int64) ([]byte, string, string, error) {
+	if err := r.ParseMultipartForm(maxMemory); err != nil {
+		return nil, "", "", fmt.Errorf("file is too large or invalid")
+	}
+
+	// We assume the frontend appends the file to a form field named "file"
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		return nil, "", "", fmt.Errorf("could not get uploaded file")
+	}
+	defer func(file multipart.File) {
+		err := file.Close()
+		if err != nil {
+			log.Printf("could not close uploaded file: %v", err)
+			return
+		}
+	}(file)
+
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		return nil, "", "", fmt.Errorf("could not read file bytes")
+	}
+
+	contentType := header.Header.Get("Content-Type")
+	extension := filepath.Ext(header.Filename)
+
+	return fileBytes, contentType, extension, nil
+}
+
+func (h *Handler) CreateReport(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be POST")
+		return
+	}
+
+	userUUID, ok := r.Context().Value(userUUIDKey).(string)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found")
+		return
+	}
+
+	var payload CreateReportPayload
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Bad Request", "Invalid JSON request")
+		return
+	}
+
+	// Give Gemini API up to 20 seconds to generate the emotional analysis
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*20)
+	defer cancel()
+
+	res, err := h.userClient.CreateReport(ctx, &userpb.CreateNewReportRequest{
+		UserId:   userUUID,
+		ReportId: payload.ReportId,
+		AudioUrl: payload.AudioUrl,
+		VideoUrl: payload.VideoUrl,
+	})
+	if err != nil {
+		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(map[string]string{
+		"message": res.Message,
+	})
+	if err != nil {
+		log.Printf("could not encode response: %v", err)
+		return
 	}
 }

@@ -37,8 +37,8 @@ func InitDB(connStr string) (*sql.DB, error) {
 		log.Fatalf("Failed to create users table: %v\n", err)
 	}
 
-	createReportsTableQuery := `CREATE TABLE IF NOT EXISTS reports_history (
-		id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	createReportsTableQuery := `CREATE TABLE IF NOT EXISTS e_veda_reports_history (
+		id UUID PRIMARY KEY,
 		user_uuid VARCHAR(255) REFERENCES e_veda_users(iam_id) ON DELETE CASCADE,
 		report_creation_date DATE NOT NULL,
 		report_creation_time TIME NOT NULL,
@@ -47,6 +47,7 @@ func InitDB(connStr string) (*sql.DB, error) {
 		analysis_result JSONB,
 		confidence_rate DECIMAL(5,2),
 		accuracy_rate DECIMAL(5,2),
+    	status VARCHAR(10) NOT NULL,
 		created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 	);`
 
