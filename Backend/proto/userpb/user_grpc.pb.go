@@ -21,12 +21,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_CreateUser_FullMethodName             = "/user.UserService/CreateUser"
-	UserService_GetUser_FullMethodName                = "/user.UserService/GetUser"
-	UserService_UpdateUser_FullMethodName             = "/user.UserService/UpdateUser"
-	UserService_UploadProfilePicture_FullMethodName   = "/user.UserService/UploadProfilePicture"
-	UserService_GetProfileCompleteness_FullMethodName = "/user.UserService/GetProfileCompleteness"
-	UserService_GetPictureAndName_FullMethodName      = "/user.UserService/GetPictureAndName"
+	UserService_CreateUser_FullMethodName               = "/user.UserService/CreateUser"
+	UserService_GetUser_FullMethodName                  = "/user.UserService/GetUser"
+	UserService_UpdateUser_FullMethodName               = "/user.UserService/UpdateUser"
+	UserService_UploadProfilePicture_FullMethodName     = "/user.UserService/UploadProfilePicture"
+	UserService_GetProfileCompleteness_FullMethodName   = "/user.UserService/GetProfileCompleteness"
+	UserService_GetPictureAndName_FullMethodName        = "/user.UserService/GetPictureAndName"
+	UserService_GetGlobalEmotionalTrends_FullMethodName = "/user.UserService/GetGlobalEmotionalTrends"
+	UserService_GetDailyInsight_FullMethodName          = "/user.UserService/GetDailyInsight"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -39,6 +41,8 @@ type UserServiceClient interface {
 	UploadProfilePicture(ctx context.Context, in *UploadProfilePictureRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 	GetProfileCompleteness(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*ProfileCompletenessResponse, error)
 	GetPictureAndName(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*NameAndPictureResponse, error)
+	GetGlobalEmotionalTrends(ctx context.Context, in *GetGlobalTrendsRequest, opts ...grpc.CallOption) (*GetEmotionalTrendsResponse, error)
+	GetDailyInsight(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetDailyInsightResponse, error)
 }
 
 type userServiceClient struct {
@@ -109,6 +113,26 @@ func (c *userServiceClient) GetPictureAndName(ctx context.Context, in *GetUserRe
 	return out, nil
 }
 
+func (c *userServiceClient) GetGlobalEmotionalTrends(ctx context.Context, in *GetGlobalTrendsRequest, opts ...grpc.CallOption) (*GetEmotionalTrendsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetEmotionalTrendsResponse)
+	err := c.cc.Invoke(ctx, UserService_GetGlobalEmotionalTrends_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetDailyInsight(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetDailyInsightResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDailyInsightResponse)
+	err := c.cc.Invoke(ctx, UserService_GetDailyInsight_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -119,6 +143,8 @@ type UserServiceServer interface {
 	UploadProfilePicture(context.Context, *UploadProfilePictureRequest) (*ApiResponse, error)
 	GetProfileCompleteness(context.Context, *GetUserRequest) (*ProfileCompletenessResponse, error)
 	GetPictureAndName(context.Context, *GetUserRequest) (*NameAndPictureResponse, error)
+	GetGlobalEmotionalTrends(context.Context, *GetGlobalTrendsRequest) (*GetEmotionalTrendsResponse, error)
+	GetDailyInsight(context.Context, *GetUserRequest) (*GetDailyInsightResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -146,6 +172,12 @@ func (UnimplementedUserServiceServer) GetProfileCompleteness(context.Context, *G
 }
 func (UnimplementedUserServiceServer) GetPictureAndName(context.Context, *GetUserRequest) (*NameAndPictureResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetPictureAndName not implemented")
+}
+func (UnimplementedUserServiceServer) GetGlobalEmotionalTrends(context.Context, *GetGlobalTrendsRequest) (*GetEmotionalTrendsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetGlobalEmotionalTrends not implemented")
+}
+func (UnimplementedUserServiceServer) GetDailyInsight(context.Context, *GetUserRequest) (*GetDailyInsightResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDailyInsight not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -276,6 +308,42 @@ func _UserService_GetPictureAndName_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetGlobalEmotionalTrends_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetGlobalTrendsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetGlobalEmotionalTrends(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetGlobalEmotionalTrends_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetGlobalEmotionalTrends(ctx, req.(*GetGlobalTrendsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetDailyInsight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetDailyInsight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetDailyInsight_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetDailyInsight(ctx, req.(*GetUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -306,6 +374,14 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPictureAndName",
 			Handler:    _UserService_GetPictureAndName_Handler,
+		},
+		{
+			MethodName: "GetGlobalEmotionalTrends",
+			Handler:    _UserService_GetGlobalEmotionalTrends_Handler,
+		},
+		{
+			MethodName: "GetDailyInsight",
+			Handler:    _UserService_GetDailyInsight_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

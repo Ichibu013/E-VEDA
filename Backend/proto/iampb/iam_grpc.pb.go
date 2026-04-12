@@ -28,6 +28,7 @@ const (
 	IAMService_ResetPassword_FullMethodName  = "/iam.IAMService/ResetPassword"
 	IAMService_ValidateToken_FullMethodName  = "/iam.IAMService/ValidateToken"
 	IAMService_DeleteUser_FullMethodName     = "/iam.IAMService/DeleteUser"
+	IAMService_UpdatePassword_FullMethodName = "/iam.IAMService/UpdatePassword"
 )
 
 // IAMServiceClient is the client API for IAMService service.
@@ -41,6 +42,7 @@ type IAMServiceClient interface {
 	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 	ValidateToken(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*ValidationResponse, error)
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*ApiResponse, error)
+	UpdatePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 }
 
 type iAMServiceClient struct {
@@ -121,6 +123,16 @@ func (c *iAMServiceClient) DeleteUser(ctx context.Context, in *DeleteUserRequest
 	return out, nil
 }
 
+func (c *iAMServiceClient) UpdatePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ApiResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApiResponse)
+	err := c.cc.Invoke(ctx, IAMService_UpdatePassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IAMServiceServer is the server API for IAMService service.
 // All implementations must embed UnimplementedIAMServiceServer
 // for forward compatibility.
@@ -132,6 +144,7 @@ type IAMServiceServer interface {
 	ResetPassword(context.Context, *ResetPasswordRequest) (*ApiResponse, error)
 	ValidateToken(context.Context, *TokenRequest) (*ValidationResponse, error)
 	DeleteUser(context.Context, *DeleteUserRequest) (*ApiResponse, error)
+	UpdatePassword(context.Context, *ChangePasswordRequest) (*ApiResponse, error)
 	mustEmbedUnimplementedIAMServiceServer()
 }
 
@@ -162,6 +175,9 @@ func (UnimplementedIAMServiceServer) ValidateToken(context.Context, *TokenReques
 }
 func (UnimplementedIAMServiceServer) DeleteUser(context.Context, *DeleteUserRequest) (*ApiResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (UnimplementedIAMServiceServer) UpdatePassword(context.Context, *ChangePasswordRequest) (*ApiResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdatePassword not implemented")
 }
 func (UnimplementedIAMServiceServer) mustEmbedUnimplementedIAMServiceServer() {}
 func (UnimplementedIAMServiceServer) testEmbeddedByValue()                    {}
@@ -310,6 +326,24 @@ func _IAMService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IAMService_UpdatePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangePasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).UpdatePassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_UpdatePassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).UpdatePassword(ctx, req.(*ChangePasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // IAMService_ServiceDesc is the grpc.ServiceDesc for IAMService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -344,6 +378,10 @@ var IAMService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteUser",
 			Handler:    _IAMService_DeleteUser_Handler,
+		},
+		{
+			MethodName: "UpdatePassword",
+			Handler:    _IAMService_UpdatePassword_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

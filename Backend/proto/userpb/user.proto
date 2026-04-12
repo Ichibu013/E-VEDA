@@ -10,6 +10,8 @@ service UserService {
   rpc UploadProfilePicture (UploadProfilePictureRequest) returns (ApiResponse);
   rpc GetProfileCompleteness(GetUserRequest) returns (ProfileCompletenessResponse) ;
   rpc GetPictureAndName (GetUserRequest) returns (NameAndPictureResponse);
+  rpc GetGlobalEmotionalTrends (GetGlobalTrendsRequest) returns (GetEmotionalTrendsResponse);
+  rpc GetDailyInsight (GetUserRequest) returns (GetDailyInsightResponse);
 }
 
 message CreateUserRequest {
@@ -42,6 +44,19 @@ message ProfileUpdateRequest {
   string gender = 7;
 }
 
+message GetGlobalTrendsRequest {}
+
+message DailyEmotion {
+  string day = 1;       // e.g., "MON", "TUE"
+  string date = 2;      // e.g., "2026-04-12"
+  double joy = 3;
+  double anger = 4;
+  double sadness = 5;
+  double fear = 6;
+  double surprise = 7;
+  double disgust = 8;
+}
+
 message UserResponse {
   string name = 1;
   string nickname = 2;
@@ -61,4 +76,13 @@ message ProfileCompletenessResponse {
 message NameAndPictureResponse {
   string name = 1;
   string profile_picture = 2;
+}
+
+message GetEmotionalTrendsResponse {
+  repeated DailyEmotion trends = 1;
+}
+
+message GetDailyInsightResponse {
+  string insight = 1;
+  string details = 2; // ADD THIS
 }

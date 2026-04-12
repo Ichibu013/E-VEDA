@@ -9,15 +9,17 @@ import (
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/redis/go-redis/v9"
 )
 
 type Server struct {
 	pb.UnimplementedUserServiceServer
 	db          *sql.DB
 	minioClient *minio.Client
+	rdb         *redis.Client
 }
 
-func NewUserServer(db *sql.DB) *Server {
+func NewUserServer(db *sql.DB, rdb *redis.Client) *Server {
 	endpoint := os.Getenv("MINIO_ENDPOINT")
 	if endpoint == "" {
 		endpoint = "localhost:9000"
@@ -32,5 +34,5 @@ func NewUserServer(db *sql.DB) *Server {
 		log.Fatalf("Failed to initialize MinIO client: %v", err)
 	}
 
-	return &Server{db: db, minioClient: minioClient}
+	return &Server{db: db, minioClient: minioClient, rdb: rdb}
 }

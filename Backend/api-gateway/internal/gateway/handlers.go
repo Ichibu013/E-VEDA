@@ -53,6 +53,11 @@ type ProfileUpdatePayload struct {
 	Gender   string  `json:"gender"`
 }
 
+type UpdatePasswordPayload struct {
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
+}
+
 // ==========================================
 // JSON Error Helpers
 // ==========================================
@@ -493,5 +498,100 @@ func (h *Handler) GetPictureWithName(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
+	}
+}
+func (h *Handler) UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be POST")
+		return
+	}
+
+	// Extract the authenticated user's ID from the JWT middleware
+	userUUID, ok := r.Context().Value(userUUIDKey).(string)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found in request context")
+		return
+	}
+
+	var payload UpdatePasswordPayload
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
+	defer cancel()
+
+	// Call the User Service
+	res, err := h.iamClient.UpdatePassword(ctx, &iampb.ChangePasswordRequest{
+		OldPassword: payload.OldPassword,
+		NewPassword: payload.NewPassword,
+		UserUuid:    userUUID,
+	})
+	if err != nil {
+		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
+		"message": res.Message,
+	})
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", err.Error())
+	}
+}
+
+func (h *Handler) GetGlobalEmotionalTrends(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be GET")
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*15) // Given 15s since AI generation takes a moment
+	defer cancel()
+
+	// Call the User Service
+	res, err := h.userClient.GetGlobalEmotionalTrends(ctx, &userpb.GetGlobalTrendsRequest{})
+	if err != nil {
+		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
+		return
+	}
+
+	// Return the formatted array to the frontend
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(res.Trends); err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", "Failed to encode response")
+	}
+}
+
+func (h *Handler) GetDailyInsight(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be GET")
+		return
+	}
+
+	userUUID, ok := r.Context().Value(userUUIDKey).(string)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found")
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
+	defer cancel()
+
+	res, err := h.userClient.GetDailyInsight(ctx, &userpb.GetUserRequest{
+		UserId: userUUID,
+	})
+	if err != nil {
+		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	// Return it wrapped in a clean JSON object for the UI
+	err = json.NewEncoder(w).Encode(map[string]string{
+		"insight": res.Insight,
+		"details": res.Details,
+	})
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", "Failed to encode response")
 	}
 }

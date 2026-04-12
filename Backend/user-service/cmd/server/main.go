@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 )
 
@@ -17,6 +18,15 @@ func main() {
 	if dbURL == "" {
 		dbURL = "postgres://postgres:root@postgres-db:5432/e_veda?sslmode=disable"
 	}
+	// Connect Redis
+	redisURL := os.Getenv("REDIS_URL")
+	if redisURL == "" {
+		redisURL = "localhost:6379" // Fallback for local testing
+	}
+	rdb := redis.NewClient(&redis.Options{
+		Addr: redisURL,
+	})
+
 	log.Println("Initializing User database...")
 	usersDB, err := user.InitDB(dbURL)
 	if err != nil {
@@ -40,7 +50,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 
 	// Instantiate server
-	pb.RegisterUserServiceServer(grpcServer, user.NewUserServer(usersDB))
+	pb.RegisterUserServiceServer(grpcServer, user.NewUserServer(usersDB, rdb))
 
 	log.Printf("User Service listening at %v", lis.Addr())
 	if err := grpcServer.Serve(lis); err != nil {

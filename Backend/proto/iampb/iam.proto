@@ -11,6 +11,7 @@ service IAMService {
   rpc ResetPassword (ResetPasswordRequest) returns (ApiResponse);
   rpc ValidateToken (TokenRequest) returns (ValidationResponse);
   rpc DeleteUser (DeleteUserRequest) returns (ApiResponse);
+  rpc UpdatePassword (ChangePasswordRequest) returns (ApiResponse);
 }
 
 message ForgotPasswordRequest {
@@ -35,6 +36,12 @@ message LoginRequest {
 message SignUpRequest {
   string email = 1;
   string password = 2;
+}
+
+message ChangePasswordRequest {
+  string old_password = 1;
+  string new_password = 2;
+  string user_uuid = 3;
 }
 
 message LoginResponse {
