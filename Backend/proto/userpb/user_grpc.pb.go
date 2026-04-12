@@ -32,6 +32,7 @@ const (
 	UserService_UploadAudio_FullMethodName              = "/user.UserService/UploadAudio"
 	UserService_UploadVideo_FullMethodName              = "/user.UserService/UploadVideo"
 	UserService_CreateReport_FullMethodName             = "/user.UserService/CreateReport"
+	UserService_GetReportsList_FullMethodName           = "/user.UserService/GetReportsList"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -49,6 +50,7 @@ type UserServiceClient interface {
 	UploadAudio(ctx context.Context, in *UploadProfilePictureRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 	UploadVideo(ctx context.Context, in *UploadProfilePictureRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 	CreateReport(ctx context.Context, in *CreateNewReportRequest, opts ...grpc.CallOption) (*ApiResponse, error)
+	GetReportsList(ctx context.Context, in *GetReportsListRequest, opts ...grpc.CallOption) (*GetReportsListResponse, error)
 }
 
 type userServiceClient struct {
@@ -169,6 +171,16 @@ func (c *userServiceClient) CreateReport(ctx context.Context, in *CreateNewRepor
 	return out, nil
 }
 
+func (c *userServiceClient) GetReportsList(ctx context.Context, in *GetReportsListRequest, opts ...grpc.CallOption) (*GetReportsListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetReportsListResponse)
+	err := c.cc.Invoke(ctx, UserService_GetReportsList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -184,6 +196,7 @@ type UserServiceServer interface {
 	UploadAudio(context.Context, *UploadProfilePictureRequest) (*ApiResponse, error)
 	UploadVideo(context.Context, *UploadProfilePictureRequest) (*ApiResponse, error)
 	CreateReport(context.Context, *CreateNewReportRequest) (*ApiResponse, error)
+	GetReportsList(context.Context, *GetReportsListRequest) (*GetReportsListResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -226,6 +239,9 @@ func (UnimplementedUserServiceServer) UploadVideo(context.Context, *UploadProfil
 }
 func (UnimplementedUserServiceServer) CreateReport(context.Context, *CreateNewReportRequest) (*ApiResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateReport not implemented")
+}
+func (UnimplementedUserServiceServer) GetReportsList(context.Context, *GetReportsListRequest) (*GetReportsListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetReportsList not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -446,6 +462,24 @@ func _UserService_CreateReport_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetReportsList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetReportsListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetReportsList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetReportsList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetReportsList(ctx, req.(*GetReportsListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -496,6 +530,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateReport",
 			Handler:    _UserService_CreateReport_Handler,
+		},
+		{
+			MethodName: "GetReportsList",
+			Handler:    _UserService_GetReportsList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

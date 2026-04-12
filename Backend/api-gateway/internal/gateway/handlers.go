@@ -11,6 +11,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"google.golang.org/grpc/status" // Required to unpack gRPC errors
@@ -757,6 +758,57 @@ func (h *Handler) CreateReport(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(map[string]string{
 		"message": res.Message,
+	})
+	if err != nil {
+		log.Printf("could not encode response: %v", err)
+		return
+	}
+}
+
+func (h *Handler) GetReportsList(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be GET")
+		return
+	}
+
+	userUUID, ok := r.Context().Value(userUUIDKey).(string)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found")
+		return
+	}
+
+	// Parse Query Parameters
+	pageStr := r.URL.Query().Get("page")
+	limitStr := r.URL.Query().Get("limit")
+	searchQuery := r.URL.Query().Get("search")
+
+	page, _ := strconv.Atoi(pageStr)   // Defaults to 0 if empty
+	limit, _ := strconv.Atoi(limitStr) // Defaults to 0 if empty
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*10)
+	defer cancel()
+
+	res, err := h.userClient.GetReportsList(ctx, &userpb.GetReportsListRequest{
+		UserId:      userUUID,
+		Page:        int32(page),
+		Limit:       int32(limit),
+		SearchQuery: searchQuery,
+	})
+
+	if err != nil {
+		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	// Return the exact structure the pagination UI needs
+	err = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data": res.Reports,
+		"pagination": map[string]interface{}{
+			"total_count":  res.TotalCount,
+			"total_pages":  res.TotalPages,
+			"current_page": res.CurrentPage,
+		},
 	})
 	if err != nil {
 		log.Printf("could not encode response: %v", err)
