@@ -37,7 +37,15 @@ func main() {
 	iamClient := iampb.NewIAMServiceClient(iamConn)
 
 	// Connect to User Service
-	userConn, err := grpc.Dial(userTarget, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	maxMsgSize := 1024 * 1024 * 250
+	userConn, err := grpc.Dial(
+		userTarget,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallRecvMsgSize(maxMsgSize),
+			grpc.MaxCallSendMsgSize(maxMsgSize),
+		),
+	)
 	if err != nil {
 		log.Fatalf("Did not connect to User: %v", err)
 	}

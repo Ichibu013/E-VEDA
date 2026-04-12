@@ -61,7 +61,6 @@ type UpdatePasswordPayload struct {
 }
 
 type CreateReportPayload struct {
-	ReportId string `json:"report_id"`
 	AudioUrl string `json:"audio_url"`
 	VideoUrl string `json:"video_url"`
 }
@@ -744,9 +743,8 @@ func (h *Handler) CreateReport(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), time.Second*20)
 	defer cancel()
 
-	res, err := h.userClient.CreateReport(ctx, &userpb.CreateNewReportRequest{
+	res, err := h.userClient.CreateNewReport(ctx, &userpb.CreateNewReportRequest{
 		UserId:   userUUID,
-		ReportId: payload.ReportId,
 		AudioUrl: payload.AudioUrl,
 		VideoUrl: payload.VideoUrl,
 	})

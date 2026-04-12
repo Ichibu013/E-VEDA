@@ -47,7 +47,11 @@ func main() {
 	}
 
 	// Register gRPC Server
-	grpcServer := grpc.NewServer()
+	maxMsgSize := 1024 * 1024 * 250
+	grpcServer := grpc.NewServer(
+		grpc.MaxRecvMsgSize(maxMsgSize),
+		grpc.MaxSendMsgSize(maxMsgSize),
+	)
 
 	// Instantiate server
 	pb.RegisterUserServiceServer(grpcServer, user.NewUserServer(usersDB, rdb))

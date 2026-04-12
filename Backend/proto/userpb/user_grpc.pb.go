@@ -31,7 +31,7 @@ const (
 	UserService_GetDailyInsight_FullMethodName          = "/user.UserService/GetDailyInsight"
 	UserService_UploadAudio_FullMethodName              = "/user.UserService/UploadAudio"
 	UserService_UploadVideo_FullMethodName              = "/user.UserService/UploadVideo"
-	UserService_CreateReport_FullMethodName             = "/user.UserService/CreateReport"
+	UserService_CreateNewReport_FullMethodName          = "/user.UserService/CreateNewReport"
 	UserService_GetReportsList_FullMethodName           = "/user.UserService/GetReportsList"
 )
 
@@ -49,7 +49,7 @@ type UserServiceClient interface {
 	GetDailyInsight(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetDailyInsightResponse, error)
 	UploadAudio(ctx context.Context, in *UploadProfilePictureRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 	UploadVideo(ctx context.Context, in *UploadProfilePictureRequest, opts ...grpc.CallOption) (*ApiResponse, error)
-	CreateReport(ctx context.Context, in *CreateNewReportRequest, opts ...grpc.CallOption) (*ApiResponse, error)
+	CreateNewReport(ctx context.Context, in *CreateNewReportRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 	GetReportsList(ctx context.Context, in *GetReportsListRequest, opts ...grpc.CallOption) (*GetReportsListResponse, error)
 }
 
@@ -161,10 +161,10 @@ func (c *userServiceClient) UploadVideo(ctx context.Context, in *UploadProfilePi
 	return out, nil
 }
 
-func (c *userServiceClient) CreateReport(ctx context.Context, in *CreateNewReportRequest, opts ...grpc.CallOption) (*ApiResponse, error) {
+func (c *userServiceClient) CreateNewReport(ctx context.Context, in *CreateNewReportRequest, opts ...grpc.CallOption) (*ApiResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ApiResponse)
-	err := c.cc.Invoke(ctx, UserService_CreateReport_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, UserService_CreateNewReport_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +195,7 @@ type UserServiceServer interface {
 	GetDailyInsight(context.Context, *GetUserRequest) (*GetDailyInsightResponse, error)
 	UploadAudio(context.Context, *UploadProfilePictureRequest) (*ApiResponse, error)
 	UploadVideo(context.Context, *UploadProfilePictureRequest) (*ApiResponse, error)
-	CreateReport(context.Context, *CreateNewReportRequest) (*ApiResponse, error)
+	CreateNewReport(context.Context, *CreateNewReportRequest) (*ApiResponse, error)
 	GetReportsList(context.Context, *GetReportsListRequest) (*GetReportsListResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
@@ -237,8 +237,8 @@ func (UnimplementedUserServiceServer) UploadAudio(context.Context, *UploadProfil
 func (UnimplementedUserServiceServer) UploadVideo(context.Context, *UploadProfilePictureRequest) (*ApiResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UploadVideo not implemented")
 }
-func (UnimplementedUserServiceServer) CreateReport(context.Context, *CreateNewReportRequest) (*ApiResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateReport not implemented")
+func (UnimplementedUserServiceServer) CreateNewReport(context.Context, *CreateNewReportRequest) (*ApiResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateNewReport not implemented")
 }
 func (UnimplementedUserServiceServer) GetReportsList(context.Context, *GetReportsListRequest) (*GetReportsListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetReportsList not implemented")
@@ -444,20 +444,20 @@ func _UserService_UploadVideo_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_CreateReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_CreateNewReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateNewReportRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).CreateReport(ctx, in)
+		return srv.(UserServiceServer).CreateNewReport(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_CreateReport_FullMethodName,
+		FullMethod: UserService_CreateNewReport_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).CreateReport(ctx, req.(*CreateNewReportRequest))
+		return srv.(UserServiceServer).CreateNewReport(ctx, req.(*CreateNewReportRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -528,8 +528,8 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_UploadVideo_Handler,
 		},
 		{
-			MethodName: "CreateReport",
-			Handler:    _UserService_CreateReport_Handler,
+			MethodName: "CreateNewReport",
+			Handler:    _UserService_CreateNewReport_Handler,
 		},
 		{
 			MethodName: "GetReportsList",

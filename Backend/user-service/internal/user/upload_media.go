@@ -19,10 +19,34 @@ import (
 
 // uploadMediaToMinio handles the repetitive MinIO upload logic and returns the public URL
 func (s *Server) uploadMediaToMinio(ctx context.Context, bucketName string, req *pb.UploadProfilePictureRequest) (string, error) {
+	// 1. CHECK IF BUCKET EXISTS
+	exists, err := s.minioClient.BucketExists(ctx, bucketName)
+	if err != nil {
+		log.Printf("Error checking if bucket %s exists: %v", bucketName, err)
+		return "", err
+	}
+
+	// 2. CREATE BUCKET IF IT DOES NOT EXIST
+	if !exists {
+		log.Printf("Bucket '%s' does not exist. Creating it now...", bucketName)
+		err = s.minioClient.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{})
+		if err != nil {
+			log.Printf("Error creating bucket %s: %v", bucketName, err)
+			return "", err
+		}
+		log.Printf("Successfully created bucket: %s", bucketName)
+
+		policy := fmt.Sprintf(`{"Version": "2012-10-17", "Statement": [{"Action": ["s3:GetObject"], "Effect": "Allow", "Principal": {"AWS": ["*"]}, "Resource": ["arn:aws:s3:::%s/*"]}]}`, bucketName)
+		err := s.minioClient.SetBucketPolicy(ctx, bucketName, policy)
+		if err != nil {
+			return "", err
+		}
+	}
+
 	objectName := fmt.Sprintf("%s-%s%s", req.GetUserId(), uuid.New().String()[:8], req.GetFileExtension())
 	reader := bytes.NewReader(req.GetFileData())
 
-	_, err := s.minioClient.PutObject(ctx, bucketName, objectName, reader, reader.Size(), minio.PutObjectOptions{
+	_, err = s.minioClient.PutObject(ctx, bucketName, objectName, reader, reader.Size(), minio.PutObjectOptions{
 		ContentType: req.GetContentType(),
 	})
 	if err != nil {

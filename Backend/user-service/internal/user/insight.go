@@ -84,7 +84,7 @@ func (s *Server) GetDailyInsight(ctx context.Context, req *pb.GetUserRequest) (*
 	}
 	defer client.Close()
 
-	model := client.GenerativeModel("gemini-1.5-flash")
+	model := client.GenerativeModel("gemini-2.5-flash")
 
 	// PRO FEATURE: Force JSON Output
 	model.ResponseMIMEType = "application/json"

@@ -51,7 +51,7 @@ func (s *Server) GetGlobalEmotionalTrends(ctx context.Context, _ *pb.GetGlobalTr
 		}
 	}(client)
 
-	model := client.GenerativeModel("gemini-1.5-flash")
+	model := client.GenerativeModel("gemini-2.5-flash")
 	model.ResponseMIMEType = "application/json" // Forces Gemini to output pure JSON
 
 	// Calculate the date range to give Gemini accurate context

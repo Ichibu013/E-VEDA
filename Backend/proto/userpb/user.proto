@@ -14,7 +14,7 @@ service UserService {
   rpc GetDailyInsight (GetUserRequest) returns (GetDailyInsightResponse);
   rpc UploadAudio (UploadProfilePictureRequest) returns (ApiResponse);
   rpc UploadVideo (UploadProfilePictureRequest) returns (ApiResponse);
-  rpc CreateReport (CreateNewReportRequest) returns (ApiResponse);
+  rpc CreateNewReport (CreateNewReportRequest) returns (ApiResponse);
   rpc GetReportsList (GetReportsListRequest) returns (GetReportsListResponse);
 }
 
@@ -52,10 +52,9 @@ message ProfileUpdateRequest {
 message GetGlobalTrendsRequest {}
 
 message CreateNewReportRequest {
-  string report_id = 1;
-  string user_id = 2;
-  string audio_url = 3;
-  string video_url = 4;
+  string user_id = 1;
+  string audio_url = 2;
+  string video_url = 3;
 }
 
 message GetReportsListRequest {

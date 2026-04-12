@@ -361,10 +361,9 @@ func (*GetGlobalTrendsRequest) Descriptor() ([]byte, []int) {
 
 type CreateNewReportRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ReportId      string                 `protobuf:"bytes,1,opt,name=report_id,json=reportId,proto3" json:"report_id,omitempty"`
-	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	AudioUrl      string                 `protobuf:"bytes,3,opt,name=audio_url,json=audioUrl,proto3" json:"audio_url,omitempty"`
-	VideoUrl      string                 `protobuf:"bytes,4,opt,name=video_url,json=videoUrl,proto3" json:"video_url,omitempty"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AudioUrl      string                 `protobuf:"bytes,2,opt,name=audio_url,json=audioUrl,proto3" json:"audio_url,omitempty"`
+	VideoUrl      string                 `protobuf:"bytes,3,opt,name=video_url,json=videoUrl,proto3" json:"video_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -397,13 +396,6 @@ func (x *CreateNewReportRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateNewReportRequest.ProtoReflect.Descriptor instead.
 func (*CreateNewReportRequest) Descriptor() ([]byte, []int) {
 	return file_userpb_user_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *CreateNewReportRequest) GetReportId() string {
-	if x != nil {
-		return x.ReportId
-	}
-	return ""
 }
 
 func (x *CreateNewReportRequest) GetUserId() string {
@@ -1096,12 +1088,11 @@ const file_userpb_user_proto_rawDesc = "" +
 	"\x06height\x18\x05 \x01(\x03R\x06height\x12\x16\n" +
 	"\x06weight\x18\x06 \x01(\x01R\x06weight\x12\x16\n" +
 	"\x06gender\x18\a \x01(\tR\x06gender\"\x18\n" +
-	"\x16GetGlobalTrendsRequest\"\x88\x01\n" +
-	"\x16CreateNewReportRequest\x12\x1b\n" +
-	"\treport_id\x18\x01 \x01(\tR\breportId\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1b\n" +
-	"\taudio_url\x18\x03 \x01(\tR\baudioUrl\x12\x1b\n" +
-	"\tvideo_url\x18\x04 \x01(\tR\bvideoUrl\"}\n" +
+	"\x16GetGlobalTrendsRequest\"k\n" +
+	"\x16CreateNewReportRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
+	"\taudio_url\x18\x02 \x01(\tR\baudioUrl\x12\x1b\n" +
+	"\tvideo_url\x18\x03 \x01(\tR\bvideoUrl\"}\n" +
 	"\x15GetReportsListRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x14\n" +
@@ -1156,7 +1147,7 @@ const file_userpb_user_proto_rawDesc = "" +
 	"totalCount\x12\x1f\n" +
 	"\vtotal_pages\x18\x03 \x01(\x05R\n" +
 	"totalPages\x12!\n" +
-	"\fcurrent_page\x18\x04 \x01(\x05R\vcurrentPage2\xdf\x06\n" +
+	"\fcurrent_page\x18\x04 \x01(\x05R\vcurrentPage2\xe2\x06\n" +
 	"\vUserService\x128\n" +
 	"\n" +
 	"CreateUser\x12\x17.user.CreateUserRequest\x1a\x11.user.ApiResponse\x123\n" +
@@ -1169,8 +1160,8 @@ const file_userpb_user_proto_rawDesc = "" +
 	"\x18GetGlobalEmotionalTrends\x12\x1c.user.GetGlobalTrendsRequest\x1a .user.GetEmotionalTrendsResponse\x12F\n" +
 	"\x0fGetDailyInsight\x12\x14.user.GetUserRequest\x1a\x1d.user.GetDailyInsightResponse\x12C\n" +
 	"\vUploadAudio\x12!.user.UploadProfilePictureRequest\x1a\x11.user.ApiResponse\x12C\n" +
-	"\vUploadVideo\x12!.user.UploadProfilePictureRequest\x1a\x11.user.ApiResponse\x12?\n" +
-	"\fCreateReport\x12\x1c.user.CreateNewReportRequest\x1a\x11.user.ApiResponse\x12K\n" +
+	"\vUploadVideo\x12!.user.UploadProfilePictureRequest\x1a\x11.user.ApiResponse\x12B\n" +
+	"\x0fCreateNewReport\x12\x1c.user.CreateNewReportRequest\x1a\x11.user.ApiResponse\x12K\n" +
 	"\x0eGetReportsList\x12\x1b.user.GetReportsListRequest\x1a\x1c.user.GetReportsListResponseB\x15Z\x13e_veda/proto/userpbb\x06proto3"
 
 var (
@@ -1217,7 +1208,7 @@ var file_userpb_user_proto_depIdxs = []int32{
 	2,  // 9: user.UserService.GetDailyInsight:input_type -> user.GetUserRequest
 	3,  // 10: user.UserService.UploadAudio:input_type -> user.UploadProfilePictureRequest
 	3,  // 11: user.UserService.UploadVideo:input_type -> user.UploadProfilePictureRequest
-	6,  // 12: user.UserService.CreateReport:input_type -> user.CreateNewReportRequest
+	6,  // 12: user.UserService.CreateNewReport:input_type -> user.CreateNewReportRequest
 	7,  // 13: user.UserService.GetReportsList:input_type -> user.GetReportsListRequest
 	1,  // 14: user.UserService.CreateUser:output_type -> user.ApiResponse
 	10, // 15: user.UserService.GetUser:output_type -> user.UserResponse
@@ -1229,7 +1220,7 @@ var file_userpb_user_proto_depIdxs = []int32{
 	14, // 21: user.UserService.GetDailyInsight:output_type -> user.GetDailyInsightResponse
 	1,  // 22: user.UserService.UploadAudio:output_type -> user.ApiResponse
 	1,  // 23: user.UserService.UploadVideo:output_type -> user.ApiResponse
-	1,  // 24: user.UserService.CreateReport:output_type -> user.ApiResponse
+	1,  // 24: user.UserService.CreateNewReport:output_type -> user.ApiResponse
 	15, // 25: user.UserService.GetReportsList:output_type -> user.GetReportsListResponse
 	14, // [14:26] is the sub-list for method output_type
 	2,  // [2:14] is the sub-list for method input_type
