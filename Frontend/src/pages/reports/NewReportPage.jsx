@@ -128,39 +128,40 @@ export default function NewReportPage() {
         )}
 
         {/* Recording Hub & Bento Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-on-surface">
           
-          {/* Left: Recording Hub (7 Columns) */}
+          {/* Left Area (7 Columns) */}
           <div className="lg:col-span-7 flex flex-col gap-8">
             {isLoading ? (
               <>
+                <Skeleton height={500} borderRadius={24} />
                 <Skeleton height={400} borderRadius={24} />
-                <Skeleton height={200} borderRadius={24} />
               </>
             ) : (
               <>
                 <FacialRecognitionFeed />
-                <VoiceRecognitionFeed />
-              </>
-            )}
-          </div>
-
-          {/* Right: Metrics & Analysis (5 Columns) */}
-          <div className="lg:col-span-5 flex flex-col gap-8">
-            {isLoading ? (
-              <>
-                <Skeleton height={250} borderRadius={24} />
-                <Skeleton height={350} borderRadius={24} />
-              </>
-            ) : (
-              <>
-                <EmotionalStateMetrics />
                 <DoctorAnalysis />
               </>
             )}
           </div>
 
+          {/* Right Area (5 Columns) */}
+          <div className="lg:col-span-5 flex flex-col gap-8">
+            {isLoading ? (
+              <>
+                <Skeleton height={252} borderRadius={24} />
+                <Skeleton height={280} borderRadius={24} />
+              </>
+            ) : (
+              <>
+                <VoiceRecognitionFeed />
+                <EmotionalStateMetrics />
+              </>
+            )}
+          </div>
+
         </div>
+
 
         {/* Full-Width Recommendations */}
         {isLoading ? (
