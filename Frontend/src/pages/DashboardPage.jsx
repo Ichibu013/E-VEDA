@@ -7,21 +7,28 @@ import EmotionCalculator from '../components/dashboard/EmotionCalculator';
 import AccuracyMetrics from '../components/dashboard/AccuracyMetrics';
 import AIInsightBanner from '../components/dashboard/AIInsightBanner';
 import { userService } from '../api/user';
+import { aiService } from '../api/ai';
 
 export default function DashboardPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [completionData, setCompletionData] = useState(null);
     const [profileData, setProfileData] = useState(null);
+    const [trendsData, setTrendsData] = useState([]);
+    const [insightData, setInsightData] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [completion, profile] = await Promise.all([
+                const [completion, profile, trends, insight] = await Promise.all([
                     userService.getCompletionStatus(),
-                    userService.getProfile()
+                    userService.getProfile(),
+                    aiService.getTrends(),
+                    aiService.getInsights()
                 ]);
                 setCompletionData(completion);
                 setProfileData(profile);
+                setTrendsData(trends);
+                setInsightData(insight);
             } catch (error) {
                 console.error('Failed to fetch dashboard data:', error);
             } finally {
@@ -47,7 +54,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Left Column (Span 8) */}
                 <div className="lg:col-span-8 flex flex-col">
-                    <EmotionalTrendsChart isLoading={isLoading} />
+                    <EmotionalTrendsChart isLoading={isLoading} trendsData={trendsData} />
                 </div>
                 
                 {/* Right Column (Span 4) */}
@@ -63,7 +70,7 @@ export default function DashboardPage() {
             {/* Circular Progress Metrics */}
             <AccuracyMetrics isLoading={isLoading} />
             {/* AI Notification Footer */}
-            <AIInsightBanner isLoading={isLoading} />
+            <AIInsightBanner isLoading={isLoading} insightData={insightData} />
         </div>
     );
 }
