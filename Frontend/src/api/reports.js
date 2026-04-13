@@ -28,5 +28,14 @@ export const reportsService = {
         'Content-Type': 'multipart/form-data',
       },
     });
+  },
+
+  /**
+   * Create final clinical report
+   * @param {Object} payload - { report_id, audio_url, video_url }
+   * @returns {Promise<Object>}
+   */
+  async createReport(payload) {
+    return apiClient.post('/report/create', payload);
   }
 };

@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { reportsService } from '../../../api/reports';
 import { encodeWAV } from '../../../utils/wavEncoder';
 
-export default function VoiceRecognitionFeed() {
+export default function VoiceRecognitionFeed({ onUploadSuccess }) {
   const [isRecording, setIsRecording] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [toastId, setToastId] = useState(null);
@@ -97,6 +97,7 @@ export default function VoiceRecognitionFeed() {
       const url = response.message; // From API docs: body contains message with S3 URL
       
       setS3Url(url);
+      if (onUploadSuccess) onUploadSuccess(url);
       toast.success('Audio uploaded successfully!', { id: loadingToast });
       console.log('Stored Audio S3 URL:', url);
 
@@ -111,6 +112,7 @@ export default function VoiceRecognitionFeed() {
   const resetSession = () => {
     setIsRecording(false);
     setS3Url(null);
+    if (onUploadSuccess) onUploadSuccess(null);
     if (toastId) toast.dismiss(toastId);
     setToastId(null);
     

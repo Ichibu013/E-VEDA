@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { toast } from 'sonner';
 import { reportsService } from '../../../api/reports';
 
-export default function FacialRecognitionFeed() {
+export default function FacialRecognitionFeed({ onUploadSuccess }) {
   const [isRecording, setIsRecording] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isCameraReady, setIsCameraReady] = useState(false);
@@ -104,6 +104,7 @@ export default function FacialRecognitionFeed() {
       const url = response.message;
       
       setS3Url(url);
+      if (onUploadSuccess) onUploadSuccess(url);
       toast.success('Video analysis synced successfully!', { id: loadingToast });
     } catch (error) {
       console.error('Video upload failed:', error);
@@ -116,6 +117,7 @@ export default function FacialRecognitionFeed() {
   const resetSession = () => {
     stopRecording();
     setS3Url(null);
+    if (onUploadSuccess) onUploadSuccess(null);
   };
 
   return (

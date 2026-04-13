@@ -1,9 +1,23 @@
 import React from 'react';
 
-export default function Recommendations() {
+export default function Recommendations({ isLocked }) {
   return (
     <div className="mt-8">
-      <section className="bg-green-50/80 rounded-3xl p-10 shadow-sm border border-green-100">
+      <section className="bg-green-50/80 rounded-3xl p-10 shadow-sm border border-green-100 relative overflow-hidden group">
+        {/* Locked Overlay */}
+        {isLocked && (
+          <div className="absolute inset-0 z-30 backdrop-blur-[4px] bg-green-900/5 flex items-center justify-center p-6 text-center">
+            <div className="bg-white/95 shadow-lg border border-outline/10 px-8 py-10 rounded-[2.5rem] flex flex-col items-center gap-4 max-w-[320px] transform transition-transform group-hover:scale-[1.02]">
+              <div className="w-14 h-14 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                <span className="material-symbols-outlined text-3xl">lock</span>
+              </div>
+              <p className="text-on-surface font-extrabold text-base leading-relaxed tracking-tight">
+                Analysis available only after report generation
+              </p>
+            </div>
+          </div>
+        )}
+
         <h2 className="text-2xl font-bold text-on-surface mb-8 flex items-center gap-3">
           <span className="material-symbols-outlined text-secondary text-3xl">verified</span>
           Recommendations
@@ -51,6 +65,7 @@ export default function Recommendations() {
           </div>
         </div>
       </section>
+
     </div>
   );
 }
