@@ -33,6 +33,7 @@ const (
 	UserService_UploadVideo_FullMethodName              = "/user.UserService/UploadVideo"
 	UserService_CreateNewReport_FullMethodName          = "/user.UserService/CreateNewReport"
 	UserService_GetReportsList_FullMethodName           = "/user.UserService/GetReportsList"
+	UserService_GetReportDraftInfo_FullMethodName       = "/user.UserService/GetReportDraftInfo"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -51,6 +52,7 @@ type UserServiceClient interface {
 	UploadVideo(ctx context.Context, in *UploadProfilePictureRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 	CreateNewReport(ctx context.Context, in *CreateNewReportRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 	GetReportsList(ctx context.Context, in *GetReportsListRequest, opts ...grpc.CallOption) (*GetReportsListResponse, error)
+	GetReportDraftInfo(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetReportDraftInfoResponse, error)
 }
 
 type userServiceClient struct {
@@ -181,6 +183,16 @@ func (c *userServiceClient) GetReportsList(ctx context.Context, in *GetReportsLi
 	return out, nil
 }
 
+func (c *userServiceClient) GetReportDraftInfo(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetReportDraftInfoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetReportDraftInfoResponse)
+	err := c.cc.Invoke(ctx, UserService_GetReportDraftInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -197,6 +209,7 @@ type UserServiceServer interface {
 	UploadVideo(context.Context, *UploadProfilePictureRequest) (*ApiResponse, error)
 	CreateNewReport(context.Context, *CreateNewReportRequest) (*ApiResponse, error)
 	GetReportsList(context.Context, *GetReportsListRequest) (*GetReportsListResponse, error)
+	GetReportDraftInfo(context.Context, *GetUserRequest) (*GetReportDraftInfoResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -242,6 +255,9 @@ func (UnimplementedUserServiceServer) CreateNewReport(context.Context, *CreateNe
 }
 func (UnimplementedUserServiceServer) GetReportsList(context.Context, *GetReportsListRequest) (*GetReportsListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetReportsList not implemented")
+}
+func (UnimplementedUserServiceServer) GetReportDraftInfo(context.Context, *GetUserRequest) (*GetReportDraftInfoResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetReportDraftInfo not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -480,6 +496,24 @@ func _UserService_GetReportsList_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetReportDraftInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetReportDraftInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetReportDraftInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetReportDraftInfo(ctx, req.(*GetUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -534,6 +568,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetReportsList",
 			Handler:    _UserService_GetReportsList_Handler,
+		},
+		{
+			MethodName: "GetReportDraftInfo",
+			Handler:    _UserService_GetReportDraftInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

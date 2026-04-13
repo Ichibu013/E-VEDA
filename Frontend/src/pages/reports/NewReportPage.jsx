@@ -31,12 +31,21 @@ export default function NewReportPage() {
   const [isReportGenerated, setIsReportGenerated] = useState(false);
   const [liveFacialUrl, setLiveFacialUrl] = useState(null);
   const [liveVoiceUrl, setLiveVoiceUrl] = useState(null);
+  const [draftInfo, setDraftInfo] = useState({ patient_name: 'Patient', projected_next_id: '#EV-00000' });
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
+    const fetchDraft = async () => {
+      try {
+        const data = await reportsService.getDraftInfo();
+        setDraftInfo(data);
+      } catch (error) {
+        console.error("Failed to fetch draft info:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDraft();
   }, []);
 
   const handleAddMediaClick = (type = 'all') => {
@@ -127,6 +136,7 @@ export default function NewReportPage() {
     setIsSaving(true);
     
     const payload = {
+      report_id: draftInfo.projected_next_id,
       audio_url: audioUrl,
       video_url: videoUrl
     };
@@ -135,6 +145,11 @@ export default function NewReportPage() {
       const response = await reportsService.createReport(payload);
       toast.success(response.message);
       setIsReportGenerated(true);
+      
+      // Clear session data after successful generation
+      setMediaList([]);
+      setLiveFacialUrl(null);
+      setLiveVoiceUrl(null);
     } catch (error) {
       console.error("Failed to generate report:", error);
       toast.error('Failed to generate clinical report. Please try again.');
@@ -156,7 +171,7 @@ export default function NewReportPage() {
                 New Analysis
               </h1>
               <p className="text-on-surface-variant font-body mt-2 text-lg">
-                Patient: <span className="font-semibold text-primary">Srushti Deshpande</span> • Case #EV-9921
+                Patient: <span className="font-semibold text-primary">{draftInfo.patient_name}</span> • Case {draftInfo.projected_next_id}
               </p>
             </div>
             <div className="flex gap-3 mb-3">

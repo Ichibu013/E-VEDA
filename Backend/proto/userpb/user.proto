@@ -16,6 +16,7 @@ service UserService {
   rpc UploadVideo (UploadProfilePictureRequest) returns (ApiResponse);
   rpc CreateNewReport (CreateNewReportRequest) returns (ApiResponse);
   rpc GetReportsList (GetReportsListRequest) returns (GetReportsListResponse);
+  rpc GetReportDraftInfo (GetUserRequest) returns (GetReportDraftInfoResponse);
 }
 
 message CreateUserRequest {
@@ -122,4 +123,9 @@ message GetReportsListResponse {
   int32 total_count = 2;
   int32 total_pages = 3;
   int32 current_page = 4;
+}
+
+message GetReportDraftInfoResponse {
+  string patient_name = 1;
+  string projected_next_id = 2; // We call it 'projected' because it might change!
 }

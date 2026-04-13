@@ -813,3 +813,33 @@ func (h *Handler) GetReportsList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (h *Handler) GetReportDraftInfo(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be GET")
+		return
+	}
+
+	userUUID, ok := r.Context().Value(userUUIDKey).(string)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found")
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*5) // Quick database hit
+	defer cancel()
+
+	res, err := h.userClient.GetReportDraftInfo(ctx, &userpb.GetUserRequest{
+		UserId: userUUID,
+	})
+	if err != nil {
+		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"patient_name":      res.PatientName,
+		"projected_next_id": res.ProjectedNextId,
+	})
+}

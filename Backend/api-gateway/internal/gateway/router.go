@@ -33,6 +33,7 @@ func NewRouter(iamClient iampb.IAMServiceClient, userClient userpb.UserServiceCl
 	mux.Handle("/api/report/upload/video", h.AuthMiddleware(http.HandlerFunc(h.UploadVideo)))
 	mux.Handle("/api/report/create", h.AuthMiddleware(http.HandlerFunc(h.CreateReport)))
 	mux.Handle("/api/reports", h.AuthMiddleware(http.HandlerFunc(h.GetReportsList)))
+	mux.Handle("/api/report/draft-info", h.AuthMiddleware(http.HandlerFunc(h.GetReportDraftInfo)))
 
 	mux.Handle("/api/user", h.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {

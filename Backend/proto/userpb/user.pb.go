@@ -1063,6 +1063,58 @@ func (x *GetReportsListResponse) GetCurrentPage() int32 {
 	return 0
 }
 
+type GetReportDraftInfoResponse struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	PatientName     string                 `protobuf:"bytes,1,opt,name=patient_name,json=patientName,proto3" json:"patient_name,omitempty"`
+	ProjectedNextId string                 `protobuf:"bytes,2,opt,name=projected_next_id,json=projectedNextId,proto3" json:"projected_next_id,omitempty"` // We call it 'projected' because it might change!
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *GetReportDraftInfoResponse) Reset() {
+	*x = GetReportDraftInfoResponse{}
+	mi := &file_userpb_user_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetReportDraftInfoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetReportDraftInfoResponse) ProtoMessage() {}
+
+func (x *GetReportDraftInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_userpb_user_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetReportDraftInfoResponse.ProtoReflect.Descriptor instead.
+func (*GetReportDraftInfoResponse) Descriptor() ([]byte, []int) {
+	return file_userpb_user_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GetReportDraftInfoResponse) GetPatientName() string {
+	if x != nil {
+		return x.PatientName
+	}
+	return ""
+}
+
+func (x *GetReportDraftInfoResponse) GetProjectedNextId() string {
+	if x != nil {
+		return x.ProjectedNextId
+	}
+	return ""
+}
+
 var File_userpb_user_proto protoreflect.FileDescriptor
 
 const file_userpb_user_proto_rawDesc = "" +
@@ -1147,7 +1199,10 @@ const file_userpb_user_proto_rawDesc = "" +
 	"totalCount\x12\x1f\n" +
 	"\vtotal_pages\x18\x03 \x01(\x05R\n" +
 	"totalPages\x12!\n" +
-	"\fcurrent_page\x18\x04 \x01(\x05R\vcurrentPage2\xe2\x06\n" +
+	"\fcurrent_page\x18\x04 \x01(\x05R\vcurrentPage\"k\n" +
+	"\x1aGetReportDraftInfoResponse\x12!\n" +
+	"\fpatient_name\x18\x01 \x01(\tR\vpatientName\x12*\n" +
+	"\x11projected_next_id\x18\x02 \x01(\tR\x0fprojectedNextId2\xb0\a\n" +
 	"\vUserService\x128\n" +
 	"\n" +
 	"CreateUser\x12\x17.user.CreateUserRequest\x1a\x11.user.ApiResponse\x123\n" +
@@ -1162,7 +1217,8 @@ const file_userpb_user_proto_rawDesc = "" +
 	"\vUploadAudio\x12!.user.UploadProfilePictureRequest\x1a\x11.user.ApiResponse\x12C\n" +
 	"\vUploadVideo\x12!.user.UploadProfilePictureRequest\x1a\x11.user.ApiResponse\x12B\n" +
 	"\x0fCreateNewReport\x12\x1c.user.CreateNewReportRequest\x1a\x11.user.ApiResponse\x12K\n" +
-	"\x0eGetReportsList\x12\x1b.user.GetReportsListRequest\x1a\x1c.user.GetReportsListResponseB\x15Z\x13e_veda/proto/userpbb\x06proto3"
+	"\x0eGetReportsList\x12\x1b.user.GetReportsListRequest\x1a\x1c.user.GetReportsListResponse\x12L\n" +
+	"\x12GetReportDraftInfo\x12\x14.user.GetUserRequest\x1a .user.GetReportDraftInfoResponseB\x15Z\x13e_veda/proto/userpbb\x06proto3"
 
 var (
 	file_userpb_user_proto_rawDescOnce sync.Once
@@ -1176,7 +1232,7 @@ func file_userpb_user_proto_rawDescGZIP() []byte {
 	return file_userpb_user_proto_rawDescData
 }
 
-var file_userpb_user_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_userpb_user_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_userpb_user_proto_goTypes = []any{
 	(*CreateUserRequest)(nil),           // 0: user.CreateUserRequest
 	(*ApiResponse)(nil),                 // 1: user.ApiResponse
@@ -1194,6 +1250,7 @@ var file_userpb_user_proto_goTypes = []any{
 	(*GetEmotionalTrendsResponse)(nil),  // 13: user.GetEmotionalTrendsResponse
 	(*GetDailyInsightResponse)(nil),     // 14: user.GetDailyInsightResponse
 	(*GetReportsListResponse)(nil),      // 15: user.GetReportsListResponse
+	(*GetReportDraftInfoResponse)(nil),  // 16: user.GetReportDraftInfoResponse
 }
 var file_userpb_user_proto_depIdxs = []int32{
 	8,  // 0: user.GetEmotionalTrendsResponse.trends:type_name -> user.DailyEmotion
@@ -1210,20 +1267,22 @@ var file_userpb_user_proto_depIdxs = []int32{
 	3,  // 11: user.UserService.UploadVideo:input_type -> user.UploadProfilePictureRequest
 	6,  // 12: user.UserService.CreateNewReport:input_type -> user.CreateNewReportRequest
 	7,  // 13: user.UserService.GetReportsList:input_type -> user.GetReportsListRequest
-	1,  // 14: user.UserService.CreateUser:output_type -> user.ApiResponse
-	10, // 15: user.UserService.GetUser:output_type -> user.UserResponse
-	1,  // 16: user.UserService.UpdateUser:output_type -> user.ApiResponse
-	1,  // 17: user.UserService.UploadProfilePicture:output_type -> user.ApiResponse
-	11, // 18: user.UserService.GetProfileCompleteness:output_type -> user.ProfileCompletenessResponse
-	12, // 19: user.UserService.GetPictureAndName:output_type -> user.NameAndPictureResponse
-	13, // 20: user.UserService.GetGlobalEmotionalTrends:output_type -> user.GetEmotionalTrendsResponse
-	14, // 21: user.UserService.GetDailyInsight:output_type -> user.GetDailyInsightResponse
-	1,  // 22: user.UserService.UploadAudio:output_type -> user.ApiResponse
-	1,  // 23: user.UserService.UploadVideo:output_type -> user.ApiResponse
-	1,  // 24: user.UserService.CreateNewReport:output_type -> user.ApiResponse
-	15, // 25: user.UserService.GetReportsList:output_type -> user.GetReportsListResponse
-	14, // [14:26] is the sub-list for method output_type
-	2,  // [2:14] is the sub-list for method input_type
+	2,  // 14: user.UserService.GetReportDraftInfo:input_type -> user.GetUserRequest
+	1,  // 15: user.UserService.CreateUser:output_type -> user.ApiResponse
+	10, // 16: user.UserService.GetUser:output_type -> user.UserResponse
+	1,  // 17: user.UserService.UpdateUser:output_type -> user.ApiResponse
+	1,  // 18: user.UserService.UploadProfilePicture:output_type -> user.ApiResponse
+	11, // 19: user.UserService.GetProfileCompleteness:output_type -> user.ProfileCompletenessResponse
+	12, // 20: user.UserService.GetPictureAndName:output_type -> user.NameAndPictureResponse
+	13, // 21: user.UserService.GetGlobalEmotionalTrends:output_type -> user.GetEmotionalTrendsResponse
+	14, // 22: user.UserService.GetDailyInsight:output_type -> user.GetDailyInsightResponse
+	1,  // 23: user.UserService.UploadAudio:output_type -> user.ApiResponse
+	1,  // 24: user.UserService.UploadVideo:output_type -> user.ApiResponse
+	1,  // 25: user.UserService.CreateNewReport:output_type -> user.ApiResponse
+	15, // 26: user.UserService.GetReportsList:output_type -> user.GetReportsListResponse
+	16, // 27: user.UserService.GetReportDraftInfo:output_type -> user.GetReportDraftInfoResponse
+	15, // [15:28] is the sub-list for method output_type
+	2,  // [2:15] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name
 	2,  // [2:2] is the sub-list for extension extendee
 	0,  // [0:2] is the sub-list for field type_name
@@ -1241,7 +1300,7 @@ func file_userpb_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_userpb_user_proto_rawDesc), len(file_userpb_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   16,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

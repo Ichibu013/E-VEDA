@@ -32,10 +32,18 @@ export const reportsService = {
 
   /**
    * Create final clinical report
-   * @param {Object} payload - { report_id, audio_url, video_url }
+   * @param {Object} payload - { audio_url, video_url }
    * @returns {Promise<Object>}
    */
   async createReport(payload) {
     return apiClient.post('/report/create', payload);
+  },
+
+  /**
+   * Get draft metadata (patient name, next ID)
+   * @returns {Promise<Object>}
+   */
+  async getDraftInfo() {
+    return apiClient.get('/report/draft-info');
   }
 };
