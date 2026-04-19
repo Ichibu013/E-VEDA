@@ -10,9 +10,8 @@ http:
     type: json
     data: |-
       {
-        "report_id" : "#EV-00001",
-        "audio_url" : "http://localhost:9000/e-veda-audios/7b56c431-c292-47f8-ba8e-95a5a6a46339-d31e2fa7.wav",
-        "video_url" : "http://localhost:9000/e-veda-videos/7b56c431-c292-47f8-ba8e-95a5a6a46339-fcf725d0.mp4"
+        "audio_url" : "http://localhost:9000/e-veda-audios/7b56c431-c292-47f8-ba8e-95a5a6a46339-6847df07.wav",
+        "video_url" : "http://localhost:9000/e-veda-videos/7b56c431-c292-47f8-ba8e-95a5a6a46339-27014295.mp4"
       }
   auth: inherit
 
@@ -23,7 +22,7 @@ settings:
   maxRedirects: 5
 
 examples:
-  - name: Success
+  - name: Success reposne
     request:
       url: "{{base_url}}/api/report/create"
       method: POST
@@ -31,9 +30,8 @@ examples:
         type: json
         data: |-
           {
-            "report_id" : "#EV-00001",
-            "audio_url" : "http://localhost:9000/e-veda-audios/7b56c431-c292-47f8-ba8e-95a5a6a46339-d31e2fa7.wav",
-            "video_url" : "http://localhost:9000/e-veda-videos/7b56c431-c292-47f8-ba8e-95a5a6a46339-fcf725d0.mp4"
+            "audio_url" : "http://localhost:9000/e-veda-audios/7b56c431-c292-47f8-ba8e-95a5a6a46339-6847df07.wav",
+            "video_url" : "http://localhost:9000/e-veda-videos/7b56c431-c292-47f8-ba8e-95a5a6a46339-27014295.mp4"
           }
     response:
       status: 200
@@ -50,12 +48,32 @@ examples:
         - name: content-type
           value: application/json
         - name: date
-          value: Sun, 12 Apr 2026 11:52:22 GMT
+          value: Sun, 19 Apr 2026 15:38:54 GMT
         - name: content-length
-          value: "54"
+          value: "1661"
       body:
         type: json
         data: |-
           {
-            "message": "Report #EV-00001 generated Successfully"
+            "result_analysis": {
+              "emotion_1_name": "Neutral",
+              "emotion_1_rating": 0.65,
+              "emotion_2_name": "Interest",
+              "emotion_2_rating": 0.2,
+              "eye_movement": "Steady",
+              "voice_tension": "Relaxed",
+              "blink_frequency": "Normal",
+              "accuracy_rate": 0.88,
+              "confidence_rate": 0.92
+            },
+            "ai_summary": {
+              "summary": "The subject exhibited a predominantly neutral emotional state (65%) with some interest (20%). Physical cues like steady eye movement, relaxed voice tension, and normal blink frequency suggest composure. Performance metrics were strong, indicating high accuracy (88%) and confidence (92%)."
+            },
+            "ai_recommendations": {
+              "point_1_title": "Sustain Engagement and Reinforce Learning",
+              "point_1_description": "The participant exhibits a strong foundation for learning, characterized by steady eye movement, relaxed voice tension, and normal blink frequency, complemented by high accuracy (88%) and confidence (92%). Capitalize on this by introducing slightly more challenging content, practical exercises, or interactive elements that build upon current knowledge. This will keep the participant actively engaged and solidify their understanding without causing frustration.",
+              "point_2_title": "Enhance Emotional Resonance and Curiosity",
+              "point_2_description": "while 'neutral' is the dominant emotion, 'interest' is present at a moderate level (20%). to cultivate deeper engagement, consider integrating storytelling, real-world case studies, or thought-provoking questions that provoke deeper thought and emotional connection to the material. this could transform passive interest into active curiosity and lead to a more memorable learning experience."
+            },
+            "message": "Report #EV-00017 generated Successfully"
           }
