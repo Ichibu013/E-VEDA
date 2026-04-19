@@ -12,9 +12,11 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"google.golang.org/grpc/status" // Required to unpack gRPC errors
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // ==========================================
@@ -739,26 +741,45 @@ func (h *Handler) CreateReport(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Give Gemini API up to 20 seconds to generate the emotional analysis
+	// FIX 1: Scrub the inputs for invalid UTF-8 before passing them to gRPC.
+	// This prevents dirty URLs from crashing the gRPC transport layer.
+	cleanAudioUrl := strings.ToValidUTF8(payload.AudioUrl, "")
+	cleanVideoUrl := strings.ToValidUTF8(payload.VideoUrl, "")
+
 	ctx, cancel := context.WithTimeout(r.Context(), time.Second*20)
 	defer cancel()
 
 	res, err := h.userClient.CreateNewReport(ctx, &userpb.CreateNewReportRequest{
 		UserId:   userUUID,
-		AudioUrl: payload.AudioUrl,
-		VideoUrl: payload.VideoUrl,
+		AudioUrl: cleanAudioUrl,
+		VideoUrl: cleanVideoUrl,
 	})
+
 	if err != nil {
+		// If it still fails here, the AI server sent back bad UTF-8.
+		log.Printf("gRPC CreateNewReport failed: %v", err)
 		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(map[string]string{
-		"message": res.Message,
-	})
+	// FIX 2: Use protojson to format the gRPC response into standard JSON.
+	// This strips out internal proto fields and respects your snake_case proto tags.
+	marshaller := protojson.MarshalOptions{
+		UseProtoNames:   true, // Forces snake_case keys as defined in your .proto file
+		EmitUnpopulated: true, // Includes fields even if they are empty/null
+	}
+
+	jsonBytes, err := marshaller.Marshal(res)
 	if err != nil {
-		log.Printf("could not encode response: %v", err)
+		log.Printf("could not encode proto to JSON: %v", err)
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", "Failed to parse report data")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(jsonBytes)
+	if err != nil {
 		return
 	}
 }

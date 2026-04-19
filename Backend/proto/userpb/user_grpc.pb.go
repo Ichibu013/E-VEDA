@@ -50,7 +50,7 @@ type UserServiceClient interface {
 	GetDailyInsight(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetDailyInsightResponse, error)
 	UploadAudio(ctx context.Context, in *UploadProfilePictureRequest, opts ...grpc.CallOption) (*ApiResponse, error)
 	UploadVideo(ctx context.Context, in *UploadProfilePictureRequest, opts ...grpc.CallOption) (*ApiResponse, error)
-	CreateNewReport(ctx context.Context, in *CreateNewReportRequest, opts ...grpc.CallOption) (*ApiResponse, error)
+	CreateNewReport(ctx context.Context, in *CreateNewReportRequest, opts ...grpc.CallOption) (*ReportGeneratedResponse, error)
 	GetReportsList(ctx context.Context, in *GetReportsListRequest, opts ...grpc.CallOption) (*GetReportsListResponse, error)
 	GetReportDraftInfo(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetReportDraftInfoResponse, error)
 }
@@ -163,9 +163,9 @@ func (c *userServiceClient) UploadVideo(ctx context.Context, in *UploadProfilePi
 	return out, nil
 }
 
-func (c *userServiceClient) CreateNewReport(ctx context.Context, in *CreateNewReportRequest, opts ...grpc.CallOption) (*ApiResponse, error) {
+func (c *userServiceClient) CreateNewReport(ctx context.Context, in *CreateNewReportRequest, opts ...grpc.CallOption) (*ReportGeneratedResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ApiResponse)
+	out := new(ReportGeneratedResponse)
 	err := c.cc.Invoke(ctx, UserService_CreateNewReport_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -207,7 +207,7 @@ type UserServiceServer interface {
 	GetDailyInsight(context.Context, *GetUserRequest) (*GetDailyInsightResponse, error)
 	UploadAudio(context.Context, *UploadProfilePictureRequest) (*ApiResponse, error)
 	UploadVideo(context.Context, *UploadProfilePictureRequest) (*ApiResponse, error)
-	CreateNewReport(context.Context, *CreateNewReportRequest) (*ApiResponse, error)
+	CreateNewReport(context.Context, *CreateNewReportRequest) (*ReportGeneratedResponse, error)
 	GetReportsList(context.Context, *GetReportsListRequest) (*GetReportsListResponse, error)
 	GetReportDraftInfo(context.Context, *GetUserRequest) (*GetReportDraftInfoResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
@@ -250,7 +250,7 @@ func (UnimplementedUserServiceServer) UploadAudio(context.Context, *UploadProfil
 func (UnimplementedUserServiceServer) UploadVideo(context.Context, *UploadProfilePictureRequest) (*ApiResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UploadVideo not implemented")
 }
-func (UnimplementedUserServiceServer) CreateNewReport(context.Context, *CreateNewReportRequest) (*ApiResponse, error) {
+func (UnimplementedUserServiceServer) CreateNewReport(context.Context, *CreateNewReportRequest) (*ReportGeneratedResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateNewReport not implemented")
 }
 func (UnimplementedUserServiceServer) GetReportsList(context.Context, *GetReportsListRequest) (*GetReportsListResponse, error) {

@@ -14,7 +14,7 @@ service UserService {
   rpc GetDailyInsight (GetUserRequest) returns (GetDailyInsightResponse);
   rpc UploadAudio (UploadProfilePictureRequest) returns (ApiResponse);
   rpc UploadVideo (UploadProfilePictureRequest) returns (ApiResponse);
-  rpc CreateNewReport (CreateNewReportRequest) returns (ApiResponse);
+  rpc CreateNewReport (CreateNewReportRequest) returns (ReportGeneratedResponse);
   rpc GetReportsList (GetReportsListRequest) returns (GetReportsListResponse);
   rpc GetReportDraftInfo (GetUserRequest) returns (GetReportDraftInfoResponse);
 }
@@ -88,6 +88,29 @@ message ReportSummary {
   optional string analysis_result = 9;
 }
 
+message ResultAnalysis {
+  string emotion_1_name = 1;
+  double emotion_1_rating = 2;
+  string emotion_2_name = 3;
+  double emotion_2_rating = 4;
+  string eye_movement = 5;
+  string voice_tension = 6;
+  string blink_frequency = 7;
+  double accuracy_rate = 8;
+  double confidence_rate = 9;
+}
+
+message AiSummary {
+  string summary = 1;
+}
+
+message AiRecommendations{
+  string point_1_title = 1;
+  string point_1_description = 2;
+  string point_2_title = 3;
+  string point_2_description = 4;
+}
+
 message UserResponse {
   string name = 1;
   string nickname = 2;
@@ -128,4 +151,11 @@ message GetReportsListResponse {
 message GetReportDraftInfoResponse {
   string patient_name = 1;
   string projected_next_id = 2; // We call it 'projected' because it might change!
+}
+
+message ReportGeneratedResponse {
+  ResultAnalysis result_analysis = 1;
+  AiSummary ai_summary = 2;
+  AiRecommendations ai_recommendations = 3;
+  string message = 4;
 }
