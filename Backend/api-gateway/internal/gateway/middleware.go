@@ -53,21 +53,28 @@ func (h *Handler) AuthMiddleware(next http.Handler) http.Handler {
 // CorsMiddleware handles Cross-Origin Resource Sharing (CORS) headers
 func CorsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Set the headers to allow your frontend's origin
-		// Note: In production, you should use your actual domain instead of "*" or localhost
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+		origin := r.Header.Get("Origin")
+
+		// Define your trusted origins
+		allowedOrigins := map[string]bool{
+			"http://localhost:5173":                            true,
+			"https://truing-multidentate-julio.ngrok-free.dev": true,
+		}
+
+		// If the request origin is in our allowed list, set it dynamically
+		if allowedOrigins[origin] {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		}
+
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 
-		// If this is a preflight request (OPTIONS), we just return a 204 No Content
-		// We do not want to pass this down to our actual API handlers
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 
-		// Otherwise, pass the request to the next handler
 		next.ServeHTTP(w, r)
 	})
 }
