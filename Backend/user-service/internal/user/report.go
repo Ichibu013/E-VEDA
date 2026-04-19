@@ -242,8 +242,10 @@ func (s *Server) generateRecommendations(ctx context.Context, client *genai.Clie
 
        You must respond with ONLY a valid JSON object.
        The JSON object MUST have keys that match the AiRecommendations schema. For example:
-       - "recommendations": Array of Strings
-       - "overall_advice": String
+       - "point_1_title": String
+	   - "point_1_description": String
+       - "point_2_title": String
+       - "point_2_description": String
     `, videoUrl, audioUrl, analysis)
 
 	recommendations := &pb.AiRecommendations{}
@@ -269,8 +271,7 @@ func (s *Server) generateAiSummary(ctx context.Context, client *genai.Client, su
 
        You must respond with ONLY a valid JSON object.
        The JSON object MUST have keys that match the AiSummary schema. For example:
-       - "summary_text": String
-       - "key_findings": Array of Strings
+       - "summary" : String
     `, summary)
 
 	aiSummary := &pb.AiSummary{}
