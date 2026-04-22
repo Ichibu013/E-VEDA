@@ -29,6 +29,7 @@ export default function NewReportPage() {
   const [mediaList, setMediaList] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isReportGenerated, setIsReportGenerated] = useState(false);
+  const [reportData, setReportData] = useState(null);
   const [liveFacialUrl, setLiveFacialUrl] = useState(null);
   const [liveVoiceUrl, setLiveVoiceUrl] = useState(null);
   const [draftInfo, setDraftInfo] = useState({ patient_name: 'Patient', projected_next_id: '#EV-00000' });
@@ -144,6 +145,7 @@ export default function NewReportPage() {
     try {
       const response = await reportsService.createReport(payload);
       toast.success(response.message);
+      setReportData(response);
       setIsReportGenerated(true);
       
       // Clear session data after successful generation
@@ -217,7 +219,7 @@ export default function NewReportPage() {
                 <CDropdown variant="btn-group" className="flex items-stretch shadow-sm rounded-r-xl" direction="dropstart">
                 
                 <CDropdownToggle  
-                  split 
+                split 
                   className="!flex !items-center !justify-center !px-3 !py-0 !text-primary hover:!bg-primary/5 !m-0 !shadow-none after:!hidden "
                 />
                   <CButton
@@ -283,7 +285,7 @@ export default function NewReportPage() {
             ) : (
               <>
                 <FacialRecognitionFeed onUploadSuccess={(url) => setLiveFacialUrl(url)} />
-                <DoctorAnalysis isLocked={!isReportGenerated} />
+                <DoctorAnalysis isLocked={!isReportGenerated} data={reportData?.ai_summary} />
               </>
             )}
           </div>
@@ -298,7 +300,7 @@ export default function NewReportPage() {
             ) : (
               <>
                 <VoiceRecognitionFeed onUploadSuccess={(url) => setLiveVoiceUrl(url)} />
-                <EmotionalStateMetrics isLocked={!isReportGenerated} />
+                <EmotionalStateMetrics isLocked={!isReportGenerated} data={reportData?.result_analysis} />
               </>
             )}
           </div>
@@ -313,9 +315,10 @@ export default function NewReportPage() {
           </div>
         ) : (
           <div className="mt-8">
-            <Recommendations isLocked={!isReportGenerated} />
+            <Recommendations isLocked={!isReportGenerated} data={reportData?.ai_recommendations} />
           </div>
         )}
+
 
 
         {/* Footer Spacer */}

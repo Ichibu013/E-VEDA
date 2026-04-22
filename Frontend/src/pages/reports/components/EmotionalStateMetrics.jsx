@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 
-export default function EmotionalStateMetrics({ isLocked }) {
+export default function EmotionalStateMetrics({ isLocked, data }) {
   const [animated, setAnimated] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setAnimated(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  // Format ratings to percentages
+  const rating1 = data?.emotion_1_rating ? Math.round(data.emotion_1_rating * 100) : 0;
+  const rating2 = data?.emotion_2_rating ? Math.round(data.emotion_2_rating * 100) : 0;
 
   return (
     <section className="bg-surface-container-lowest rounded-3xl p-8 shadow-sm relative overflow-hidden group">
@@ -29,31 +33,31 @@ export default function EmotionalStateMetrics({ isLocked }) {
         Emotional State
       </h2>
       <div className="space-y-8">
-        {/* Progress Bar: Joy */}
+        {/* Progress Bar: Emotion 1 */}
         <div className="space-y-3">
           <div className="flex justify-between items-center text-base">
-            <span className="font-medium text-on-surface">Joy / Contentment</span>
-            <span className="font-bold text-secondary">82%</span>
+            <span className="font-medium text-on-surface">{data?.emotion_1_name || "Primary State"}</span>
+            <span className="font-bold text-secondary">{rating1}%</span>
           </div>
           <div className="h-2.5 w-full bg-surface-container-high rounded-full overflow-hidden">
             <div 
               className="h-full bg-secondary rounded-full transition-all duration-1000 ease-out" 
-              style={{ width: animated ? "82%" : "0%" }} 
+              style={{ width: animated ? `${rating1}%` : "0%" }} 
             />
           </div>
         </div>
 
 
-        {/* Progress Bar: Neutral */}
+        {/* Progress Bar: Emotion 2 */}
         <div className="space-y-3">
           <div className="flex justify-between items-center text-base">
-            <span className="font-medium text-on-surface">Equilibrium</span>
-            <span className="font-bold text-primary">64%</span>
+            <span className="font-medium text-on-surface">{data?.emotion_2_name || "Secondary State"}</span>
+            <span className="font-bold text-primary">{rating2}%</span>
           </div>
           <div className="h-2.5 w-full bg-surface-container-high rounded-full overflow-hidden">
             <div 
               className="h-full bg-primary rounded-full transition-all duration-1000 ease-out" 
-              style={{ width: animated ? "64%" : "0%" }} 
+              style={{ width: animated ? `${rating2}%` : "0%" }} 
             />
           </div>
         </div>
@@ -71,8 +75,8 @@ export default function EmotionalStateMetrics({ isLocked }) {
               <span className="material-symbols-outlined text-primary text-xl">visibility</span>
               <span className="text-base font-medium text-on-surface">Eye Movement</span>
             </div>
-            <span className="text-xs font-bold text-secondary border border-secondary/20 px-2 py-1 rounded">
-              NORMAL
+            <span className="text-xs font-bold text-secondary border border-secondary/20 px-2 py-1 rounded uppercase">
+              {data?.eye_movement || "N/A"}
             </span>
           </div>
 
@@ -81,8 +85,8 @@ export default function EmotionalStateMetrics({ isLocked }) {
               <span className="material-symbols-outlined text-primary text-xl">mood</span>
               <span className="text-base font-medium text-on-surface">Muscle Tension</span>
             </div>
-            <span className="text-xs font-bold text-secondary border border-secondary/20 px-2 py-1 rounded">
-              RELAXED
+            <span className="text-xs font-bold text-secondary border border-secondary/20 px-2 py-1 rounded uppercase">
+              {data?.voice_tension || "N/A"}
             </span>
           </div>
 
@@ -91,8 +95,8 @@ export default function EmotionalStateMetrics({ isLocked }) {
               <span className="material-symbols-outlined text-primary text-xl">speed</span>
               <span className="text-base font-medium text-on-surface">Blink Frequency</span>
             </div>
-            <span className="text-xs font-bold text-tertiary border border-tertiary/20 px-2 py-1 rounded">
-              STABLE
+            <span className="text-xs font-bold text-tertiary border border-tertiary/20 px-2 py-1 rounded uppercase">
+              {data?.blink_frequency || "N/A"}
             </span>
           </div>
         </div>

@@ -45,5 +45,15 @@ export const reportsService = {
    */
   async getDraftInfo() {
     return apiClient.get('/report/draft-info');
+  },
+
+  /**
+   * Get list of reports with pagination
+   * @param {number} page - Page number
+   * @param {number} limit - Items per page
+   * @returns {Promise<Object>}
+   */
+  async getReports(page = 1, limit = 5) {
+    return apiClient.get(`/reports?page=${page}&limit=${limit}`);
   }
 };

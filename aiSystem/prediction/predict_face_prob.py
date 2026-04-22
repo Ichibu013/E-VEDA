@@ -1,7 +1,14 @@
+import os
+import warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+warnings.filterwarnings('ignore')
+
 import cv2
 import numpy as np
 import tensorflow as tf
-import os
+
+from tensorflow.keras.layers import SeparableConv2D, SpatialDropout2D
+from tensorflow.keras.utils import custom_object_scope
 
 # Suppress TensorFlow logging spam
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -9,7 +16,9 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # -------------------------------\n
 # 1. Configuration & Label Mapping
 # -------------------------------\n
-MODEL_PATH = "aiSystem/models/ferplus_model_pd_best.h5"
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODEL_PATH = os.path.join(BASE_DIR, "models", "ferplus_model_pd_best.h5")
 
 # The exact order your PyTorch Fusion model expects (DO NOT CHANGE)
 FUSION_EMOTIONS = ['Neutral', 'Happy', 'Sad', 'Anger', 'Fear', 'Disgust', 'Surprise']
@@ -24,10 +33,30 @@ MAPPING_INDICES = [FERPLUS_EMOTIONS.index(emo) for emo in FUSION_EMOTIONS]
 # -------------------------------\n
 # 2. Load Keras Model Safely
 # -------------------------------\n
+
+class PatchedSeparableConv2D(SeparableConv2D):
+    def __init__(self, *args, **kwargs):
+        kwargs.pop('groups', None)
+        kwargs.pop('kernel_initializer', None)
+        kwargs.pop('kernel_regularizer', None)
+        kwargs.pop('kernel_constraint', None)
+        super().__init__(*args, **kwargs)
+
+class PatchedSpatialDropout2D(SpatialDropout2D):
+    def __init__(self, rate=0.5, **kwargs):
+        kwargs.pop('trainable', None)
+        kwargs.pop('noise_shape', None)
+        kwargs.pop('seed', None)
+        super().__init__(rate=rate, **kwargs)
+
 def load_face_model():
     try:
         print(f"Loading Keras FER+ model from {MODEL_PATH}...")
-        model = tf.keras.models.load_model(MODEL_PATH)
+        with custom_object_scope({
+            'SeparableConv2D': PatchedSeparableConv2D,
+            'SpatialDropout2D': PatchedSpatialDropout2D,
+        }):
+            model = tf.keras.models.load_model(MODEL_PATH, compile=False)  # <-- add this
         print("Successfully loaded Keras FER+ model.")
         return model
     except Exception as e:

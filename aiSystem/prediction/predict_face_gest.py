@@ -165,24 +165,25 @@ class UltimateEnsemble(nn.Module):
 # Load Model
 # ==============================
 def load_model(path):
-    # Instantiate the full ensemble wrapper
     model = UltimateEnsemble()
-    
     try:
-        # Load the state dict directly. No key replacing needed anymore!
-        full_state_dict = torch.load(path, map_location=DEVICE)
-        model.load_state_dict(full_state_dict)
-        print(f"Successfully loaded FULL MASTER ENSEMBLE from {path}")
-            
+        single_state = torch.load(path, map_location=DEVICE)
+        new_state = {}
+        for key, val in single_state.items():
+            for m in ['model1', 'model2', 'model3']:
+                new_state[f"{m}.{key}"] = val
+        model.load_state_dict(new_state, strict=False)
+        print(f"Successfully loaded model from {path}")
     except Exception as e:
         print(f"ERROR loading Ensemble model: {e}")
-
     model.to(DEVICE)
     model.eval()
     return model
 
 # Load model once when file starts
-MODEL_PATH = "aiSystem/models/ensemble_FER_gesture.pth"
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODEL_PATH = os.path.join(BASE_DIR, "models", "ensemble_FER_gesture.pth")
 
 model = load_model(MODEL_PATH)
 

@@ -1,21 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useNavigate } from 'react-router-dom';
+import { reportsService } from '../../api/reports';
 import ReportsFilterBar from './components/ReportsFilterBar';
 import ReportsTable from './components/ReportsTable';
 import Pagination from './components/Pagination';
-import InsightsSummary from './components/InsightsSummary';
 
 export default function ReportsHistoryPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [reports, setReports] = useState([]);
+  const [pagination, setPagination] = useState({ current_page: 1, total_pages: 1 });
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
+    const fetchReports = async () => {
+      setIsLoading(true);
+      try {
+        const response = await reportsService.getReports(currentPage);
+        setReports(response.data || []);
+        setPagination(response.pagination || { current_page: 1, total_pages: 1 });
+      } catch (error) {
+        console.error("Failed to fetch reports:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReports();
+  }, [currentPage]);
 
   return (
     <div className="flex min-h-screen transition-opacity duration-500 ease-in-out opacity-100">
@@ -44,12 +57,24 @@ export default function ReportsHistoryPage() {
 
           {/* Table of Reports (CoreUI CTable) */}
           <div className="mb-6">
-            {isLoading ? <Skeleton height={400} borderRadius={24} /> : <ReportsTable />}
+            {isLoading ? (
+              <Skeleton height={400} borderRadius={24} />
+            ) : (
+              <ReportsTable reports={reports} />
+            )}
           </div>
 
           {/* Pagination */}
           <div className="flex justify-end">
-            {isLoading ? <Skeleton height={40} borderRadius={16} width={200} /> : <Pagination />}
+            {isLoading ? (
+              <Skeleton height={40} borderRadius={16} width={200} />
+            ) : (
+              <Pagination 
+                currentPage={currentPage} 
+                totalPages={pagination.total_pages} 
+                onPageChange={setCurrentPage} 
+              />
+            )}
           </div>
         </section>
 

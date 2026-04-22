@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function DoctorAnalysis({ isLocked }) {
+export default function DoctorAnalysis({ isLocked, data }) {
   return (
     <section className="bg-surface-container-lowest rounded-3xl p-8 shadow-sm flex-1 relative overflow-hidden group">
       {/* Locked Overlay */}
@@ -23,9 +23,7 @@ export default function DoctorAnalysis({ isLocked }) {
       </h2>
       <div className="bg-surface-container-low rounded-2xl p-6  text-on-surface leading-relaxed text-base">
         <p>
-          Patient exhibits excellent emotional stability. Facial analysis
-          confirms a high degree of congruence between verbal sentiment
-          and physical cues.
+          {data?.summary || "Analysis pending generation..."}
         </p>
       </div>
     </section>

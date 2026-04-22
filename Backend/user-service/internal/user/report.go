@@ -1,11 +1,14 @@
 package user
 
 import (
+	"bytes"
 	"context"
 	pb "e_veda/proto/userpb"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -88,7 +91,7 @@ func (s *Server) CreateNewReport(ctx context.Context, request *pb.CreateNewRepor
 	}(client)
 
 	log.Println("Step 1: Generating Analysis...")
-	analysis, err := s.generateAnalysis(ctx, client, request.GetVideoUrl(), request.GetAudioUrl())
+	analysis, err := s.generateAnalysis(ctx, request.GetVideoUrl(), request.GetAudioUrl())
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -196,37 +199,63 @@ func (s *Server) CreateNewReport(ctx context.Context, request *pb.CreateNewRepor
 	return finalResp, nil
 }
 
-func (s *Server) generateAnalysis(ctx context.Context, client *genai.Client, videoUrl string, audioUrl string) (*pb.ResultAnalysis, error) {
-	log.Println("Generating Emotional response from Gemini API...")
+func (s *Server) generateAnalysis(_ context.Context, videoUrl string, audioUrl string) (*pb.ResultAnalysis, error) {
+	log.Println("Generating Emotional response from E-VEDA API...")
 
-	prompt := fmt.Sprintf(`
-       Analyze the behavioral and emotional metrics based on the provided media sources:
-       Video URL: %s
-       Audio URL: %s
-
-       You must respond with ONLY a valid JSON object.
-       The JSON object MUST have exactly these keys and data types:
-       - "emotion_1_name": String (e.g., Anger)
-       - "emotion_1_rating": Number (e.g., 0.85)
-       - "emotion_2_name": String (e.g., Joy)
-       - "emotion_2_rating": Number (e.g., 0.12)
-       - "eye_movement": String (e.g., "Rapid", "Steady")
-       - "voice_tension": String (e.g., "High", "Relaxed")
-       - "blink_frequency": String (e.g., "Normal", "Elevated")
-       - "accuracy_rate": Number (e.g., 0.90)
-       - "confidence_rate": Number (e.g., 0.90)
-    `, videoUrl, audioUrl)
-
-	analysis := &pb.ResultAnalysis{}
-	if err := callGeminiJSON(ctx, client, prompt, analysis); err != nil {
-		return nil, err
+	reqBody, err := json.Marshal(map[string]string{
+		"audio_url": audioUrl,
+		"video_url": videoUrl,
+	})
+	if err != nil {
+		log.Printf("Failed to marshal request body: %v", err)
+		return nil, status.Error(codes.Internal, "Failed to marshal request body")
 	}
 
-	analysis.Emotion_1Name = strings.ToValidUTF8(analysis.Emotion_1Name, "")
-	analysis.Emotion_2Name = strings.ToValidUTF8(analysis.Emotion_2Name, "")
-	analysis.EyeMovement = strings.ToValidUTF8(analysis.EyeMovement, "")
-	analysis.VoiceTension = strings.ToValidUTF8(analysis.VoiceTension, "")
-	analysis.BlinkFrequency = strings.ToValidUTF8(analysis.BlinkFrequency, "")
+	resp, err := http.Post("http://e.veda.ai:8000/analyze", "application/json", bytes.NewBuffer(reqBody))
+	if err != nil {
+		return nil, fmt.Errorf("failed to call E-VEDA API: %w", err)
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Printf("Failed to close body: %v", err)
+			return
+		}
+	}(resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("E-VEDA API returned status %d: %s", resp.StatusCode, string(body))
+	}
+
+	var result struct {
+		Emotion1Name   string  `json:"emotion_1_name"`
+		Emotion1Rating float64 `json:"emotion_1_rating"`
+		Emotion2Name   string  `json:"emotion_2_name"`
+		Emotion2Rating float64 `json:"emotion_2_rating"`
+		EyeMovement    string  `json:"eye_movement"`
+		VoiceTension   string  `json:"voice_tension"`
+		BlinkFrequency string  `json:"blink_frequency"`
+		AccuracyRate   float64 `json:"accuracy_rate"`
+		ConfidenceRate float64 `json:"confidence_rate"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("failed to decode E-VEDA API response: %w", err)
+	}
+
+	// Map to protobuf
+	analysis := &pb.ResultAnalysis{
+		Emotion_1Name:   strings.ToValidUTF8(result.Emotion1Name, ""),
+		Emotion_1Rating: result.Emotion1Rating,
+		Emotion_2Name:   strings.ToValidUTF8(result.Emotion2Name, ""),
+		Emotion_2Rating: result.Emotion2Rating,
+		EyeMovement:     strings.ToValidUTF8(result.EyeMovement, ""),
+		VoiceTension:    strings.ToValidUTF8(result.VoiceTension, ""),
+		BlinkFrequency:  strings.ToValidUTF8(result.BlinkFrequency, ""),
+		AccuracyRate:    result.AccuracyRate,
+		ConfidenceRate:  result.ConfidenceRate,
+	}
 
 	return analysis, nil
 }

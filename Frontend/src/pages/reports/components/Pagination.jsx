@@ -1,25 +1,39 @@
 import React from 'react';
 
-export default function Pagination() {
+export default function Pagination({ currentPage, totalPages, onPageChange }) {
+  if (totalPages <= 1) return null;
+
+  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+
   return (
     <div className="mt-12 flex items-center justify-center gap-2">
-      <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-colors">
+      <button 
+        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+        disabled={currentPage === 1}
+        className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+      >
         <span className="material-symbols-outlined">chevron_left</span>
       </button>
-      <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary text-white font-bold shadow-md shadow-primary/20">
-        1
-      </button>
-      <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-colors font-medium">
-        2
-      </button>
-      <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-colors font-medium">
-        3
-      </button>
-      <span className="text-on-surface-variant px-2">...</span>
-      <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-colors font-medium">
-        12
-      </button>
-      <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-colors">
+
+      {pages.map(page => (
+        <button 
+          key={page}
+          onClick={() => onPageChange(page)}
+          className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200 font-bold ${
+            currentPage === page 
+              ? 'bg-primary text-white shadow-md shadow-primary/20' 
+              : 'bg-surface-container-low text-on-surface-variant hover:bg-primary/10 hover:text-primary'
+          }`}
+        >
+          {page}
+        </button>
+      ))}
+
+      <button 
+        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+        disabled={currentPage === totalPages}
+        className="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-low text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+      >
         <span className="material-symbols-outlined">chevron_right</span>
       </button>
     </div>
