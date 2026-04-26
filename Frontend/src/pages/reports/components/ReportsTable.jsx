@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { 
-  CTable, 
-  CTableHead, 
-  CTableRow, 
-  CTableHeaderCell, 
-  CTableBody, 
-  CTableDataCell 
+import {
+  CTable,
+  CTableHead,
+  CTableRow,
+  CTableHeaderCell,
+  CTableBody,
+  CTableDataCell
 } from '@coreui/react';
 
 export default function ReportsTable({ reports }) {
@@ -94,32 +94,12 @@ export default function ReportsTable({ reports }) {
               </CTableDataCell>
               <CTableDataCell className="py-4 text-right pr-6 border-slate-100">
                 <div className="flex justify-end gap-3 opacity-60 group-hover:opacity-100 transition-opacity">
-                  <button 
+                  <button
                     onClick={() => navigate(`/dashboard/reports/${encodeURIComponent(report.id)}`)}
-                    className="p-2 text-slate-400 hover:text-primary transition-colors" 
-                    title="View Details"
+                    className="px-4 py-2 text-sm font-semibold text-primary bg-primary/10 hover:bg-primary/20 rounded-xl transition-colors flex items-center gap-2"
                   >
-                    <span className="material-symbols-outlined text-[20px]">visibility</span>
-                  </button>
-                  <button 
-                    onClick={() => handleDownload(report)}
-                    disabled={downloadingId === report.id}
-                    className={`p-2 transition-colors ${downloadingId === report.id ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
-                    title="Download PDF"
-                  >
-                    <span className={`material-symbols-outlined text-[20px] ${downloadingId === report.id ? 'animate-bounce' : ''}`}>
-                      {downloadingId === report.id ? 'hourglass_empty' : 'download'}
-                    </span>
-                  </button>
-                  <button 
-                    onClick={() => handleShare(report)}
-                    disabled={sharingId === report.id}
-                    className={`p-2 transition-colors ${sharingId === report.id ? 'text-primary' : 'text-slate-400 hover:text-primary'}`} 
-                    title="Share"
-                  >
-                    <span className={`material-symbols-outlined text-[20px] ${sharingId === report.id ? 'animate-spin' : ''}`}>
-                      {sharingId === report.id ? 'progress_activity' : 'share'}
-                    </span>
+                    <span className="material-symbols-outlined text-[18px]">visibility</span>
+                    View Details
                   </button>
                 </div>
               </CTableDataCell>

@@ -1,14 +1,27 @@
 import React, { useState, useEffect } from 'react';
 
-export default function ReportDetailsHeader() {
+export default function ReportDetailsHeader({ report }) {
+  const { patient_name, date, time, confidence_result } = report || {};
+  // Parse confidence result to a percentage (e.g. 0.88 -> 88)
+  const wellnessScore = confidence_result ? Math.round(confidence_result * 100) : 0;
+  // Calculate offset for the SVG circle (2 * pi * r = 213.6)
+  const targetOffset = 213.6 - (213.6 * wellnessScore) / 100;
+
   const [offset, setOffset] = useState(213.6); // Full circumference (2 * pi * r=34)
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setOffset(25.6); // Target offset for 88/100
+      setOffset(targetOffset); // Target offset based on score
     }, 100);
     return () => clearTimeout(timer);
-  }, []);
+  }, [targetOffset]);
+
+  // Format date if available
+  const formattedDate = date ? new Date(date).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  }) : 'Unknown Date';
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
@@ -21,19 +34,21 @@ export default function ReportDetailsHeader() {
           <span className="font-medium text-primary">Session Summary</span>
         </nav>
         <h1 className="text-4xl font-extrabold tracking-tight mb-2">
-          Srushti Shinde
+          {patient_name || 'Unknown Patient'}
         </h1>
         <div className="flex items-center gap-4 text-on-surface-variant">
           <div className="flex items-center gap-1.5">
             <span className="material-symbols-outlined text-lg">
               calendar_today
             </span>
-            <span className="text-sm font-medium">Oct 24, 2023</span>
+            <span className="text-sm font-medium">{formattedDate}</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-lg">schedule</span>
-            <span className="text-sm font-medium">10:30 AM - 11:15 AM</span>
-          </div>
+          {time && (
+            <div className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-lg">schedule</span>
+              <span className="text-sm font-medium">{time}</span>
+            </div>
+          )}
         </div>
       </div>
       <div className="bg-surface-container-low p-1 rounded-3xl flex items-center gap-4 pr-8">
@@ -61,7 +76,7 @@ export default function ReportDetailsHeader() {
             />
           </svg>
           <span className="absolute text-2xl font-black text-on-surface">
-            88
+            {wellnessScore}
           </span>
         </div>
         <div>

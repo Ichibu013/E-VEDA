@@ -1,6 +1,12 @@
 import React from 'react';
 
-export default function EmotionalFluctuations() {
+export default function EmotionalFluctuations({ report }) {
+  const { analysis_result } = report || {};
+  const emotion1Name = analysis_result?.emotion1Name || 'Joy';
+  const emotion2Name = analysis_result?.emotion2Name || 'Neutral';
+  const emotion1Rating = analysis_result?.emotion1Rating ? Math.round(analysis_result.emotion1Rating * 100) : 72;
+  const emotion2Rating = analysis_result?.emotion2Rating ? Math.round(analysis_result.emotion2Rating * 100) : 50;
+
   return (
     <div className="md:col-span-8 bg-surface-container-lowest rounded-[2rem] p-8">
       <div className="flex justify-between items-center mb-10">
@@ -13,11 +19,11 @@ export default function EmotionalFluctuations() {
         <div className="flex gap-4">
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-primary" />
-            <span className="text-xs font-semibold">Joy</span>
+            <span className="text-xs font-semibold">{emotion1Name}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-secondary" />
-            <span className="text-xs font-semibold">Neutral</span>
+            <span className="text-xs font-semibold">{emotion2Name}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-tertiary" />
@@ -70,9 +76,9 @@ export default function EmotionalFluctuations() {
       <div className="grid grid-cols-3 gap-6">
         <div className="bg-surface-container-low p-4 rounded-2xl">
           <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-            Average Joy
+            Average {emotion1Name}
           </p>
-          <p className="text-2xl font-black text-primary">72%</p>
+          <p className="text-2xl font-black text-primary">{emotion1Rating}%</p>
         </div>
         <div className="bg-surface-container-low p-4 rounded-2xl">
           <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">

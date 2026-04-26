@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import html2pdf from 'html2pdf.js';
 
-export default function ReportDetailsFooter() {
+export default function ReportDetailsFooter({ report }) {
   const navigate = useNavigate();
   const [isPrinting, setIsPrinting] = useState(false);
 
@@ -10,7 +11,22 @@ export default function ReportDetailsFooter() {
     if (isPrinting) return;
     setIsPrinting(true);
     
-    const printPromise = new Promise((resolve) => setTimeout(resolve, 2000));
+    const element = document.getElementById('report-content');
+    if (!element) {
+      setIsPrinting(false);
+      toast.error('Report content not found');
+      return;
+    }
+
+    const opt = {
+      margin:       [0.5, 0.5, 0.5, 0.5],
+      filename:     `report_${report?.report_id || 'details'}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+
+    const printPromise = html2pdf().set(opt).from(element).save();
     
     toast.promise(printPromise, {
       loading: 'Generating PDF...',
@@ -18,7 +34,7 @@ export default function ReportDetailsFooter() {
       error: 'Failed to generate PDF',
     });
 
-    printPromise.then(() => {
+    printPromise.finally(() => {
       setIsPrinting(false);
     });
   };
