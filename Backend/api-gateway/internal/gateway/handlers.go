@@ -10,6 +10,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -859,8 +860,75 @@ func (h *Handler) GetReportDraftInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
+	err = json.NewEncoder(w).Encode(map[string]string{
 		"patient_name":      res.PatientName,
 		"projected_next_id": res.ProjectedNextId,
 	})
+	if err != nil {
+		log.Printf("failed to encode json: %v", err)
+		return
+	}
+}
+
+func (h *Handler) GetReportById(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		respondWithError(w, http.StatusMethodNotAllowed, "Method Not Allowed", "Method must be GET")
+		return
+	}
+
+	_, ok := r.Context().Value(userUUIDKey).(string)
+	if !ok {
+		respondWithError(w, http.StatusUnauthorized, "Unauthorized", "User UUID not found")
+		return
+	}
+
+	rawReportID := r.URL.Query().Get("id")
+
+	if rawReportID == "" {
+		respondWithError(w, http.StatusBadRequest, "Bad Request", "Report ID is required")
+		return
+	}
+
+	// 2. FORCE URL DECODING
+	// This turns "%23EV-00020" back into "#EV-00020"
+	reportID, err := url.QueryUnescape(rawReportID)
+	if err != nil {
+		// Fallback just in case decoding fails, though it rarely does
+		reportID = rawReportID
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*5) // Quick database hit
+	defer cancel()
+
+	// 2. Call the gRPC microservice
+	res, err := h.userClient.GetReportByID(ctx, &userpb.GetReportByIdRequest{
+		ReportId: reportID, // Pass the extracted ID here
+	})
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			respondWithError(w, http.StatusNotFound, "Not Found", "Report not found")
+			return
+		}
+		// Otherwise, it's a real 500 error
+		respondWithGrpcError(w, http.StatusInternalServerError, "Internal Server Error", err)
+		return
+	}
+
+	// 3. Format and send the response
+	w.Header().Set("Content-Type", "application/json")
+
+	responseMap := map[string]interface{}{
+		"report_id":         res.ReportId,
+		"patient_name":      res.PatientName,
+		"analysis_result":   res.AnalysisResult.AsMap(),
+		"confidence_result": res.ConfidenceResult,
+		"accuracy_result":   res.AccuracyResult,
+		"date":              res.Date,
+		"time":              res.Time,
+	}
+
+	if err := json.NewEncoder(w).Encode(responseMap); err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Internal Server Error", "Failed to encode response")
+		return
+	}
 }

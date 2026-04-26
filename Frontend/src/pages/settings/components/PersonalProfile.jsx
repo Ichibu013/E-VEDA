@@ -2,6 +2,12 @@ import React, { useRef } from 'react';
 import { toast } from 'sonner';
 import { userService } from '../../../api/user';
 
+// Helper to strip localhost so Vite can proxy the MinIO request
+const getProxiedImageUrl = (url) => {
+  if (!url) return '';
+  return url.replace('http://localhost:9000', '');
+};
+
 export default function PersonalProfile({ data, onChange, isSaving }) {
   const fileInputRef = useRef(null);
 
@@ -33,6 +39,9 @@ export default function PersonalProfile({ data, onChange, isSaving }) {
       error: (err) => err.message || 'Failed to upload photo',
     });
   };
+
+  const defaultImage = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&auto=format&fit=crop&q=80"; // Replaced broken googleusercontent link with a working placeholder
+
   return (
     <section className="md:col-span-8 bg-surface-container-lowest rounded-2xl p-8 md:p-10 border border-transparent shadow-sm">
       <div className="flex items-center gap-3 mb-8">
@@ -47,7 +56,8 @@ export default function PersonalProfile({ data, onChange, isSaving }) {
              <img
                alt="Profile photo"
                className="w-36 h-36 rounded-full object-cover border-4 border-surface-container"
-               src={data.profile_picture || "https://lh3.googleusercontent.com/aida-public/AB6AXuCDVj9mAaWvn8SRJjPm6NrULSrWexCr99MHlhvMFBlIpyJFBDvpsT-jB6nKwaY9Ufh-U4hxOgpTy_XS5Fg0B9a4qzSlMfI0UTxkwxTTAt5_rDzpCw-RKlGA9OuhwX_xW7hrupS-txUDPivVRnSiHYVdGlQyLNeVS99mIjjVw5ErmLmRM2ub9YzQMOeggkXMQiDnZDmgOWTGMs2Q0Eet6M12TaAXMPgQc4cgzlNRq1bPqKw-ALtyYQtFgwjVBdlrbcfj0In8XkAQgQ8"}
+               // APPLIED THE HELPER HERE
+               src={data?.profile_picture ? getProxiedImageUrl(data.profile_picture) : defaultImage}
              />
              <input 
                type="file" 

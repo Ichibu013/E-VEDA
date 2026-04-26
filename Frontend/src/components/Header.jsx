@@ -7,6 +7,12 @@ import Drawer from 'react-modern-drawer';
 import 'react-modern-drawer/dist/index.css';
 import { userService } from '../api/user';
 
+// Helper to strip localhost so Vite can proxy the MinIO request
+const getProxiedImageUrl = (url) => {
+  if (!url) return '';
+  return url.replace('http://localhost:9000', '');
+};
+
 export default function Header() {
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -53,6 +59,9 @@ export default function Header() {
       navigate('/login');
     });
   };
+
+  // Fallback image constant
+  const defaultAvatar = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80";
 
   return (
     <CHeader className="mb-0 border-b border-surface-container px-8 bg-surface-container-lowest shrink-0 h-16 flex items-center ">
@@ -101,7 +110,8 @@ export default function Header() {
               </div>
             ) : (
               <img 
-                 src={userData.profile_picture_url || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80"} 
+                 // APPLIED HELPER HERE
+                 src={userData.profile_picture_url ? getProxiedImageUrl(userData.profile_picture_url) : defaultAvatar} 
                  alt={userData.user_name || "User"} 
                  className="w-9 h-9 rounded-full object-cover border border-slate-200"
               />
@@ -136,7 +146,8 @@ export default function Header() {
             ) : (
               <>
                 <img 
-                  src={userData.profile_picture_url || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80"} 
+                  // APPLIED HELPER HERE
+                  src={userData.profile_picture_url ? getProxiedImageUrl(userData.profile_picture_url) : defaultAvatar} 
                   className="w-24 h-24 rounded-full object-cover border-4 border-surface shadow-md mb-4" 
                     alt={userData.user_name || "User"} 
                 />

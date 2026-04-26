@@ -55,7 +55,7 @@ func InitDB(connStr string) (*sql.DB, error) {
 		status VARCHAR(20) NOT NULL,
 		created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 	);
-`
+	`
 
 	if _, err := db.Exec(createReportsTableQuery); err != nil {
 		log.Fatalf("Failed to create reports_history table: %v\n", err)

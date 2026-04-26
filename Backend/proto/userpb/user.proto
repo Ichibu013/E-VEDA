@@ -3,6 +3,8 @@ syntax = "proto3";
 package user;
 option go_package = "e_veda/proto/userpb";
 
+import "google/protobuf/struct.proto";
+
 service UserService {
   rpc CreateUser (CreateUserRequest) returns (ApiResponse);
   rpc GetUser (GetUserRequest) returns (UserResponse);
@@ -17,6 +19,7 @@ service UserService {
   rpc CreateNewReport (CreateNewReportRequest) returns (ReportGeneratedResponse);
   rpc GetReportsList (GetReportsListRequest) returns (GetReportsListResponse);
   rpc GetReportDraftInfo (GetUserRequest) returns (GetReportDraftInfoResponse);
+  rpc GetReportByID (GetReportByIdRequest) returns (GetReportDetailsResponse);
 }
 
 message CreateUserRequest {
@@ -39,7 +42,6 @@ message UploadProfilePictureRequest {
   string file_extension = 4; // e.g., ".jpg"
 }
 
-
 message ProfileUpdateRequest {
   string user_id = 1;
   string name = 2;
@@ -56,6 +58,10 @@ message CreateNewReportRequest {
   string user_id = 1;
   string audio_url = 2;
   string video_url = 3;
+}
+
+message GetReportByIdRequest {
+  string report_id = 1;
 }
 
 message GetReportsListRequest {
@@ -158,4 +164,14 @@ message ReportGeneratedResponse {
   AiSummary ai_summary = 2;
   AiRecommendations ai_recommendations = 3;
   string message = 4;
+}
+
+message GetReportDetailsResponse {
+  string report_id = 1;
+  string patient_name = 2;
+  google.protobuf.Struct analysis_result = 3;
+  double confidence_result = 4;
+  double accuracy_result = 5;
+  string date = 7;
+  string time = 8;
 }

@@ -128,6 +128,24 @@ func (s *Server) CreateNewReport(ctx context.Context, request *pb.CreateNewRepor
 		return nil, status.Error(codes.Internal, "Failed to serialize analysis data")
 	}
 
+	var analysisMap map[string]interface{}
+	if err := json.Unmarshal(analysisBytes, &analysisMap); err != nil {
+		log.Printf("Failed to unmarshal analysis bytes for scrubbing: %v", err)
+		return nil, status.Error(codes.Internal, "Failed to process analysis data")
+	}
+
+	// Delete keys (handling both camelCase and snake_case to be safe)
+	delete(analysisMap, "accuracyRate")
+	delete(analysisMap, "accuracy_rate")
+	delete(analysisMap, "confidenceRate")
+	delete(analysisMap, "confidence_rate")
+
+	cleanAnalysisBytes, err := json.Marshal(analysisMap)
+	if err != nil {
+		log.Printf("Failed to marshal scrubbed analysis map: %v", err)
+		return nil, status.Error(codes.Internal, "Failed to serialize clean analysis data")
+	}
+
 	query := `
 		INSERT INTO reports_history 
 		(
@@ -138,7 +156,9 @@ func (s *Server) CreateNewReport(ctx context.Context, request *pb.CreateNewRepor
 			minio_audio_file_url,
 			minio_video_file_url,
 			status,
-			analysis_result
+			analysis_result,
+			confidence_rate,
+			accuracy_rate 
 		) 
 		VALUES (
 			'#EV-' || TO_CHAR(nextval('report_id_seq'), 'FM00000'), 
@@ -148,7 +168,9 @@ func (s *Server) CreateNewReport(ctx context.Context, request *pb.CreateNewRepor
 			$2, 
 			$3, 
 			$4,
-			$5
+			$5,
+			$6,
+			$7
 		)
 		RETURNING id;`
 
@@ -158,7 +180,9 @@ func (s *Server) CreateNewReport(ctx context.Context, request *pb.CreateNewRepor
 		request.GetAudioUrl(),
 		request.GetVideoUrl(),
 		"PENDING",
-		analysisBytes,
+		cleanAnalysisBytes,
+		analysis.GetAccuracyRate(),
+		analysis.GetConfidenceRate(),
 	).Scan(&generatedID)
 
 	if err != nil {

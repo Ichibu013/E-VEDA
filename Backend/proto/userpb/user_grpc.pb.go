@@ -34,6 +34,7 @@ const (
 	UserService_CreateNewReport_FullMethodName          = "/user.UserService/CreateNewReport"
 	UserService_GetReportsList_FullMethodName           = "/user.UserService/GetReportsList"
 	UserService_GetReportDraftInfo_FullMethodName       = "/user.UserService/GetReportDraftInfo"
+	UserService_GetReportByID_FullMethodName            = "/user.UserService/GetReportByID"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -53,6 +54,7 @@ type UserServiceClient interface {
 	CreateNewReport(ctx context.Context, in *CreateNewReportRequest, opts ...grpc.CallOption) (*ReportGeneratedResponse, error)
 	GetReportsList(ctx context.Context, in *GetReportsListRequest, opts ...grpc.CallOption) (*GetReportsListResponse, error)
 	GetReportDraftInfo(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetReportDraftInfoResponse, error)
+	GetReportByID(ctx context.Context, in *GetReportByIdRequest, opts ...grpc.CallOption) (*GetReportDetailsResponse, error)
 }
 
 type userServiceClient struct {
@@ -193,6 +195,16 @@ func (c *userServiceClient) GetReportDraftInfo(ctx context.Context, in *GetUserR
 	return out, nil
 }
 
+func (c *userServiceClient) GetReportByID(ctx context.Context, in *GetReportByIdRequest, opts ...grpc.CallOption) (*GetReportDetailsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetReportDetailsResponse)
+	err := c.cc.Invoke(ctx, UserService_GetReportByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -210,6 +222,7 @@ type UserServiceServer interface {
 	CreateNewReport(context.Context, *CreateNewReportRequest) (*ReportGeneratedResponse, error)
 	GetReportsList(context.Context, *GetReportsListRequest) (*GetReportsListResponse, error)
 	GetReportDraftInfo(context.Context, *GetUserRequest) (*GetReportDraftInfoResponse, error)
+	GetReportByID(context.Context, *GetReportByIdRequest) (*GetReportDetailsResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -258,6 +271,9 @@ func (UnimplementedUserServiceServer) GetReportsList(context.Context, *GetReport
 }
 func (UnimplementedUserServiceServer) GetReportDraftInfo(context.Context, *GetUserRequest) (*GetReportDraftInfoResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetReportDraftInfo not implemented")
+}
+func (UnimplementedUserServiceServer) GetReportByID(context.Context, *GetReportByIdRequest) (*GetReportDetailsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetReportByID not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -514,6 +530,24 @@ func _UserService_GetReportDraftInfo_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetReportByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetReportByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetReportByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetReportByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetReportByID(ctx, req.(*GetReportByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -572,6 +606,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetReportDraftInfo",
 			Handler:    _UserService_GetReportDraftInfo_Handler,
+		},
+		{
+			MethodName: "GetReportByID",
+			Handler:    _UserService_GetReportByID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

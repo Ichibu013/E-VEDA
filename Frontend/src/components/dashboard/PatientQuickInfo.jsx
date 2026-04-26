@@ -1,16 +1,25 @@
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 
+// Helper to strip localhost so Vite can proxy the MinIO request
+const getProxiedImageUrl = (url) => {
+  if (!url) return '';
+  return url.replace('http://localhost:9000', '');
+};
+
 export default function PatientQuickInfo({ isLoading, data }) {
   if (isLoading) {
     return <Skeleton height={180} borderRadius={24} className="shadow-sm" />;
   }
 
+  const defaultImage = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80";
+
   return (
     <div className="bg-surface-container-lowest rounded-3xl p-6 shadow-sm flex flex-col justify-between overflow-hidden">
       <div className="flex items-center gap-4 mb-6">
         <img
-          src={data?.profile_picture || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80"}
+          // APPLIED THE HELPER HERE
+          src={data?.profile_picture ? getProxiedImageUrl(data.profile_picture) : defaultImage}
           alt={data?.name || "Patient"}
           className="w-16 h-16 rounded-2xl object-cover shadow-sm border border-slate-100"
         />

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getCookie } from '../utils/cookies';
 
-export const BASE_URL = 'http://localhost:8080/api';
+export const BASE_URL = '/api';
 
 /**
  * Centered Axios instance
