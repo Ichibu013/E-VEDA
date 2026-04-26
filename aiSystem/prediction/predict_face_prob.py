@@ -92,13 +92,18 @@ def predict_face_prob(face_img):
     face_input = np.expand_dims(face, axis=-1)  # Add channel dimension
     face_input = np.expand_dims(face_input, axis=0) # Add batch dimension
 
-    # Get predictions
-    # verbose=0 stops Keras from printing a progress bar to the console on every single frame
     preds = model.predict(face_input, verbose=0)[0] 
 
-    # REORDER the predictions to match the Fusion model's expectations
-    # If the h5 outputs 8 classes (FER+ sometimes includes 'Contempt'), you will need to handle that here.
-    reordered_preds = preds[MAPPING_INDICES]
+    # FIXED: Check the output length to apply the correct mapping array
+    # Target Fusion Order: ['Neutral', 'Happy', 'Sad', 'Anger', 'Fear', 'Disgust', 'Surprise']
+    if len(preds) == 8:
+        # Microsoft FER+ 8-class order: [Neutral, Happy, Surprise, Sad, Anger, Disgust, Fear, Contempt]
+        mapping = [0, 1, 3, 4, 6, 5, 2]
+        reordered_preds = preds[mapping]
+    else:
+        # Classic FER2013 7-class order: [Angry, Disgust, Fear, Happy, Sad, Surprise, Neutral]
+        mapping = [6, 3, 4, 0, 2, 1, 5]
+        reordered_preds = preds[mapping]
 
     # Return as a float32 numpy array, which predict_face_gest.py will convert to a tensor
     return reordered_preds.astype(np.float32)

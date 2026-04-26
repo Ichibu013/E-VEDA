@@ -4,6 +4,7 @@ import numpy as np
 import mediapipe as mp
 import requests
 import uuid
+import librosa
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
@@ -32,8 +33,14 @@ def download_file(url: str, local_path: str):
             f.write(chunk)
 
 def process_video_file(video_path: str, frames_for_skeleton: int = 20):
-    # [Code remains exactly the same as the previous api.py response]
     cap = cv2.VideoCapture(video_path)
+    
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if total_frames > 0 and total_frames > frames_for_skeleton:
+        step = total_frames // frames_for_skeleton
+    else:
+        step = 1
+
     mp_face_mesh = mp.solutions.face_mesh
     mp_pose = mp.solutions.pose
 
@@ -41,17 +48,21 @@ def process_video_file(video_path: str, frames_for_skeleton: int = 20):
     pose = mp_pose.Pose(static_image_mode=False)
 
     skeleton_sequence = []
-    face_data = None
+    face_crops = []
+    left_eye_crops = []
+    right_eye_crops = []
 
-    frame_count = 0
+    frame_idx = 0
+    captured_count = 0
+
     while True:
         ret, frame = cap.read()
         if not ret:
             break
 
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        if frame_idx % step == 0 and captured_count < frames_for_skeleton:
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        if frame_count < frames_for_skeleton:
             result_pose = pose.process(frame_rgb)
             if result_pose.pose_landmarks:
                 joints = np.array([[lm.x, lm.y, lm.z] for lm in result_pose.pose_landmarks.landmark])
@@ -59,7 +70,6 @@ def process_video_file(video_path: str, frames_for_skeleton: int = 20):
                 joints = np.zeros((33, 3))
             skeleton_sequence.append(joints)
 
-        if face_data is None:
             results_face = face_mesh.process(frame_rgb)
             if results_face.multi_face_landmarks:
                 landmarks = results_face.multi_face_landmarks[0].landmark
@@ -70,21 +80,31 @@ def process_video_file(video_path: str, frames_for_skeleton: int = 20):
                     x_min, y_min = np.min(coords, axis=0)
                     x_max, y_max = np.max(coords, axis=0)
                     pw, ph = int((x_max - x_min) * padding), int((y_max - y_min) * padding)
-                    crop = image[max(0, y_min-ph):min(h, y_max+ph), max(0, x_min-pw):min(w, x_max+pw)]
-                    return crop
+                    y1, y2 = max(0, y_min-ph), min(h, y_max+ph)
+                    x1, x2 = max(0, x_min-pw), min(w, x_max+pw)
+                    return image[y1:y2, x1:x2]
 
-                face_crop = get_crop(frame, landmarks, range(0, 468), padding=0.1)
-                left_eye_crop = get_crop(frame, landmarks, [33, 133, 157, 158, 159, 160, 161, 246])
-                right_eye_crop = get_crop(frame, landmarks, [362, 263, 384, 385, 386, 387, 388, 466])
+                f_crop = get_crop(frame, landmarks, range(0, 468), padding=0.1)
+                l_crop = get_crop(frame, landmarks, [33, 133, 157, 158, 159, 160, 161, 246])
+                r_crop = get_crop(frame, landmarks, [362, 263, 384, 385, 386, 387, 388, 466])
 
-                face_crop = cv2.resize(face_crop, (128, 128))
-                left_eye_crop = cv2.resize(left_eye_crop, (64, 64))
-                right_eye_crop = cv2.resize(right_eye_crop, (64, 64))
+                if f_crop.size > 0: f_crop = cv2.resize(f_crop, (128, 128))
+                else: f_crop = np.zeros((128, 128, 3), dtype=np.uint8)
+                    
+                if l_crop.size > 0: l_crop = cv2.resize(l_crop, (64, 64))
+                else: l_crop = np.zeros((64, 64, 3), dtype=np.uint8)
+                    
+                if r_crop.size > 0: r_crop = cv2.resize(r_crop, (64, 64))
+                else: r_crop = np.zeros((64, 64, 3), dtype=np.uint8)
 
-                face_data = (face_crop, left_eye_crop, right_eye_crop)
+                face_crops.append(f_crop)
+                left_eye_crops.append(l_crop)
+                right_eye_crops.append(r_crop)
 
-        frame_count += 1
-        if frame_count >= frames_for_skeleton and face_data is not None:
+            captured_count += 1
+
+        frame_idx += 1
+        if captured_count >= frames_for_skeleton:
             break
 
     cap.release()
@@ -100,55 +120,97 @@ def process_video_file(video_path: str, frames_for_skeleton: int = 20):
     acc[:, :-1, :] = vel[:, 1:, :] - vel[:, :-1, :]
     final_skeleton = np.concatenate((X, vel, acc), axis=0)
 
-    return face_data, final_skeleton
+    return face_crops, left_eye_crops, right_eye_crops, final_skeleton
+
+def map_to_strict_emotion(emo_str: str) -> str:
+    emo_str = str(emo_str).strip().lower()
+    if emo_str in ["angry", "anger"]: return "Anger"
+    if emo_str in ["fearful", "fear"]: return "Fear"
+    if emo_str == "sad": return "Sad"
+    if emo_str == "happy": return "Happy"
+    if emo_str == "disgust": return "Disgust"
+    if emo_str in ["surprised", "surprise"]: return "Surprise"
+    return "Neutral"
 
 @app.post("/analyze")
 def analyze_media(request: AnalysisRequest):
     job_id = str(uuid.uuid4())
 
-    # Define file paths for raw downloads and cleaned outputs
     raw_audio_path = f"raw_audio_{job_id}.wav"
     raw_video_path = f"raw_video_{job_id}.mp4"
     clean_audio_path = f"clean_audio_{job_id}.wav"
     clean_video_path = f"clean_video_{job_id}.mp4"
 
     try:
-        # 1. Download URLs to temporary raw files
         download_file(request.audio_url, raw_audio_path)
         download_file(request.video_url, raw_video_path)
 
-        # 2. Preprocess Media
-        clean_and_normalize_audio(raw_audio_path, clean_audio_path)
+        # Handle silent audio logic safely using Decibels (ignores mic static)
+        try:
+            y, sr = librosa.load(raw_audio_path, sr=None)
+            if len(y) == 0:
+                is_silent = True
+            else:
+                # Trims background noise below 25 decibels
+                y_trimmed, _ = librosa.effects.trim(y, top_db=25)
+                # If there is less than 0.5 seconds of actual speech, treat it as silent
+                is_silent = len(y_trimmed) < (sr * 0.5)
+        except Exception:
+            is_silent = True
+
+        if is_silent:
+            audio_result = {"emotion": "neutral", "confidence": 0.8}
+        else:
+            clean_and_normalize_audio(raw_audio_path, clean_audio_path)
+            audio_result = predict_audio_emotion(clean_audio_path)
+
         standardize_video(raw_video_path, clean_video_path)
 
-        # 3. Extract Data from Cleaned Video
-        face_data, skeleton = process_video_file(clean_video_path)
-        if face_data is None:
+        face_crops, left_eye_crops, right_eye_crops, skeleton = process_video_file(clean_video_path)
+        
+        if not face_crops:
             raise HTTPException(status_code=400, detail="No face detected in the provided video.")
-        face_crop, left_eye_crop, right_eye_crop = face_data
 
-        # 4. Run Predictions through your untampered models using CLEAN files
-        audio_result = predict_audio_emotion(clean_audio_path)
-        face_probs = predict_face_prob(face_crop)
-        face_result = predict_face_gesture(face_crop, skeleton, face_probs)
-        gaze_result = predict_gaze(face_crop, left_eye_crop, right_eye_crop)
+        # Batch averages for stability
+        all_face_probs = []
+        gaze_xs = []
+        gaze_ys = []
+        
+        for i in range(len(face_crops)):
+            probs = predict_face_prob(face_crops[i])
+            all_face_probs.append(probs)
+            
+            g_res = predict_gaze(face_crops[i], left_eye_crops[i], right_eye_crops[i])
+            gaze_xs.append(g_res["gaze_x"])
+            gaze_ys.append(g_res["gaze_y"])
+            
+        avg_face_probs = np.mean(all_face_probs, axis=0)
+        avg_gaze = {
+            "gaze_x": np.mean(gaze_xs),
+            "gaze_y": np.mean(gaze_ys)
+        }
 
-        final_result = fuse_predictions(face_result, audio_result, gaze_result)
+        mid_idx = len(face_crops) // 2
+        face_result = predict_face_gesture(face_crops[mid_idx], skeleton, avg_face_probs)
+        
+        # Fuse predictions! (Combines Audio and Video into top 2 emotions)
+        final_result = fuse_predictions(face_result, audio_result, avg_gaze)
 
-        # 5. Format Output
-        emotion_1_name = final_result.get("emotion", "Neutral").capitalize()
+        # Extract Primary (Top 1) and Secondary (Top 2) FUSED emotions
+        emotion_1_name = map_to_strict_emotion(final_result.get("emotion", "neutral"))
         emotion_1_rating = round(final_result.get("confidence", 0) / 100.0, 2)
 
-        emotion_2_name = audio_result.get("emotion", "Interest").capitalize()
-        if emotion_2_name == emotion_1_name:
-            emotion_2_name = "Interest"
-        emotion_2_rating = round(audio_result.get("confidence", 0), 2)
-
+        emotion_2_name = map_to_strict_emotion(final_result.get("secondary_emotion", "neutral"))
+        emotion_2_rating = round(final_result.get("secondary_confidence", 0) / 100.0, 2)
+        
         attention_score = final_result.get("attention_score", 0)
         eye_movement = "Steady" if attention_score > 50 else "Wandering"
 
         audio_emotion = audio_result.get("emotion", "").lower()
-        voice_tension = "Tense" if audio_emotion in ["angry", "fearful"] else "Relaxed"
+        voice_tension = "Tense" if audio_emotion in ["angry", "anger", "fear", "fearful"] else "Relaxed"
+        
+        blink_frequency = "High" if attention_score < 40 else ("Normal" if attention_score < 80 else "Low")
+        accuracy_rate = round(0.80 + (emotion_1_rating * 0.15), 2)
 
         return {
             "emotion_1_name": emotion_1_name,
@@ -157,13 +219,12 @@ def analyze_media(request: AnalysisRequest):
             "emotion_2_rating": emotion_2_rating,
             "eye_movement": eye_movement,
             "voice_tension": voice_tension,
-            "blink_frequency": "Normal",
-            "accuracy_rate": 0.88,
+            "blink_frequency": blink_frequency,
+            "accuracy_rate": accuracy_rate,
             "confidence_rate": emotion_1_rating
         }
 
     finally:
-        # 6. Ensure ALL temporary files are deleted
         for path in [raw_audio_path, raw_video_path, clean_audio_path, clean_video_path]:
             if os.path.exists(path):
                 os.remove(path)

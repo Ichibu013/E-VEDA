@@ -30,80 +30,75 @@ GAZE_WEIGHT = 0.20
 # ATTENTION CALCULATION
 # -----------------------------
 def compute_attention(gaze_x, gaze_y):
-
-    center_x = 0.5
-    center_y = 0.5
+    
+    # tanh outputs are mapped from -1.0 to 1.0, so the center is 0.0
+    center_x = 0.0
+    center_y = 0.0
 
     distance = math.sqrt((gaze_x - center_x)**2 + (gaze_y - center_y)**2)
-
     attention = max(0, 100 - distance * 100)
 
     return round(attention, 2)
-
 
 # -----------------------------
 # ATTENTION STATE
 # -----------------------------
 def attention_state(attention):
-
     if attention > 70:
         return "Focused"
-
     elif attention > 40:
         return "Moderate"
-
     else:
         return "Distracted"
-
 
 # -----------------------------
 # MULTIMODAL FUSION
 # -----------------------------
 def fuse_predictions(face_result, audio_result, gaze_result):
 
-    emotion_scores = {e: 0 for e in EMOTIONS}
+    # 1. Initialize all emotion scores to 0
+    emotion_scores = {e: 0.0 for e in EMOTIONS}
 
-    # compute attention
+    # 2. Compute attention for dynamic weighting
     attention = compute_attention(
         gaze_result["gaze_x"],
         gaze_result["gaze_y"]
     )
-
-    # dynamic face weight
     face_weight_dynamic = FACE_WEIGHT * (attention / 100) 
 
-    # face contribution
+    # 3. Add VIDEO (Face) contribution to the total score
     face_emotion = face_result["emotion"]
-
     if face_emotion in EMOTION_MAP:
         face_emotion = EMOTION_MAP[face_emotion]
+        
+    emotion_scores[face_emotion] += (face_result["confidence"] * face_weight_dynamic)
 
-    emotion_scores[face_emotion] += (
-            face_result["confidence"] * face_weight_dynamic
-    )
-
-    # audio contribution
+    # 4. Add AUDIO contribution to the total score
     audio_emotion = audio_result["emotion"]
-
-    # convert to fusion emotion label if needed
     if audio_emotion in EMOTION_MAP:
         audio_emotion = EMOTION_MAP[audio_emotion]
+        
+    emotion_scores[audio_emotion] += (audio_result["confidence"] * AUDIO_WEIGHT)
 
-    emotion_scores[audio_emotion] += (
-            audio_result["confidence"] * AUDIO_WEIGHT
-    )
+    # 5. Get the Top 1 and Top 2 combined emotions
+    sorted_emotions = sorted(emotion_scores.items(), key=lambda item: item[1], reverse=True)
+    
+    top_1_emo = sorted_emotions[0][0]
+    top_1_score = sorted_emotions[0][1]
+    
+    top_2_emo = sorted_emotions[1][0]
+    top_2_score = sorted_emotions[1][1]
 
-    # final emotion
-    final_emotion = max(emotion_scores, key=emotion_scores.get)
-
-    raw_confidence = emotion_scores[final_emotion]
-
+    # 6. Normalize the confidences
     max_possible = face_weight_dynamic + AUDIO_WEIGHT
-    normalized_confidence = raw_confidence / max_possible
+    normalized_conf_1 = (top_1_score / max_possible) if max_possible > 0 else 0
+    normalized_conf_2 = (top_2_score / max_possible) if max_possible > 0 else 0
 
     return {
-        "emotion": final_emotion,
-        "confidence": round(normalized_confidence * 100, 2),
+        "emotion": top_1_emo,
+        "confidence": round(normalized_conf_1 * 100, 2),
+        "secondary_emotion": top_2_emo,
+        "secondary_confidence": round(normalized_conf_2 * 100, 2),
         "attention_score": attention,
         "attention_state": attention_state(attention)
     }

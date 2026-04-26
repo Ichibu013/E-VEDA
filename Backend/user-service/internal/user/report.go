@@ -179,7 +179,7 @@ func (s *Server) CreateNewReport(ctx context.Context, request *pb.CreateNewRepor
 		request.GetUserId(),
 		request.GetAudioUrl(),
 		request.GetVideoUrl(),
-		"PENDING",
+		"COMPLETED",
 		cleanAnalysisBytes,
 		analysis.GetAccuracyRate(),
 		analysis.GetConfidenceRate(),

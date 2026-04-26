@@ -747,7 +747,7 @@ func (h *Handler) CreateReport(w http.ResponseWriter, r *http.Request) {
 	cleanAudioUrl := strings.ToValidUTF8(payload.AudioUrl, "")
 	cleanVideoUrl := strings.ToValidUTF8(payload.VideoUrl, "")
 
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second*20)
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*120)
 	defer cancel()
 
 	res, err := h.userClient.CreateNewReport(ctx, &userpb.CreateNewReportRequest{
