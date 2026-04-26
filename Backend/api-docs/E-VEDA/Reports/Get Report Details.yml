@@ -1,0 +1,65 @@
+info:
+  name: Get Report Details
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{base_url}}/api/report?id=%23EV-00020"
+  params:
+    - name: id
+      value: "%23EV-00020"
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: Success
+    request:
+      url: "{{base_url}}/api/report?id=%23EV-00020"
+      method: GET
+      params:
+        - name: id
+          value: "%23EV-00020"
+          type: query
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: access-control-allow-credentials
+          value: "true"
+        - name: access-control-allow-headers
+          value: Content-Type, Authorization
+        - name: access-control-allow-methods
+          value: GET, POST, PUT, DELETE, OPTIONS
+        - name: content-type
+          value: application/json
+        - name: date
+          value: Sun, 26 Apr 2026 10:25:27 GMT
+        - name: content-length
+          value: "327"
+      body:
+        type: json
+        data: |-
+          {
+            "accuracy_result": 0.78,
+            "analysis_result": {
+              "blinkFrequency": "Normal",
+              "emotion1Name": "Fear",
+              "emotion1Rating": 0.78,
+              "emotion2Name": "Interest",
+              "emotion2Rating": 1,
+              "eyeMovement": "Wandering",
+              "voiceTension": "Relaxed"
+            },
+            "confidence_result": 0.88,
+            "date": "2026-04-26",
+            "patient_name": "Ansh Sharma",
+            "report_id": "#EV-00020",
+            "time": "15:58:08"
+          }
