@@ -1,15 +1,30 @@
-def mental_state(emotion, attention):
+from utils.emotion_labels import normalize_emotion
 
-    if emotion == "angry" and attention < 50:
+
+def mental_state(emotion: str, attention: float) -> str:
+    """
+    Derive a coarse mental state label from the fused emotion and attention score.
+
+    Args:
+        emotion:   Raw or canonical emotion string (normalized internally).
+        attention: Attention score 0–100 from gaze model.
+
+    Returns:
+        One of: "High Stress", "Possible Depression", "Normal",
+                "Positive State", "Mild Stress"
+    """
+    emo = normalize_emotion(emotion)
+
+    if emo == "angry" and attention < 50:
         return "High Stress"
 
-    elif emotion == "sad" and attention < 40:
+    elif emo == "sad" and attention < 40:
         return "Possible Depression"
 
-    elif emotion == "neutral" and attention > 70:
+    elif emo == "neutral" and attention > 70:
         return "Normal"
 
-    elif emotion == "happy":
+    elif emo == "happy":
         return "Positive State"
 
     else:
