@@ -203,22 +203,25 @@ def predict_face_gesture(face_input, skeleton_input, face_probs):
     ).unsqueeze(0).to(DEVICE)
 
     with torch.no_grad():
-
         output = model(skel,face)
-
         prob = torch.softmax(output,dim=1)
-
         pred = torch.argmax(prob,dim=1).item()
 
     emotion = EMOTION_NAMES[pred].lower()
-
-    # convert anger → angry to match fusion labels
     if emotion == "anger":
         emotion = "angry"
-
     confidence = prob[0][pred].item()
+
+    # --- FIX: Extract full probability distribution ---
+    probs_array = prob[0].cpu().numpy()
+    emotion_probs = {EMOTION_NAMES[i].lower(): float(probs_array[i]) for i in range(len(EMOTION_NAMES))}
+
+    # Map anger to match the fusion dictionary
+    if "anger" in emotion_probs:
+        emotion_probs["angry"] = emotion_probs.pop("anger")
 
     return {
         "emotion": emotion,
-        "confidence": confidence
-        }
+        "confidence": confidence,
+        "probabilities": emotion_probs # Added for Soft Fusion
+    }

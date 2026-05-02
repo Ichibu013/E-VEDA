@@ -55,7 +55,6 @@ def attention_state(attention):
 # MULTIMODAL FUSION
 # -----------------------------
 def fuse_predictions(face_result, audio_result, gaze_result):
-
     # 1. Initialize all emotion scores to 0
     emotion_scores = {e: 0.0 for e in EMOTIONS}
 
@@ -64,28 +63,45 @@ def fuse_predictions(face_result, audio_result, gaze_result):
         gaze_result["gaze_x"],
         gaze_result["gaze_y"]
     )
-    face_weight_dynamic = FACE_WEIGHT * (attention / 100) 
+    face_weight_dynamic = FACE_WEIGHT * (attention / 100)
 
-    # 3. Add VIDEO (Face) contribution to the total score
-    face_emotion = face_result["emotion"]
-    if face_emotion in EMOTION_MAP:
-        face_emotion = EMOTION_MAP[face_emotion]
-        
-    emotion_scores[face_emotion] += (face_result["confidence"] * face_weight_dynamic)
+    # --- FIX: SOFT FUSION ---
+    # Extract full distributions (fallback to empty dict to avoid breaking legacy tests)
+    face_probs = face_result.get("probabilities", {})
+    audio_probs = audio_result.get("probabilities", {})
 
-    # 4. Add AUDIO contribution to the total score
-    audio_emotion = audio_result["emotion"]
-    if audio_emotion in EMOTION_MAP:
-        audio_emotion = EMOTION_MAP[audio_emotion]
-        
-    emotion_scores[audio_emotion] += (audio_result["confidence"] * AUDIO_WEIGHT)
+    if face_probs and audio_probs:
+        # Add VIDEO (Face) full distribution
+        for emo, prob in face_probs.items():
+            # FIX: Force lowercase to ensure keys match the dictionary
+            clean_emo = str(emo).strip().lower()
+            mapped_emo = EMOTION_MAP.get(clean_emo, clean_emo)
+            if mapped_emo in emotion_scores:
+                emotion_scores[mapped_emo] += (prob * face_weight_dynamic)
+
+        # Add AUDIO full distribution
+        for emo, prob in audio_probs.items():
+            # FIX: Force lowercase to ensure keys match the dictionary
+            clean_emo = str(emo).strip().lower()
+            mapped_emo = EMOTION_MAP.get(clean_emo, clean_emo)
+            if mapped_emo in emotion_scores:
+                emotion_scores[mapped_emo] += (prob * AUDIO_WEIGHT)
+    else:
+        # Legacy fallback if distributions aren't found
+        face_emo = EMOTION_MAP.get(face_result["emotion"], face_result["emotion"])
+        if face_emo in emotion_scores:
+            emotion_scores[face_emo] += (face_result["confidence"] * face_weight_dynamic)
+
+        audio_emo = EMOTION_MAP.get(audio_result["emotion"], audio_result["emotion"])
+        if audio_emo in emotion_scores:
+            emotion_scores[audio_emo] += (audio_result["confidence"] * AUDIO_WEIGHT)
 
     # 5. Get the Top 1 and Top 2 combined emotions
     sorted_emotions = sorted(emotion_scores.items(), key=lambda item: item[1], reverse=True)
-    
+
     top_1_emo = sorted_emotions[0][0]
     top_1_score = sorted_emotions[0][1]
-    
+
     top_2_emo = sorted_emotions[1][0]
     top_2_score = sorted_emotions[1][1]
 

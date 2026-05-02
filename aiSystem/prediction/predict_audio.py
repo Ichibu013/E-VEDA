@@ -64,22 +64,22 @@ def extract_features(file_path):
 
 
 def predict_audio_emotion(audio_file):
-
     # Feature extraction
     features = extract_features(audio_file)
-
     # Scale
     features = scaler.transform([features])
-
     # Predict
     predictions = model.predict(features)
-
     emotion_index = np.argmax(predictions)
     emotion_label = encoder.inverse_transform([emotion_index])[0]
-
     confidence = float(np.max(predictions))
+
+    # --- FIX: Extract full probability distribution ---
+    probabilities = predictions[0]
+    emotion_probs = {encoder.inverse_transform([i])[0]: float(probabilities[i]) for i in range(len(probabilities))}
 
     return {
         "emotion": emotion_label,
-        "confidence": confidence
+        "confidence": confidence,
+        "probabilities": emotion_probs
     }
