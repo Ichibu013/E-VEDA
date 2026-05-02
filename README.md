@@ -67,6 +67,46 @@ sequenceDiagram
     Frontend-->>User: render dashboard
 ```
 
+### Full Execution Flow
+
+```mermaid
+flowchart TD
+    %% User Actions
+    U_Login[User logs into platform] --> U_Record[User records audio/video for assessment]
+    U_Record --> F_Upload[Frontend uploads media to MinIO Storage]
+    
+    %% Frontend to Backend
+    F_Upload --> F_Req[Frontend requests analysis via API Gateway]
+    
+    %% API Gateway & Auth
+    F_Req --> GW_Auth[API Gateway validates request & calls IAM Service]
+    GW_Auth --> IAM_Check{Is Authorized?}
+    
+    %% Unauth Flow
+    IAM_Check -- No --> Auth_Fail[Return 401/403 Unauthorized]
+    Auth_Fail --> F_Error[Frontend displays error]
+    
+    %% Auth Flow
+    IAM_Check -- Yes --> GW_Route[API Gateway routes to User Service]
+    
+    %% User Service to AI
+    GW_Route --> US_ReqAI[User Service sends media URLs to AI System]
+    
+    %% AI Processing Pipeline
+    US_ReqAI --> AI_DL[AI System downloads media from MinIO]
+    AI_DL --> AI_Process[AI multiprocessing: Audio, Gaze, Face, Skeleton]
+    AI_Process --> AI_Fuse[AI Semantically fuses modal data]
+    AI_Fuse --> AI_Res[AI returns mental state metrics]
+    
+    %% Backend Finalization
+    AI_Res --> US_Save[User Service saves report to PostgreSQL]
+    US_Save --> GW_Res[User Service returns report data to API Gateway]
+    
+    %% Return to User
+    GW_Res --> F_Display[Frontend receives JSON and renders Dashboard]
+    F_Display --> U_View[User views assessment results]
+```
+
 ## Repository Structure
 
 ```text
@@ -74,7 +114,6 @@ E-VEDA/
 ├── Backend/          # Go microservices backend and Docker compose orchestration
 ├── Frontend/         # React + Vite web client
 ├── aiSystem/         # Python FastAPI multimodal AI inference system
-├── .devcontainer/    # Development container configuration
 └── README.md         # Root project documentation
 ```
 
@@ -92,9 +131,9 @@ E-VEDA/
 
 - Docker & Docker Compose
 - Node.js (v18+ recommended)
-- npm or yarn
-- Python 3.11+ (for `aiSystem`)
-- Optional: Go 1.20+ for backend development
+- npm (for `frontend`)
+- Python 3.10 (for `aiSystem`)
+- Optional: Go 1.20+ (for `backend`)
 
 ### Frontend Setup
 
