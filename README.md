@@ -2,6 +2,22 @@
 
 E-VEDA is an integrated AI-powered mental state assessment platform for education and healthcare. It combines a React/Vite web frontend, Go-based microservices backend, and a Python multimodal AI system that analyzes audio and video to infer emotion, attention, and stress.
 
+> **BE Computer Final Year Project** by Students of **Keystone School of Engineering, Pune, IN**
+> Under the guidance of **Prof. Vrushali Wankhade**
+
+## Project Members
+
+1. **Ansh Sharma** [Project Lead]
+2. **Divesh Sonawane** [AI System Architect]
+3. **Shreeyash Shinde** [Frontend Developer]
+4. **Srushti Shinde** [UI/UX Designer]
+
+### Module Contributors
+
+- **AI System**: Divesh Sonawane and Ansh Sharma
+- **Frontend**: Shreeyash Shinde, Srushti Shinde, and Ansh Sharma
+- **Backend**: Ansh Sharma
+
 ## Project Overview
 
 - **Frontend**: React with Vite for responsive UI, user authentication, report generation, and dashboard interactions.
