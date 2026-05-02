@@ -1,6 +1,5 @@
 from utils.emotion_labels import normalize_emotion
 
-
 def mental_state(emotion: str, attention: float) -> str:
     """
     Derive a coarse mental state label from the fused emotion and attention score.

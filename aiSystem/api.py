@@ -17,7 +17,6 @@ from prediction.predict_face_gest import predict_face_gesture
 from prediction.predict_gaze import predict_gaze
 from fusion.fusion_model import fuse_predictions
 
-# Bug 2 fix: import the correct silent-audio fallback
 from utils.audio_fallback import make_silent_audio_result
 
 app = FastAPI(title="E-VEDA API")

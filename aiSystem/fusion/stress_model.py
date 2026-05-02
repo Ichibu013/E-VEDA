@@ -1,6 +1,5 @@
 from utils.emotion_labels import normalize_emotion
 
-
 def compute_stress(emotion: str, attention: float) -> int:
     """
     Compute a stress score 0–100 from fused emotion and attention.
