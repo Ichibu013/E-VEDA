@@ -1,3 +1,11 @@
+"""
+Live Camera Input Module
+========================
+Provides functionalities to open local webcams, track facial features using MediaPipe, 
+and automatically extract region-specific crops (e.g., full face, left/right eyes) 
+necessary for real-time model inference.
+"""
+
 import cv2
 import mediapipe as mp
 import numpy as np

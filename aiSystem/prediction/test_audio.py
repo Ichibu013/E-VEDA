@@ -1,3 +1,9 @@
+"""
+Audio Prediction Test Module
+============================
+A script to test the Audio emotion MLP independently on a specific local audio wav file.
+"""
+
 import os
 from aiSystem.prediction.predict_audio import predict_audio_emotion
 

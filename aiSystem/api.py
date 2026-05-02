@@ -1,3 +1,11 @@
+"""
+E-VEDA System API Module
+========================
+This module exposes the multimodal emotion and mental state analysis system as a RESTful API using FastAPI.
+It handles incoming requests containing audio and video URLs, orchestrates the download, preprocessing,
+and inference pipelines for each modality, and fuses the results to return a comprehensive mental state assessment.
+"""
+
 import os
 import cv2
 import numpy as np
@@ -23,11 +31,28 @@ app = FastAPI(title="E-VEDA API")
 
 
 class AnalysisRequest(BaseModel):
+    """
+    Data model for the API analysis request.
+    
+    Attributes:
+        audio_url (str): URL to the audio file to be analyzed.
+        video_url (str): URL to the video file to be analyzed.
+    """
     audio_url: str
     video_url: str
 
 
 def download_file(url: str, local_path: str):
+    """
+    Downloads a file from a given URL to a local path.
+
+    Args:
+        url (str): The URL of the file to download.
+        local_path (str): The local destination path for the downloaded file.
+    
+    Raises:
+        HTTPError: If the HTTP request returns an unsuccessful status code.
+    """
     response = requests.get(url, stream=True)
     response.raise_for_status()
     with open(local_path, "wb") as f:
@@ -36,6 +61,17 @@ def download_file(url: str, local_path: str):
 
 
 def process_video_file(video_path: str, frames_for_skeleton: int = 20):
+    """
+    Processes the video file to extract face and eye crops, and temporal skeleton features.
+
+    Args:
+        video_path (str): The path to the downloaded video file.
+        frames_for_skeleton (int): The number of frames to extract for skeleton sequence (default is 20).
+
+    Returns:
+        tuple: A tuple containing lists of face crops, left eye crops, right eye crops, 
+               and the final processed skeleton sequence array.
+    """
     cap = cv2.VideoCapture(video_path)
 
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -79,6 +115,7 @@ def process_video_file(video_path: str, frames_for_skeleton: int = 20):
                 landmarks = results_face.multi_face_landmarks[0].landmark
 
                 def get_crop(image, landmarks, indices, padding=0.2):
+                    """Helper function to crop a specific facial region based on landmarks."""
                     h, w, _ = image.shape
                     coords  = [(int(landmarks[i].x * w), int(landmarks[i].y * h))
                                for i in indices]
@@ -128,6 +165,15 @@ def process_video_file(video_path: str, frames_for_skeleton: int = 20):
 
 
 def map_to_strict_emotion(emo_str: str) -> str:
+    """
+    Maps a raw emotion string to a strictly defined canonical emotion category.
+    
+    Args:
+        emo_str (str): The raw emotion string to map.
+        
+    Returns:
+        str: The canonical emotion label (e.g., 'Anger', 'Happy', 'Neutral').
+    """
     emo_str = str(emo_str).strip().lower()
     if emo_str in ["angry", "anger"]:  return "Anger"
     if emo_str in ["fearful", "fear"]: return "Fear"
@@ -140,6 +186,23 @@ def map_to_strict_emotion(emo_str: str) -> str:
 
 @app.post("/analyze")
 def analyze_media(request: AnalysisRequest):
+    """
+    Main API endpoint for processing multimodal requests.
+
+    This function coordinates:
+    1. Downloading media files.
+    2. Analyzing audio for silence and extracting audio-based emotion.
+    3. Processing video for facial expressions, gestures, and gaze tracking.
+    4. Fusing the multimodal results into a coherent final assessment.
+    5. Cleanup of temporary files.
+    
+    Args:
+        request (AnalysisRequest): The incoming request containing media URLs.
+        
+    Returns:
+        dict: A comprehensive dictionary detailing detected emotions, confidence rates, 
+              eye movement, voice tension, blink frequency, and system accuracy.
+    """
     job_id = str(uuid.uuid4())
 
     raw_audio_path  = f"raw_audio_{job_id}.wav"
@@ -151,7 +214,7 @@ def analyze_media(request: AnalysisRequest):
         download_file(request.audio_url, raw_audio_path)
         download_file(request.video_url, raw_video_path)
 
-        # Silence detection
+        # Silence detection to ensure robustness against empty audio inputs
         try:
             y, sr = librosa.load(raw_audio_path, sr=None)
             if len(y) == 0:
@@ -163,8 +226,7 @@ def analyze_media(request: AnalysisRequest):
             is_silent = True
 
         if is_silent:
-            # Bug 2 fix: use make_silent_audio_result() so the soft-fusion
-            # path in fuse_predictions() is always taken.
+            # Fallback for silent/unreadable audio ensuring soft-fusion path is taken
             audio_result = make_silent_audio_result()
         else:
             clean_and_normalize_audio(raw_audio_path, clean_audio_path)
@@ -185,6 +247,7 @@ def analyze_media(request: AnalysisRequest):
         gaze_xs        = []
         gaze_ys        = []
 
+        # Analyze each extracted crop sequentially
         for i in range(len(face_crops)):
             probs = predict_face_prob(face_crops[i])
             all_face_probs.append(probs)
@@ -202,8 +265,10 @@ def analyze_media(request: AnalysisRequest):
         mid_idx     = len(face_crops) // 2
         face_result = predict_face_gesture(face_crops[mid_idx], skeleton, avg_face_probs)
 
+        # Multimodal fusion of disparate signals
         final_result = fuse_predictions(face_result, audio_result, avg_gaze)
 
+        # Extract and format finalized metrics for the API response
         emotion_1_name   = map_to_strict_emotion(final_result.get("emotion", "neutral"))
         emotion_1_rating = round(final_result.get("confidence", 0) / 100.0, 2)
 
@@ -221,7 +286,6 @@ def analyze_media(request: AnalysisRequest):
                             ("Normal" if attention_score < 80 else "Low"))
         accuracy_rate    = round(0.80 + (emotion_1_rating * 0.15), 2)
 
-        # Response format is UNCHANGED from original api.py
         return {
             "emotion_1_name":   emotion_1_name,
             "emotion_1_rating": emotion_1_rating,
@@ -235,6 +299,7 @@ def analyze_media(request: AnalysisRequest):
         }
 
     finally:
+        # Cleanup temporary files created during processing
         for path in [raw_audio_path, raw_video_path, clean_audio_path, clean_video_path]:
             if os.path.exists(path):
                 os.remove(path)
@@ -242,4 +307,5 @@ def analyze_media(request: AnalysisRequest):
 
 if __name__ == "__main__":
     import uvicorn
+    # Launch API service
     uvicorn.run(app, host="0.0.0.0", port=8000)

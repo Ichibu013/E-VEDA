@@ -1,3 +1,10 @@
+"""
+Legacy Face and Gesture Prediction Module
+=========================================
+WARNING: This is an archived, deprecated version of the multimodal face and skeleton
+prediction module. Use aiSystem/prediction/predict_face_gest.py for active inference.
+"""
+
 import torch
 import torch.nn as nn
 import numpy as np

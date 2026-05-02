@@ -1,3 +1,11 @@
+"""
+E-VEDA Real-Time Execution Module
+=================================
+This script orchestrates the live testing interface for the E-VEDA multimodal AI system.
+It ties together camera capture, audio recording, parallel inferencing across models,
+and semantic fusion for real-time mental state analysis.
+"""
+
 import cv2
 import numpy as np
 import time
@@ -20,7 +28,20 @@ from aiSystem.features.extract_skeleton import extract_skeleton_sequence
 from aiSystem.prediction.predict_face_prob import predict_face_prob
 
 def run_multimodal_system():
+    """
+    Executes a complete pass of the multimodal fusion system.
 
+    Steps:
+    1. Captures synchronous webcam video and microphone audio.
+    2. Runs predictive models to score acoustic emotion.
+    3. Extracts pose dynamics and facial probabilities.
+    4. Predicts face gestures and visual gaze tracking.
+    5. Merges these modality streams via the fusion model.
+    6. Formats and persists semantic metrics (e.g. mental state, stress level).
+
+    Returns:
+        dict: The final integrated prediction result containing fused confidence scores.
+    """
     # Capture camera
     face, left_eye, right_eye = capture_face_and_eyes()
 
@@ -29,7 +50,6 @@ def run_multimodal_system():
 
     # Predictions
     audio_result = predict_audio_emotion(audio_file)
-
 
     print("Extracting skeleton sequence...")
     skeleton = extract_skeleton_sequence()
@@ -61,7 +81,6 @@ def run_multimodal_system():
 
     final_result["mental_state"] = state
 
-
     stress = compute_stress(
             final_result["emotion"],
             final_result["attention_score"]
@@ -69,14 +88,11 @@ def run_multimodal_system():
 
     final_result["stress_score"] = stress
 
-
     save_result(final_result)
 
     return final_result
 
 if __name__ == "__main__":
-
-
     print("Starting E-VEDA Real-Time System...")
 
     result = run_multimodal_system()
@@ -95,5 +111,3 @@ if __name__ == "__main__":
     print("Stress Score     :", result["stress_score"], "/100")
 
     print("==============================")
-
-        

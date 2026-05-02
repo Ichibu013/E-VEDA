@@ -1,3 +1,11 @@
+"""
+Face and Gesture Prediction Ensemble Module
+===========================================
+This module combines predictions from an Adaptive Graph Convolutional Network (AGCN) 
+trained on body skeletons, and an MLP mapping facial emotion probabilities, 
+to output a fused multimodal gesture/expression prediction.
+"""
+
 import os
 import numpy as np
 import torch
@@ -123,6 +131,15 @@ class UltimateEnsemble(nn.Module):
 # =============================================================================
 
 def load_model(path: str) -> UltimateEnsemble:
+    """
+    Load the pre-trained ensemble model weights into the PyTorch ensemble structure.
+    
+    Args:
+        path (str): The absolute path to the `.pth` weights file.
+        
+    Returns:
+        UltimateEnsemble: A fully populated and evaluated model ready for inference.
+    """
     model = UltimateEnsemble()
     try:
         single_state = torch.load(path, map_location=DEVICE)
@@ -204,7 +221,7 @@ def predict_face_gesture(
         face_probs:     Face emotion probabilities array of shape (7,).
 
     Returns:
-        dict with keys: "emotion", "confidence", "probabilities"
+        dict: A dictionary with keys "emotion", "confidence", and a full map of "probabilities".
     """
     # Bug 7 fix: validate skeleton before tensor conversion
     skeleton_input = _validate_and_pad_skeleton(skeleton_input)

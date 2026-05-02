@@ -1,3 +1,9 @@
+"""
+Gaze Prediction Test Module
+===========================
+Tests the continuous 2D gaze prediction CNN on a hardcoded set of static local images.
+"""
+
 import cv2
 from aiSystem.prediction.predict_gaze import predict_gaze
 

@@ -1,3 +1,10 @@
+"""
+Gaze and Eye-Tracking Predictor Module
+======================================
+Uses a multi-branch Convolutional Neural Network (CNN) combining the full face, left eye, 
+and right eye crops to predict a 2D continuous gaze coordinate vector (x, y).
+"""
+
 import os
 import numpy as np
 import cv2
@@ -82,7 +89,7 @@ with zipfile.ZipFile(model_path, 'r') as z:
                 ])
 
 def preprocess_face(img):
-
+    """Resizes and normalizes the full face image for model input."""
     img = cv2.resize(img, (128,128))
     img = img.astype("float32") / 255.0
     img = np.expand_dims(img, axis=0)
@@ -91,7 +98,7 @@ def preprocess_face(img):
 
 
 def preprocess_eye(img):
-
+    """Resizes and normalizes individual eye crops for model input."""
     img = cv2.resize(img, (64,64))
     img = img.astype("float32") / 255.0
     img = np.expand_dims(img, axis=0)
@@ -100,7 +107,17 @@ def preprocess_eye(img):
 
 
 def predict_gaze(face, left_eye, right_eye):
+    """
+    Computes normalized continuous 2D gaze vectors given facial bounding boxes.
 
+    Args:
+        face (np.ndarray): The raw BGR full face crop image.
+        left_eye (np.ndarray): The raw BGR left eye crop image.
+        right_eye (np.ndarray): The raw BGR right eye crop image.
+
+    Returns:
+        dict: A dictionary storing float estimates for "gaze_x" and "gaze_y" coordinates.
+    """
     face_img = preprocess_face(face)
     l_eye_img = preprocess_eye(left_eye)
     r_eye_img = preprocess_eye(right_eye)

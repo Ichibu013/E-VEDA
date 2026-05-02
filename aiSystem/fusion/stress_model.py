@@ -1,3 +1,10 @@
+"""
+Stress Modeling Module
+======================
+This module estimates physiological and psychological stress levels
+using fused emotion labels and attention metrics as inputs.
+"""
+
 from utils.emotion_labels import normalize_emotion
 
 def compute_stress(emotion: str, attention: float) -> int:
@@ -9,7 +16,8 @@ def compute_stress(emotion: str, attention: float) -> int:
         attention: Attention score 0–100 from gaze model.
 
     Returns:
-        Integer stress score clamped to [0, 100].
+        int: Integer stress score clamped to [0, 100], where higher values
+             indicate higher perceived stress.
     """
     emo = normalize_emotion(emotion)
 

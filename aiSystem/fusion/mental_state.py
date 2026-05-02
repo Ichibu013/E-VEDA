@@ -1,3 +1,10 @@
+"""
+Mental State Classifier Module
+==============================
+This module maps fused low-level multimodal features (e.g., emotion and attention)
+into high-level cognitive/mental state categories.
+"""
+
 from utils.emotion_labels import normalize_emotion
 
 def mental_state(emotion: str, attention: float) -> str:
@@ -9,8 +16,8 @@ def mental_state(emotion: str, attention: float) -> str:
         attention: Attention score 0–100 from gaze model.
 
     Returns:
-        One of: "High Stress", "Possible Depression", "Normal",
-                "Positive State", "Mild Stress"
+        str: One of: "High Stress", "Possible Depression", "Normal",
+             "Positive State", "Mild Stress"
     """
     emo = normalize_emotion(emotion)
 

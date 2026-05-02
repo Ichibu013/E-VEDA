@@ -1,3 +1,11 @@
+"""
+Emotion Label Normalization Module
+==================================
+This utility standardizes disparate textual emotion predictions from multiple specialized models
+(like RAVDESS audio models vs. FER2013 face models) into a unified canonical taxonomy required 
+by the fusion and mental state inference stages.
+"""
+
 _CANONICAL_MAP: dict[str, str] = {
     # Face model outputs (FER+ / FER2013)
     "anger":     "angry",
@@ -66,6 +74,12 @@ def normalize_probs_dict(probs: dict) -> dict:
         raw = {"fearful": 0.3, "neutral": 0.5, "happy": 0.2}
         normalize_probs_dict(raw)
         → {"fear": 0.3, "neutral": 0.5, "happy": 0.2}
+        
+    Args:
+        probs (dict): Dictionary mapping string labels to raw float probabilities.
+        
+    Returns:
+        dict: Processed and normalized probability map using canonical labels.
     """
     canonical: dict[str, float] = {e: 0.0 for e in CANONICAL_EMOTIONS}
     for raw_label, prob in probs.items():

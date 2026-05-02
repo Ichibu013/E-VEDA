@@ -1,3 +1,10 @@
+"""
+Audio Emotion Prediction Module
+===============================
+This module extracts acoustic features (MFCC, Chroma, Mel, Contrast, Tonnetz) from an audio clip
+and passes them through a pre-trained Multi-Layer Perceptron (MLP) to predict the speaker's emotional state.
+"""
+
 import os
 import numpy as np
 import librosa
@@ -47,6 +54,16 @@ scaler = joblib.load(scaler_path)
 encoder = joblib.load(encoder_path)
 
 def extract_features(file_path):
+    """
+    Extracts numerical acoustic features from the given audio file using librosa.
+    
+    Args:
+        file_path (str): Path to the audio file.
+        
+    Returns:
+        np.ndarray: A horizontally stacked array containing MFCC, Chroma, Mel, 
+                    Contrast, and Tonnetz features.
+    """
     y, sr = librosa.load(file_path, duration=3, offset=0.5)
 
     mfcc = np.mean(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40).T, axis=0)
@@ -64,6 +81,16 @@ def extract_features(file_path):
 
 
 def predict_audio_emotion(audio_file):
+    """
+    Predicts the emotion of the speaker in an audio file.
+    
+    Args:
+        audio_file (str): The path to the audio file to analyze.
+        
+    Returns:
+        dict: A dictionary containing the predicted emotion label, the confidence 
+              score (highest probability), and the full probability distribution.
+    """
     # Feature extraction
     features = extract_features(audio_file)
     # Scale

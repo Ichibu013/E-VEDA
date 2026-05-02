@@ -1,3 +1,10 @@
+"""
+Skeleton Feature Extraction Module
+==================================
+This module utilizes Google's MediaPipe to capture body posture landmarks and computes
+derived dynamic features (velocity and acceleration) for action/gesture recognition.
+"""
+
 import cv2
 import mediapipe as mp
 import numpy as np
@@ -5,6 +12,19 @@ import numpy as np
 mp_pose = mp.solutions.pose
 
 def extract_skeleton_sequence(frames=20):
+    """
+    Captures a real-time temporal sequence of body skeleton coordinates using MediaPipe.
+    Calculates derived positional dynamics: raw position, velocity, and acceleration.
+
+    Args:
+        frames (int): Number of consecutive frames to extract (default 20).
+
+    Returns:
+        np.ndarray: A multi-channel array of skeleton sequences with shape (9, frames, 33).
+                    Channels 0-2: Position (X, Y, Z)
+                    Channels 3-5: Velocity (first derivative of position)
+                    Channels 6-8: Acceleration (second derivative of position)
+    """
     cap = cv2.VideoCapture(0)
     pose = mp_pose.Pose()
     skeleton_sequence = []

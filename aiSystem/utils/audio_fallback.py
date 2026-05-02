@@ -1,3 +1,10 @@
+"""
+Audio Fallback Module
+=====================
+Provides resilient mechanisms to handle silent or absent audio input gracefully,
+ensuring the multi-modality fusion system doesn't crash when audio modalities are missing.
+"""
+
 SILENT_AUDIO_PRIOR: dict[str, float] = {
     "neutral":  0.70,
     "happy":    0.06,
@@ -29,6 +36,9 @@ def make_silent_audio_result() -> dict:
             audio_result = make_silent_audio_result()
         else:
             audio_result = predict_audio_emotion(clean_audio_path)
+            
+    Returns:
+        dict: The dummy prediction schema mapping to an ambiguous 'neutral' output.
     """
     return {
         "emotion":       "neutral",

@@ -1,3 +1,9 @@
+"""
+Face Gesture Prediction Test Module
+===================================
+A script to test the AGCN face/gesture ensemble model on randomized synthetic data arrays.
+"""
+
 import torch
 import numpy as np
 
@@ -38,11 +44,11 @@ face_probs = np.array([
 # Run Prediction
 # --------------------------------
 
-emotion, confidence = predict_face_gesture(
-    model,
+result = predict_face_gesture(
+    None,
     skeleton_input,
     face_probs
 )
 
-print("Emotion:", emotion)
-print("Confidence:", round(confidence*100,2), "%")
+print("Emotion:", result['emotion'])
+print("Confidence:", round(result['confidence']*100,2), "%")

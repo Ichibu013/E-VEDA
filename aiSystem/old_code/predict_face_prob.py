@@ -1,3 +1,10 @@
+"""
+Legacy Face Emotion Probability Predictor
+=========================================
+WARNING: This is an archived, deprecated version of the standalone PyTorch facial CNN.
+Use aiSystem/prediction/predict_face_prob.py for active inference utilizing the Keras FER+ model.
+"""
+
 import cv2
 import torch
 import torch.nn.functional as F

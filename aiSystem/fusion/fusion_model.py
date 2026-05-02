@@ -1,3 +1,10 @@
+"""
+Multimodal Fusion Model Module
+==============================
+This module implements the soft late-fusion algorithms, combining the discrete predictions 
+from the audio, video/facial, and gaze models into a cohesive prediction of mental state.
+"""
+
 import math
 from utils.emotion_labels import normalize_emotion, CANONICAL_EMOTIONS
 
@@ -27,11 +34,30 @@ _NEGATIVE_EMOTIONS = {"angry", "fear", "disgust", "sad"}
 # Helpers
 # ---------------------------------------------------------------------------
 def compute_attention(gaze_x: float, gaze_y: float) -> float:
+    """
+    Computes an attention score based on normalized gaze coordinates.
+    
+    Args:
+        gaze_x (float): Normalized horizontal gaze component.
+        gaze_y (float): Normalized vertical gaze component.
+        
+    Returns:
+        float: Computed attention score out of 100.
+    """
     distance = math.sqrt(gaze_x ** 2 + gaze_y ** 2)
     return round(max(0.0, 100.0 - distance * 100.0), 2)
 
 
 def attention_state(attention: float) -> str:
+    """
+    Discretizes the continuous attention score into categorical states.
+    
+    Args:
+        attention (float): The continuous attention score (0-100).
+        
+    Returns:
+        str: Categorical label describing attention.
+    """
     if attention > 70:   return "Focused"
     elif attention > 40: return "Moderate"
     else:                return "Distracted"
