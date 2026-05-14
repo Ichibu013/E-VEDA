@@ -33,7 +33,7 @@ export default function ReportsHistoryPage() {
   return (
     <div className="flex min-h-screen transition-opacity duration-500 ease-in-out opacity-100">
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl mx-auto w-full">
+      <main className="flex-1 max-w-8xl mx-auto w-full">
         <section >
           <div className="mb-10">
             {isLoading ? (

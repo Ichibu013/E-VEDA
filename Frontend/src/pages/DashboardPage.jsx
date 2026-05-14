@@ -40,7 +40,7 @@ export default function DashboardPage() {
     }, []);
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8 transition-opacity duration-500 ease-in-out opacity-100">
+        <div className="max-w-8xl mx-auto space-y-8 transition-opacity duration-500 ease-in-out opacity-100">
             {!isLoading && completionData && !completionData.isComplete && (
                 <WelcomeBanner 
                     isLoading={isLoading} 

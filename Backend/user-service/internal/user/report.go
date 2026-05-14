@@ -218,8 +218,6 @@ func (s *Server) CreateNewReport(ctx context.Context, request *pb.CreateNewRepor
 		return resp, nil // Fallback to original if this fails
 	}
 
-	log.Printf("Successfully scrubbed final report : %v\n", finalResp)
-
 	return finalResp, nil
 }
 
