@@ -41,10 +41,10 @@ const CircularProgress = ({ percentage, color, text, icon }) => {
 
 export default function AccuracyMetrics({ isLoading }) {
   const metrics = [
-    { id: 1, percentage: 90, color: '#136ac1', text: 'Face Accuracy', icon: 'face' },
-    { id: 2, percentage: 80, color: '#156c4d', text: 'Voice Accuracy', icon: 'mic' },
-    { id: 3, percentage: 70, color: '#6b5dd3', text: 'Gesture Accuracy', icon: 'waving_hand' },
-    { id: 4, percentage: 85, color: '#4299e1', text: 'Eye Accuracy', icon: 'visibility' },
+    { id: 1, percentage: 92.2, color: '#136ac1', text: 'Face Accuracy', icon: 'face' },
+    { id: 2, percentage: 86.1, color: '#156c4d', text: 'Voice Accuracy', icon: 'mic' },
+    { id: 3, percentage: 93.4, color: '#6b5dd3', text: 'Gesture Accuracy', icon: 'waving_hand' },
+    { id: 4, percentage: 91.1, color: '#4299e1', text: 'Eye Accuracy', icon: 'visibility' },
   ];
 
   if (isLoading) {

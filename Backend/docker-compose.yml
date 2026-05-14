@@ -43,7 +43,7 @@ services:
     networks:
       - backend_net
     extra_hosts:
-      - "host.docker.internal:10.10.0.5"
+      - "host.docker.internal:10.10.0.1"
 
   user-service:
     build:
@@ -62,7 +62,7 @@ services:
     networks:
       - backend_net
     extra_hosts:
-      - "host.docker.internal:10.10.0.5"
+      - "host.docker.internal:10.10.0.1"
       - "e.veda.ai:host-gateway"
 
   # -------------------------------------

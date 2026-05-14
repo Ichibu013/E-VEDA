@@ -35,7 +35,7 @@ export default function ReportDetailsPage() {
 
   return (
     <>
-      <main id="report-content" className="max-w-7xl mx-auto w-full transition-opacity duration-500 ease-in-out opacity-100 bg-surface text-on-surface">
+      <main id="report-content" className="max-w-8xl mx-auto w-full transition-opacity duration-500 ease-in-out opacity-100 bg-surface text-on-surface">
         {/* Header Section */}
         {isLoading ? (
           <Skeleton height={80} borderRadius={16} className="mb-8" />
