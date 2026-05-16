@@ -10,7 +10,7 @@ E-VEDA is an integrated AI-powered mental state assessment platform for educatio
 1. **Ansh Sharma** [Project Lead]
 2. **Divesh Sonawane** [AI System Developer]
 3. **Shreeyash Shinde** [Frontend Developer]
-4. **Srushti Shinde** [UI/UX Designer]
+4. **Srushti Shinde** [UI/UX Designer + Frontend Developer]
 
 ### Module Contributors
 
