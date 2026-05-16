@@ -1,10 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { toast } from 'sonner';
-import { 
-  CDropdown, 
-  CDropdownToggle, 
-  CDropdownMenu, 
+import {
+  CDropdown,
+  CDropdownToggle,
+  CDropdownMenu,
   CDropdownItem,
   CButton,
   CModal,
@@ -53,9 +53,9 @@ export default function NewReportPage() {
     let acceptValue = "video/*,audio/*";
     if (type === 'video') acceptValue = "video/*";
     if (type === 'audio') acceptValue = "audio/*";
-    
+
     setFileAccept(acceptValue);
-    
+
     // Use a slight delay to ensure the 'accept' attribute is updated before the dialog opens
     setTimeout(() => {
       fileInputRef.current?.click();
@@ -67,25 +67,25 @@ export default function NewReportPage() {
     formData.append('file', file);
 
     // Update status to uploading immediately
-    setMediaList(prev => prev.map(item => 
+    setMediaList(prev => prev.map(item =>
       item.id === tempId ? { ...item, status: 'uploading' } : item
     ));
 
     try {
-      const response = type === 'video' 
+      const response = type === 'video'
         ? await reportsService.uploadVideo(formData)
         : await reportsService.uploadAudio(formData);
 
       const s3Url = response.message;
-      
-      setMediaList(prev => prev.map(item => 
-        item.id === tempId 
+
+      setMediaList(prev => prev.map(item =>
+        item.id === tempId
           ? { ...item, status: 'ready', s3Url, s3Id: s3Url.split('/').pop() }
           : item
       ));
     } catch (error) {
       console.error("Upload failed for", file.name, error);
-      setMediaList(prev => prev.map(item => 
+      setMediaList(prev => prev.map(item =>
         item.id === tempId ? { ...item, status: 'error' } : item
       ));
       throw error; // Re-throw for batch handler to catch if needed
@@ -100,13 +100,13 @@ export default function NewReportPage() {
     }
 
     const toastId = toast.loading(`Submitting ${pendingItems.length} media file(s) to backend...`);
-    
+
     try {
       // Parallel execution
-      await Promise.all(pendingItems.map(item => 
+      await Promise.all(pendingItems.map(item =>
         performUpload(item.id, item.fileObject, item.type)
       ));
-      
+
       toast.success("Session media synchronized successfully!", { id: toastId });
     } catch (error) {
       toast.error("Batch submission partially failed. Please check individual status in Library.", { id: toastId });
@@ -120,22 +120,23 @@ export default function NewReportPage() {
 
   const handleSave = async () => {
     if (isSaving) return;
-    
+
     // Check for uploaded media
     const manualVideo = mediaList.find(m => m.type === 'video' && m.status === 'ready');
     const manualAudio = mediaList.find(m => m.type === 'audio' && m.status === 'ready');
-    
+
     // Priority: Live feeds > Manual uploads
     const videoUrl = liveFacialUrl || manualVideo?.s3Url;
     const audioUrl = liveVoiceUrl || manualAudio?.s3Url;
-    
+
     if (!videoUrl || !audioUrl) {
       toast.warning("Please record a session OR upload media before generating the report.");
       return;
     }
 
     setIsSaving(true);
-    
+    const toastId = toast.loading("Generating clinical report...");
+
     const payload = {
       report_id: draftInfo.projected_next_id,
       audio_url: audioUrl,
@@ -144,17 +145,17 @@ export default function NewReportPage() {
 
     try {
       const response = await reportsService.createReport(payload);
-      toast.success(response.message);
+      toast.success(response.message, { id: toastId });
       setReportData(response);
       setIsReportGenerated(true);
-      
+
       // Clear session data after successful generation
       setMediaList([]);
       setLiveFacialUrl(null);
       setLiveVoiceUrl(null);
     } catch (error) {
       console.error("Failed to generate report:", error);
-      toast.error('Failed to generate clinical report. Please try again.');
+      toast.error('Failed to generate clinical report. Please try again.', { id: toastId });
     } finally {
       setIsSaving(false);
     }
@@ -178,12 +179,12 @@ export default function NewReportPage() {
             </div>
             <div className="flex gap-3 mb-3">
               {/* Hidden Input for Media Files */}
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                className="hidden" 
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
                 accept={fileAccept}
-                multiple 
+                multiple
                 onChange={(e) => {
                   const files = Array.from(e.target.files);
                   if (files.length) {
@@ -201,10 +202,10 @@ export default function NewReportPage() {
                   }
                 }}
               />
-              
+
               {/* Media Library Trigger */}
               {mediaList.length > 0 && (
-                <button 
+                <button
                   onClick={() => setIsModalVisible(true)}
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-outline/20 font-semibold text-on-surface hover:bg-surface-container-high transition-colors"
                 >
@@ -216,27 +217,27 @@ export default function NewReportPage() {
                 </button>
               )}
 
-                <CDropdown variant="btn-group" className="flex items-stretch shadow-sm rounded-r-xl" direction="dropstart">
-                
-                <CDropdownToggle  
-                split 
+              <CDropdown variant="btn-group" className="flex items-stretch shadow-sm rounded-r-xl" direction="dropstart">
+
+                <CDropdownToggle
+                  split
                   className="!flex !items-center !justify-center !px-3 !py-0 !text-primary hover:!bg-primary/5 !m-0 !shadow-none after:!hidden "
                 />
-                  <CButton
-                    onClick={handleUploadAll}
-                    disabled={!mediaList.some(m => m.status === 'local' || m.status === 'error')}
-                    className="!flex !items-center !gap-2 !px-5 !py-0 !font-semibold !text-primary hover:!bg-primary/5 !transition-all !m-0 !shadow-none !text-sm disabled:!opacity-30 disabled:!cursor-not-allowed !rounded-r-lg"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">upload_file</span>
-                    Submit Media
-                  </CButton>
-                
+                <CButton
+                  onClick={handleUploadAll}
+                  disabled={!mediaList.some(m => m.status === 'local' || m.status === 'error')}
+                  className="!flex !items-center !gap-2 !px-5 !py-0 !font-semibold !text-primary hover:!bg-primary/5 !transition-all !m-0 !shadow-none !text-sm disabled:!opacity-30 disabled:!cursor-not-allowed !rounded-r-lg"
+                >
+                  <span className="material-symbols-outlined text-[20px]">upload_file</span>
+                  Submit Media
+                </CButton>
+
                 <CDropdownMenu className="!shadow-2xl !border-0 !rounded-2xl !p-2 !bg-white/90 !backdrop-blur-xl mt-1 min-w-[200px] !animate-in !fade-in !slide-in-from-top-1 !duration-200">
 
                   <div className="px-3 py-2 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
                     Upload Source
                   </div>
-                  <CDropdownItem 
+                  <CDropdownItem
                     onClick={() => handleAddMediaClick('video')}
                     className="!rounded-xl !flex !items-center !gap-3 !text-sm !font-bold !p-3 !text-on-surface hover:!bg-primary/5 !transition-all !cursor-pointer border-0"
                   >
@@ -245,7 +246,7 @@ export default function NewReportPage() {
                     </div>
                     Upload Video
                   </CDropdownItem>
-                  <CDropdownItem 
+                  <CDropdownItem
                     onClick={() => handleAddMediaClick('audio')}
                     className="!rounded-xl !flex !items-center !gap-3 !text-sm !font-bold !p-3 !text-on-surface hover:!bg-primary/5 !transition-all !cursor-pointer border-0"
                   >
@@ -259,7 +260,7 @@ export default function NewReportPage() {
 
 
 
-              <button 
+              <button
                 onClick={handleSave}
                 disabled={isSaving}
                 className={`flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white font-bold transition-all shadow-md ${isSaving ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary-dim hover:scale-[1.02] active:scale-[0.98]'}`}
@@ -274,7 +275,7 @@ export default function NewReportPage() {
 
         {/* Recording Hub & Bento Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-on-surface">
-          
+
           {/* Left Area (7 Columns) */}
           <div className="lg:col-span-7 flex flex-col gap-8">
             {isLoading ? (
@@ -326,8 +327,8 @@ export default function NewReportPage() {
       </main>
 
       {/* Media Library Modal */}
-      <CModal 
-        visible={isModalVisible} 
+      <CModal
+        visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         size="lg"
         alignment="center"
@@ -349,15 +350,13 @@ export default function NewReportPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {mediaList.map((media) => (
-                <div key={media.id} className={`group relative flex items-center gap-4 p-4 rounded-3xl bg-surface-container-low border border-outline/5 transition-all ${
-                    media.status === 'ready' ? 'hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5' : ''
+                <div key={media.id} className={`group relative flex items-center gap-4 p-4 rounded-3xl bg-surface-container-low border border-outline/5 transition-all ${media.status === 'ready' ? 'hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5' : ''
                   }`}>
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-colors ${
-                    media.status === 'uploading' ? 'bg-surface-container-high' :
-                    media.status === 'local' ? 'bg-orange-50 text-orange-600' :
-                    media.status === 'error' ? 'bg-red-50 text-red-600' :
-                    media.type === 'video' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
-                  }`}>
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-colors ${media.status === 'uploading' ? 'bg-surface-container-high' :
+                      media.status === 'local' ? 'bg-orange-50 text-orange-600' :
+                        media.status === 'error' ? 'bg-red-50 text-red-600' :
+                          media.type === 'video' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
+                    }`}>
                     {media.status === 'uploading' ? (
                       <span className="material-symbols-outlined text-2xl animate-spin text-primary">progress_activity</span>
                     ) : media.status === 'local' ? (
@@ -371,15 +370,14 @@ export default function NewReportPage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`font-bold truncate text-sm transition-colors ${
-                      media.status === 'error' ? 'text-red-600' : 'text-on-surface'
-                    }`} title={media.name}>
-                        {media.name}
+                    <p className={`font-bold truncate text-sm transition-colors ${media.status === 'error' ? 'text-red-600' : 'text-on-surface'
+                      }`} title={media.name}>
+                      {media.name}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-[10px] uppercase font-black text-on-surface-variant/60 tracking-wider">
-                        {media.status === 'uploading' ? 'Uploading...' : 
-                         media.status === 'local' ? 'Pending' : media.size}
+                        {media.status === 'uploading' ? 'Uploading...' :
+                          media.status === 'local' ? 'Pending' : media.size}
                       </span>
                       {media.status === 'ready' && (
                         <>
@@ -392,7 +390,7 @@ export default function NewReportPage() {
                     </div>
                   </div>
 
-                  <button 
+                  <button
                     onClick={() => handleDeleteMedia(media.id)}
                     className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-red-50 hover:text-red-500 transition-colors"
                     title="Delete Media"
@@ -406,13 +404,13 @@ export default function NewReportPage() {
         </CModalBody>
 
         <CModalFooter className="border-t border-outline/10 p-8 bg-surface-container-low">
-          <CButton 
+          <CButton
             onClick={() => setIsModalVisible(false)}
             className="px-8 py-2.5 rounded-xl font-bold text-on-surface-variant hover:bg-surface-container-highest transition-colors border-0"
           >
             Close Library
           </CButton>
-          <CButton 
+          <CButton
             onClick={() => {
               setIsModalVisible(false);
               handleAddMediaClick('all');
