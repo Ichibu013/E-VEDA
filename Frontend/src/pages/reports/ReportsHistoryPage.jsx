@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useNavigate } from 'react-router-dom';
 import { reportsService } from '../../api/reports';
-import ReportsFilterBar from './components/ReportsFilterBar';
+// import ReportsFilterBar from './components/ReportsFilterBar';
 import ReportsTable from './components/ReportsTable';
 import Pagination from './components/Pagination';
 
@@ -51,9 +51,9 @@ export default function ReportsHistoryPage() {
           </div>
 
           {/* Filters Section */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             {isLoading ? <Skeleton height={60} borderRadius={16} /> : <ReportsFilterBar />}
-          </div>
+          </div> */}
 
           {/* Table of Reports (CoreUI CTable) */}
           <div className="mb-6">

@@ -59,7 +59,7 @@ export default function ReportsTable({ reports }) {
             <CTableHeaderCell scope="col" className="w-[80px] text-center border-b-0 py-4 text-on-surface-variant font-medium text-sm">Type</CTableHeaderCell>
             <CTableHeaderCell scope="col" className="border-b-0 py-4 text-on-surface-variant font-medium text-sm">Patient Name</CTableHeaderCell>
             <CTableHeaderCell scope="col" className="border-b-0 py-4 text-on-surface-variant font-medium text-sm">Date</CTableHeaderCell>
-            <CTableHeaderCell scope="col" className="border-b-0 py-4 text-on-surface-variant font-medium text-sm">Report Type</CTableHeaderCell>
+            <CTableHeaderCell scope="col" className="hidden md:table-cell border-b-0 py-4 text-on-surface-variant font-medium text-sm">Report Type</CTableHeaderCell>
             <CTableHeaderCell scope="col" className="text-right border-b-0 py-4 text-on-surface-variant font-medium text-sm pr-6">Actions</CTableHeaderCell>
           </CTableRow>
         </CTableHead>
@@ -87,7 +87,7 @@ export default function ReportsTable({ reports }) {
               <CTableDataCell className="py-4 border-slate-100">
                 <p className="text-sm text-on-surface mb-0">{formatDate(report.date)}</p>
               </CTableDataCell>
-              <CTableDataCell className="py-4 border-slate-100">
+              <CTableDataCell className="hidden md:table-cell py-4 border-slate-100">
                 <span className="text-xs font-semibold px-2.5 py-1 bg-surface-container-high rounded-full text-on-surface-variant">
                   {report.report_type}
                 </span>
@@ -96,10 +96,10 @@ export default function ReportsTable({ reports }) {
                 <div className="flex justify-end gap-3 opacity-60 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => navigate(`/dashboard/reports/${encodeURIComponent(report.id)}`)}
-                    className="px-4 py-2 text-sm font-semibold text-primary bg-primary/10 hover:bg-primary/20 rounded-xl transition-colors flex items-center gap-2"
+                    className="p-2 md:px-4 md:py-2 text-sm font-semibold text-primary bg-primary/10 hover:bg-primary/20 rounded-xl transition-colors flex items-center justify-center gap-2"
                   >
                     <span className="material-symbols-outlined text-[18px]">visibility</span>
-                    View Details
+                    <span className="hidden md:inline">View Details</span>
                   </button>
                 </div>
               </CTableDataCell>

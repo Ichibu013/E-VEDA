@@ -3,7 +3,16 @@ import React from 'react';
 export default function Pagination({ currentPage, totalPages, onPageChange }) {
   if (totalPages <= 1) return null;
 
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const maxVisible = 4;
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = startPage + maxVisible - 1;
+
+  if (endPage > totalPages) {
+    endPage = totalPages;
+    startPage = Math.max(1, endPage - maxVisible + 1);
+  }
+
+  const pages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
 
   return (
     <div className="mt-12 flex items-center justify-center gap-2">
