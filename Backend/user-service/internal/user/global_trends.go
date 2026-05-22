@@ -75,7 +75,11 @@ func (s *Server) GetGlobalEmotionalTrends(ctx context.Context, _ *pb.GetGlobalTr
 		- "surprise": Integer
 		- "disgust": Integer
 
-		The six emotion values must be percentages (0-100) and MUST sum up to exactly 100 for each day.
+		Guidelines for emotion values:
+		- The six emotion values must be percentages (0-100) and MUST sum up to exactly 100 for each day.
+		- Ensure a diverse and varied emotional distribution: do NOT let any single emotion dominate. Specifically, no single emotion should exceed 40 percent on any given day.
+		- Avoid having any emotion drop to 0. Every emotion must have a minimum value of at least 5 percent to ensure all emotions are represented.
+		- Introduce realistic daily fluctuations. Vary the prominent emotions day-by-day (e.g., joy might be slightly higher on some days, while others have a different distribution) to reflect dynamic global sentiment changes.
 	`, startDate, endDate)
 
 	resp, err := model.GenerateContent(ctx, genai.Text(prompt))

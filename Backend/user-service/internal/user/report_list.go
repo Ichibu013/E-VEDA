@@ -24,6 +24,7 @@ func (s *Server) GetReportsList(ctx context.Context, req *pb.GetReportsListReque
 	offset := (page - 1) * limit
 
 	searchQuery := req.GetSearchQuery()
+	userID := req.GetUserId()
 
 	// Consider using LEFT JOIN if a missing user should not hide the report
 	countQuery := `
@@ -41,6 +42,13 @@ func (s *Server) GetReportsList(ctx context.Context, req *pb.GetReportsListReque
 
 	var args []interface{}
 	argCount := 1
+
+	if userID != "" {
+		countQuery += fmt.Sprintf(` AND r.user_uuid = $%d`, argCount)
+		dataQuery += fmt.Sprintf(` AND r.user_uuid = $%d`, argCount)
+		args = append(args, userID)
+		argCount++
+	}
 
 	if searchQuery != "" {
 		searchTerm := "%" + searchQuery + "%"
