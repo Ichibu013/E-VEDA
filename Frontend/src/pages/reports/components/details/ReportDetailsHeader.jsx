@@ -24,7 +24,7 @@ export default function ReportDetailsHeader({ report }) {
   }) : 'Unknown Date';
 
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 md:mb-12 gap-6">
       <div>
         <nav className="flex items-center gap-2 text-on-surface-variant text-sm mb-4">
           <span className="hover:text-primary cursor-pointer">Sessions</span>
@@ -33,7 +33,7 @@ export default function ReportDetailsHeader({ report }) {
           </span>
           <span className="font-medium text-primary">Session Summary</span>
         </nav>
-        <h1 className="text-4xl font-extrabold tracking-tight mb-2">
+        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2">
           {patient_name || 'Unknown Patient'}
         </h1>
         <div className="flex items-center gap-4 text-on-surface-variant">
@@ -51,7 +51,7 @@ export default function ReportDetailsHeader({ report }) {
           )}
         </div>
       </div>
-      <div className="bg-surface-container-low p-1 rounded-3xl flex items-center gap-4 pr-8">
+      <div className="bg-surface-container-low p-1 rounded-3xl flex items-center justify-center md:justify-start gap-4 pr-4 md:pr-8 w-full md:w-auto">
         <div className="relative w-24 h-24 flex items-center justify-center">
           <svg className="w-20 h-20 transform -rotate-90">
             <circle
@@ -75,11 +75,11 @@ export default function ReportDetailsHeader({ report }) {
               strokeWidth={6}
             />
           </svg>
-          <span className="absolute text-2xl font-black text-on-surface">
+          <span className="absolute inset-0 flex items-center justify-center text-2xl font-black text-on-surface">
             {wellnessScore}
           </span>
         </div>
-        <div>
+        <div className="text-left">
           <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant opacity-70">
             Wellness Index
           </p>

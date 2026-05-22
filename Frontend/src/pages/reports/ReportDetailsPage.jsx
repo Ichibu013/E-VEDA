@@ -44,7 +44,7 @@ export default function ReportDetailsPage() {
         ) : null}
 
         {/* Bento Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8">
           
           {/* Core Insights Panel (Emotional Graph) */}
           {isLoading ? (

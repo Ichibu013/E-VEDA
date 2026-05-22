@@ -7,8 +7,8 @@ export default function BiometricAnalysis({ report }) {
   const { voiceTension, emotion1Name, emotion2Name, eyeMovement } = analysis_result || {};
 
   return (
-    <div className="md:col-span-4 flex flex-col gap-8">
-      <div className="bg-surface-container-lowest rounded-[2rem] p-8 flex-1">
+    <div className="md:col-span-4 flex flex-col gap-4 md:gap-8">
+      <div className="bg-surface-container-lowest rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 flex-1">
         <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
           <span className="material-symbols-outlined text-primary">face</span>
           Facial Analysis

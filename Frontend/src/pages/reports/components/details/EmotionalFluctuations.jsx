@@ -58,8 +58,8 @@ export default function EmotionalFluctuations({ report }) {
   const y2_3 = getYCoordinate(emotion2Rating, 3, false);
 
   return (
-    <div className="md:col-span-8 bg-surface-container-lowest rounded-[2rem] p-8">
-      <div className="flex justify-between items-center mb-10">
+    <div className="md:col-span-8 bg-surface-container-lowest rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-10">
         <div>
           <h3 className="text-xl font-bold mb-1">Emotional Fluctuations</h3>
         </div>
@@ -71,10 +71,6 @@ export default function EmotionalFluctuations({ report }) {
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-secondary" />
             <span className="text-xs font-semibold">{emotion2Name}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-tertiary" />
-            <span className="text-xs font-semibold">Focus</span>
           </div>
         </div>
       </div>
@@ -126,7 +122,7 @@ export default function EmotionalFluctuations({ report }) {
           <span>45 MIN</span>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-6">
         <div className="bg-surface-container-low p-4 rounded-2xl">
           <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">
             Average {emotion1Name}

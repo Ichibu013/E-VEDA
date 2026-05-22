@@ -45,8 +45,8 @@ export default function ReportDetailsFooter({ report }) {
   };
 
   return (
-    <footer data-html2canvas-ignore="true" className="sticky bottom-[-2rem] w-[calc(100%+4rem)] -ml-8 -mb-8 mt-12 bg-slate-50/90 backdrop-blur-md border-t border-surface-variant/30 py-4 px-8 z-40">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+    <footer data-html2canvas-ignore="true" className="sticky bottom-[-1rem] md:bottom-[-2rem] w-[calc(100%+2rem)] md:w-[calc(100%+4rem)] -ml-4 md:-ml-8 -mb-4 md:-mb-8 mt-6 md:mt-12 bg-slate-50/90 backdrop-blur-md border-t border-surface-variant/30 py-4 px-4 md:px-8 z-40">
+      <div className="max-w-7xl mx-auto flex flex-row justify-between items-center gap-4">
         <button 
           onClick={() => navigate('/dashboard/reports')}
           className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-semibold group"
