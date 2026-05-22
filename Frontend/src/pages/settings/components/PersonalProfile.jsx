@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { toast } from 'sonner';
 import { userService } from '../../../api/user';
+import { User } from 'lucide-react';
 
 // Helper to strip localhost so Vite can proxy the MinIO request
 const getProxiedImageUrl = (url) => {
@@ -40,7 +41,7 @@ export default function PersonalProfile({ data, onChange, isSaving }) {
     });
   };
 
-  const defaultImage = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&auto=format&fit=crop&q=80"; // Replaced broken googleusercontent link with a working placeholder
+  // Personal profile component implementation
 
   return (
     <section className="md:col-span-8 bg-surface-container-lowest rounded-2xl p-8 md:p-10 border border-transparent shadow-sm">
@@ -53,12 +54,17 @@ export default function PersonalProfile({ data, onChange, isSaving }) {
       <div className="flex flex-col md:flex-row gap-10">
         <div className="flex flex-col items-center gap-4">
           <div className="relative group">
-             <img
-               alt="Profile photo"
-               className="w-36 h-36 rounded-full object-cover border-4 border-surface-container"
-               // APPLIED THE HELPER HERE
-               src={data?.profile_picture ? getProxiedImageUrl(data.profile_picture) : defaultImage}
-             />
+             {data?.profile_picture ? (
+               <img
+                 alt="Profile photo"
+                 className="w-36 h-36 rounded-full object-cover border-4 border-surface-container"
+                 src={getProxiedImageUrl(data.profile_picture)}
+               />
+             ) : (
+               <div className="w-36 h-36 rounded-full bg-slate-100 flex items-center justify-center border-4 border-surface-container text-slate-400">
+                 <User size={64} />
+               </div>
+             )}
              <input 
                type="file" 
                ref={fileInputRef} 

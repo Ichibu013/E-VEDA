@@ -1,5 +1,6 @@
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { User } from 'lucide-react';
 
 // Helper to strip localhost so Vite can proxy the MinIO request
 const getProxiedImageUrl = (url) => {
@@ -12,17 +13,22 @@ export default function PatientQuickInfo({ isLoading, data }) {
     return <Skeleton height={180} borderRadius={24} className="shadow-sm" />;
   }
 
-  const defaultImage = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80";
+  // PatientQuickInfo implementation
 
   return (
     <div className="bg-surface-container-lowest rounded-3xl p-6 shadow-sm flex flex-col justify-between overflow-hidden">
       <div className="flex items-center gap-4 mb-6">
-        <img
-          // APPLIED THE HELPER HERE
-          src={data?.profile_picture ? getProxiedImageUrl(data.profile_picture) : defaultImage}
-          alt={data?.name || "Patient"}
-          className="w-16 h-16 rounded-2xl object-cover shadow-sm border border-slate-100"
-        />
+        {data?.profile_picture ? (
+          <img
+            src={getProxiedImageUrl(data.profile_picture)}
+            alt={data?.name || "Patient"}
+            className="w-16 h-16 rounded-2xl object-cover shadow-sm border border-slate-100"
+          />
+        ) : (
+          <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center border border-slate-100 text-slate-400">
+            <User size={28} />
+          </div>
+        )}
         <div>
           <h3 className="text-xl font-bold font-headline text-on-surface">{data?.name || "Patient"}</h3>
           <p className="text-sm font-medium text-on-surface-variant/80">{data?.age || "--"} Years Old • Patient</p>

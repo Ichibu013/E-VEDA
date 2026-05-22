@@ -6,6 +6,7 @@ import { CHeader, CContainer } from '@coreui/react';
 import Drawer from 'react-modern-drawer';
 import 'react-modern-drawer/dist/index.css';
 import { userService } from '../api/user';
+import { User } from 'lucide-react';
 
 // Helper to strip localhost so Vite can proxy the MinIO request
 const getProxiedImageUrl = (url) => {
@@ -60,8 +61,7 @@ export default function Header() {
     });
   };
 
-  // Fallback image constant
-  const defaultAvatar = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80";
+  // Header component implementation
 
   return (
     <CHeader className="mb-0 border-b border-surface-container px-8 bg-surface-container-lowest shrink-0 h-16 flex items-center ">
@@ -108,13 +108,16 @@ export default function Header() {
               <div className="w-9 h-9 flex items-center justify-center">
                 <span className="material-symbols-outlined animate-spin text-[20px] text-primary">progress_activity</span>
               </div>
-            ) : (
+            ) : userData.profile_picture_url ? (
               <img 
-                 // APPLIED HELPER HERE
-                 src={userData.profile_picture_url ? getProxiedImageUrl(userData.profile_picture_url) : defaultAvatar} 
+                 src={getProxiedImageUrl(userData.profile_picture_url)} 
                  alt={userData.user_name || "User"} 
                  className="w-9 h-9 rounded-full object-cover border border-slate-200"
               />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 text-slate-500">
+                <User size={18} />
+              </div>
             )}
           </button>
         </div>
@@ -145,12 +148,17 @@ export default function Header() {
               </div>
             ) : (
               <>
-                <img 
-                  // APPLIED HELPER HERE
-                  src={userData.profile_picture_url ? getProxiedImageUrl(userData.profile_picture_url) : defaultAvatar} 
-                  className="w-24 h-24 rounded-full object-cover border-4 border-surface shadow-md mb-4" 
+                {userData.profile_picture_url ? (
+                  <img 
+                    src={getProxiedImageUrl(userData.profile_picture_url)} 
+                    className="w-24 h-24 rounded-full object-cover border-4 border-surface shadow-md mb-4" 
                     alt={userData.user_name || "User"} 
-                />
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center border-4 border-slate-200 shadow-md mb-4 text-slate-500">
+                    <User size={48} />
+                  </div>
+                )}
                 <h3 className="text-xl font-bold text-on-surface tracking-tight">{userData.user_name || "Clinician Alex"}</h3>
               </>
             )}

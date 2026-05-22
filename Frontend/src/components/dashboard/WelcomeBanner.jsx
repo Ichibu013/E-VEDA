@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { User } from 'lucide-react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
@@ -38,17 +39,13 @@ export default function WelcomeBanner({ isLoading, userName, completionPercentag
           </p>
 
           <div className="flex items-center justify-center lg:justify-start gap-4">
-            <div className="flex -space-x-3">
-              <img
-                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&auto=format&fit=crop&q=80"
-                alt="Specialist 1"
-                className="w-8 h-8 rounded-full border-2 border-primary object-cover"
-              />
-              <img
-                src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&auto=format&fit=crop&q=80"
-                alt="Specialist 2"
-                className="w-8 h-8 rounded-full border-2 border-primary object-cover"
-              />
+            <div className="flex -space-x-2">
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center border-2 border-primary text-white">
+                <User size={14} />
+              </div>
+              <div className="w-8 h-8 rounded-full bg-white/25 flex items-center justify-center border-2 border-primary text-white">
+                <User size={14} />
+              </div>
             </div>
             <span className="text-sm font-medium text-white/90">
               Joined by 2 specialists today

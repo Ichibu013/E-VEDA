@@ -25,7 +25,7 @@ export default function NewReportPage() {
   const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [fileAccept, setFileAccept] = useState("video/*,audio/*");
+  const [fileAccept, setFileAccept] = useState("video/*,audio/*,audio/mpeg,audio/mp3,.mp3,.mpeg");
   const [mediaList, setMediaList] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isReportGenerated, setIsReportGenerated] = useState(false);
@@ -50,9 +50,9 @@ export default function NewReportPage() {
   }, []);
 
   const handleAddMediaClick = (type = 'all') => {
-    let acceptValue = "video/*,audio/*";
+    let acceptValue = "video/*,audio/*,audio/mpeg,audio/mp3,.mp3,.mpeg";
     if (type === 'video') acceptValue = "video/*";
-    if (type === 'audio') acceptValue = "audio/*";
+    if (type === 'audio') acceptValue = "audio/*,audio/mpeg,audio/mp3,.mp3,.mpeg";
 
     setFileAccept(acceptValue);
 
@@ -188,15 +188,52 @@ export default function NewReportPage() {
                 onChange={(e) => {
                   const files = Array.from(e.target.files);
                   if (files.length) {
-                    const newMedia = files.map(file => ({
-                      id: Math.random().toString(36).substr(2, 9),
-                      name: file.name,
-                      type: file.type.startsWith('video') ? 'video' : 'audio',
-                      size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
-                      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                      status: 'local',
-                      fileObject: file
-                    }));
+                    const newMedia = files.map(file => {
+                      const fileType = file.type || '';
+                      const fileName = file.name.toLowerCase();
+                      
+                      // Identify audio files: check mime type and common mpeg audio extensions
+                      const isAudioExtension = 
+                        fileName.endsWith('.mp3') || 
+                        fileName.endsWith('.wav') || 
+                        fileName.endsWith('.m4a') || 
+                        fileName.endsWith('.ogg') || 
+                        fileName.endsWith('.aac') || 
+                        fileName.endsWith('.flac') || 
+                        fileName.endsWith('.mpeg') || 
+                        fileName.endsWith('.mpg') || 
+                        fileName.endsWith('.mpga');
+                        
+                      const isAudioMime = 
+                        fileType.startsWith('audio/') || 
+                        fileType === 'audio/mpeg' || 
+                        fileType === 'audio/mp3' || 
+                        fileType === 'audio/mpeg3' || 
+                        fileType === 'audio/x-mpeg-3';
+                      
+                      let mediaType = 'audio';
+                      // Classify as video if the mime type starts with video AND it is not an audio extension/mime
+                      if (fileType.startsWith('video/') && !isAudioExtension && !isAudioMime) {
+                        mediaType = 'video';
+                      }
+                      
+                      // Also respect user's explicit selection via fileAccept state
+                      if (fileAccept === 'video/*') {
+                        mediaType = 'video';
+                      } else if (fileAccept.startsWith('audio/*') || (fileAccept.includes('audio') && !fileAccept.includes('video'))) {
+                        mediaType = 'audio';
+                      }
+
+                      return {
+                        id: Math.random().toString(36).substr(2, 9),
+                        name: file.name,
+                        type: mediaType,
+                        size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+                        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        status: 'local',
+                        fileObject: file
+                      };
+                    });
                     setMediaList(prev => [...prev, ...newMedia]);
                     toast.success(`${files.length} file(s) added to session queue`);
                   }
