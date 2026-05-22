@@ -78,6 +78,14 @@ export default function Header() {
     <CHeader className="mb-0 border-b border-surface-container px-4 lg:px-8 bg-surface-container-lowest shrink-0 h-16 flex items-center ">
       <CContainer fluid className="flex justify-between items-center px-0 lg:px-4">
         
+        {/* Mobile Navigation Drawer Toggle */}
+        <button 
+          onClick={toggleNavigationDrawer}
+          className="!flex lg:!hidden !flex-row !items-center !gap-2 !text-slate-700 !px-4 !py-2.5 !rounded-xl !text-sm !font-bold !transition-all !duration-200 !outline-none !cursor-pointer"
+        >
+          <Menu size={32} />
+        </button>
+
         {/* Left Side: Search Bar */}
         <div className="hidden lg:flex items-center bg-[#f1f5f9] rounded-xl px-4 py-2.5 w-full max-w-md border border-transparent focus-within:border-primary/30 focus-within:bg-white transition-all shadow-sm">
           <svg 
@@ -97,13 +105,7 @@ export default function Header() {
         </div>
 
         {/* Right Side: Actions & Avatar */}
-        <div className="flex items-center gap-4 lg:gap-5">
-          <button 
-            onClick={toggleNavigationDrawer}
-             className="!flex lg:!hidden !flex-row !items-center !gap-2  !text-slate-700 !px-4 !py-2.5 !rounded-xl !text-sm !font-bold !transition-all !duration-200 !outline-none !cursor-pointer"
-          >
-            <Menu size={32} />
-          </button>
+        <div className="flex items-center gap-4 lg:gap-5 ml-auto">
           <button 
             onClick={toggleDrawer}
             disabled={isLoading}
