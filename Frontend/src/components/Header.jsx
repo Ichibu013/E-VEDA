@@ -7,6 +7,7 @@ import Drawer from 'react-modern-drawer';
 import 'react-modern-drawer/dist/index.css';
 import { userService } from '../api/user';
 import { User } from 'lucide-react';
+import { removeCookie } from '../utils/cookies';
 
 // Helper to strip localhost so Vite can proxy the MinIO request
 const getProxiedImageUrl = (url) => {
@@ -48,7 +49,11 @@ export default function Header() {
     if (isLoggingOut) return;
     setIsLoggingOut(true);
     
-    const logoutPromise = new Promise((resolve) => setTimeout(resolve, 1500));
+    const logoutPromise = new Promise((resolve) => {
+      // Clear the session authentication token cookie
+      removeCookie('auth_token');
+      setTimeout(resolve, 500);
+    });
     
     toast.promise(logoutPromise, {
       loading: 'Logging out...',
@@ -57,7 +62,8 @@ export default function Header() {
     });
 
     logoutPromise.then(() => {
-      navigate('/login');
+      // Prevent back navigation to the dashboard and trigger a full page reload to clear cache
+      window.location.replace('/login');
     });
   };
 
