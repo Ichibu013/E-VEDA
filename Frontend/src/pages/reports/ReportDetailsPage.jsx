@@ -66,7 +66,7 @@ export default function ReportDetailsPage() {
 
         </div>
         {/* Footer Actions */}
-        <div className="mt-8">
+        <div className="mt-8" data-html2canvas-ignore="true">
           {isLoading ? (
             <Skeleton height={60} borderRadius={16} />
           ) : report ? (

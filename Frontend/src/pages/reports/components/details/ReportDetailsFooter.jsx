@@ -19,11 +19,16 @@ export default function ReportDetailsFooter({ report }) {
     }
 
     const opt = {
-      margin:       [0.5, 0.5, 0.5, 0.5],
+      margin:       [0.2, 0.3, 0.2, 0.3],
       filename:     `report_${report?.report_id || 'details'}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, logging: false },
-      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      html2canvas:  { 
+        scale: 2, 
+        useCORS: true, 
+        logging: false,
+        windowWidth: 1400
+      },
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
     };
 
     const printPromise = html2pdf().set(opt).from(element).save();
@@ -40,7 +45,7 @@ export default function ReportDetailsFooter({ report }) {
   };
 
   return (
-    <footer className="sticky bottom-[-2rem] w-[calc(100%+4rem)] -ml-8 -mb-8 mt-12 bg-slate-50/90 backdrop-blur-md border-t border-surface-variant/30 py-4 px-8 z-40">
+    <footer data-html2canvas-ignore="true" className="sticky bottom-[-2rem] w-[calc(100%+4rem)] -ml-8 -mb-8 mt-12 bg-slate-50/90 backdrop-blur-md border-t border-surface-variant/30 py-4 px-8 z-40">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
         <button 
           onClick={() => navigate('/dashboard/reports')}
