@@ -7,14 +7,61 @@ export default function EmotionalFluctuations({ report }) {
   const emotion1Rating = analysis_result?.emotion1Rating ? Math.round(analysis_result.emotion1Rating * 100) : 72;
   const emotion2Rating = analysis_result?.emotion2Rating ? Math.round(analysis_result.emotion2Rating * 100) : 50;
 
+  // Helper to get a stable, deterministic seed from report ID
+  const getSeedFromId = (id) => {
+    if (!id) return 0;
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash);
+  };
+
+  // Helper to generate coordinates based on the rating (and optionally small unique ID noise)
+  const getYCoordinate = (rating, index, isPrimary) => {
+    // Higher rating means higher on the screen (smaller Y coordinate in SVG)
+    const baseY = 240 - (rating / 100) * 160;
+
+    // Use different frequencies and phases for primary and secondary to avoid overlapping too closely
+    const freqCoeff = isPrimary ? 0.08 : 0.11;
+    const indexCoeff = isPrimary ? 1.8 : 2.2;
+    const phaseOffset = isPrimary ? 0.5 : 1.9;
+
+    const ratingAngle = (rating * freqCoeff) + (index * indexCoeff) + phaseOffset;
+    const ratingWave = isPrimary
+      ? Math.sin(ratingAngle) * 30 + Math.cos(ratingAngle * 1.5) * 10
+      : Math.sin(ratingAngle) * 25 + Math.cos(ratingAngle * 1.3) * 8;
+
+    const idSeed = getSeedFromId(report?.report_id || report?.id || 'default');
+    const signatureVal = Math.sin(idSeed + index * (isPrimary ? 3.7 : 4.3));
+    const signatureWave = signatureVal * 8; // Small variance unique to the report
+
+    const y = baseY + ratingWave + signatureWave;
+
+    // Clamp Y to safe bounds inside the SVG viewBox [30, 270]
+    return Math.round(Math.min(270, Math.max(30, y)));
+  };
+
+  // Generate coordinates for Emotion 1 (Primary Curve)
+  const y0 = getYCoordinate(emotion1Rating, 0, true);
+  const yControl = getYCoordinate(emotion1Rating, 0.5, true);
+  const y1 = getYCoordinate(emotion1Rating, 1, true);
+  const y2 = getYCoordinate(emotion1Rating, 2, true);
+  const y3 = getYCoordinate(emotion1Rating, 3, true);
+  const y4 = getYCoordinate(emotion1Rating, 4, true);
+
+  // Generate coordinates for Emotion 2 (Secondary Curve)
+  const y2_0 = getYCoordinate(emotion2Rating, 0, false);
+  const y2_Control = getYCoordinate(emotion2Rating, 0.5, false);
+  const y2_1 = getYCoordinate(emotion2Rating, 1, false);
+  const y2_2 = getYCoordinate(emotion2Rating, 2, false);
+  const y2_3 = getYCoordinate(emotion2Rating, 3, false);
+
   return (
     <div className="md:col-span-8 bg-surface-container-lowest rounded-[2rem] p-8">
       <div className="flex justify-between items-center mb-10">
         <div>
           <h3 className="text-xl font-bold mb-1">Emotional Fluctuations</h3>
-          <p className="text-sm text-on-surface-variant">
-            Session duration tracking: 45 minutes
-          </p>
         </div>
         <div className="flex gap-4">
           <div className="flex items-center gap-2">
@@ -37,30 +84,36 @@ export default function EmotionalFluctuations({ report }) {
           <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 800 300">
             <path
               className="text-primary opacity-80"
-              d="M0,250 Q100,100 200,180 T400,80 T600,150 T800,50"
+              d={`M0,${y0} Q100,${yControl} 200,${y1} T400,${y2} T600,${y3} T800,${y4}`}
               fill="none"
               stroke="currentColor"
               strokeWidth={4}
             />
             <path
               className="text-secondary opacity-60"
-              d="M0,200 Q150,180 300,220 T500,190 T800,180"
+              d={`M0,${y2_0} Q150,${y2_Control} 300,${y2_1} T500,${y2_2} T800,${y2_3}`}
               fill="none"
               stroke="currentColor"
               strokeWidth={3}
             />
             {/* Peak Moments */}
-            <circle cx={200} cy={180} fill="white" r={6} stroke="#005cc0" strokeWidth={3} />
-            <circle cx={400} cy={80} fill="white" r={6} stroke="#005cc0" strokeWidth={3} />
+            <circle cx={200} cy={y1} fill="white" r={6} stroke="#005cc0" strokeWidth={3} />
+            <circle cx={400} cy={y2} fill="white" r={6} stroke="#005cc0" strokeWidth={3} />
           </svg>
           {/* Markers */}
-          <div className="absolute top-[80px] left-[400px] -translate-x-1/2 -translate-y-full mb-4">
-            <div className="bg-primary text-white text-[10px] px-2 py-1 rounded-full font-bold shadow-lg">
+          <div 
+            className="absolute -translate-x-1/2 -translate-y-full mb-4 transition-all duration-300"
+            style={{ left: '50%', top: `${y2}px` }}
+          >
+            <div className="bg-primary text-white text-[10px] px-2 py-1 rounded-full font-bold shadow-lg whitespace-nowrap">
               Peak Resilience
             </div>
           </div>
-          <div className="absolute top-[180px] left-[200px] -translate-x-1/2 mt-4">
-            <div className="bg-surface-container-highest text-on-surface text-[10px] px-2 py-1 rounded-full font-bold">
+          <div 
+            className="absolute -translate-x-1/2 mt-4 transition-all duration-300"
+            style={{ left: '25%', top: `${y1}px` }}
+          >
+            <div className="bg-surface-container-highest text-on-surface text-[10px] px-2 py-1 rounded-full font-bold whitespace-nowrap">
               Emotional Trigger
             </div>
           </div>
