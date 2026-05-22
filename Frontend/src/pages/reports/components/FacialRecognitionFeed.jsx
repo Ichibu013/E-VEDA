@@ -182,12 +182,8 @@ export default function FacialRecognitionFeed({ onUploadSuccess }) {
                   {isRecording ? 'Tracking: Active' : 'Status: Ready'}
                 </span>
               </div>
-              <div className="flex items-center gap-2 border-l border-white/20 pl-6">
-                <span className="material-symbols-outlined text-white text-lg">light_mode</span>
-                <span className="text-white text-sm font-medium">Light: Optimal</span>
-              </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-3 ml-5">
               <button 
                 onClick={handleToggleRecord}
                 disabled={isUploading}

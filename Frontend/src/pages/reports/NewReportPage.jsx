@@ -12,7 +12,8 @@ import {
   CModalTitle,
   CModalBody,
   CModalFooter,
-  CBadge
+  CBadge,
+  CCollapse
 } from '@coreui/react';
 import { reportsService } from '../../api/reports';
 import FacialRecognitionFeed from './components/FacialRecognitionFeed';
@@ -33,6 +34,25 @@ export default function NewReportPage() {
   const [liveFacialUrl, setLiveFacialUrl] = useState(null);
   const [liveVoiceUrl, setLiveVoiceUrl] = useState(null);
   const [draftInfo, setDraftInfo] = useState({ patient_name: 'Patient', projected_next_id: '#EV-00000' });
+  const [isMobile, setIsMobile] = useState(false);
+  const [isResultOpen, setIsResultOpen] = useState(false);
+  const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isReportGenerated) {
+      setIsResultOpen(true);
+      setIsSuggestionsOpen(true);
+    }
+  }, [isReportGenerated]);
 
   useEffect(() => {
     const fetchDraft = async () => {
@@ -310,54 +330,106 @@ export default function NewReportPage() {
           </header>
         )}
 
-        {/* Recording Hub & Bento Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-on-surface">
-
-          {/* Left Area (7 Columns) */}
-          <div className="lg:col-span-7 flex flex-col gap-8">
-            {isLoading ? (
-              <>
+        {/* Recording Hub & Bento Grid / Mobile Sequential Stack */}
+        {isLoading ? (
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-on-surface">
+              {/* Left Area Skeletons */}
+              <div className="lg:col-span-7 flex flex-col gap-8">
                 <Skeleton height={500} borderRadius={24} />
                 <Skeleton height={400} borderRadius={24} />
-              </>
-            ) : (
-              <>
-                <FacialRecognitionFeed onUploadSuccess={(url) => setLiveFacialUrl(url)} />
-                <DoctorAnalysis isLocked={!isReportGenerated} data={reportData?.ai_summary} />
-              </>
-            )}
-          </div>
-
-          {/* Right Area (5 Columns) */}
-          <div className="lg:col-span-5 flex flex-col gap-8">
-            {isLoading ? (
-              <>
+              </div>
+              {/* Right Area Skeletons */}
+              <div className="lg:col-span-5 flex flex-col gap-8">
                 <Skeleton height={252} borderRadius={24} />
                 <Skeleton height={280} borderRadius={24} />
-              </>
-            ) : (
-              <>
-                <VoiceRecognitionFeed onUploadSuccess={(url) => setLiveVoiceUrl(url)} />
-                <EmotionalStateMetrics isLocked={!isReportGenerated} data={reportData?.result_analysis} />
-              </>
-            )}
-          </div>
+              </div>
+            </div>
+            <div className="mt-8">
+              <Skeleton height={150} borderRadius={24} />
+            </div>
+          </>
+        ) : isMobile ? (
+          /* Mobile Sequential Stack with Collapsible Panels */
+          <div className="flex flex-col gap-6 text-on-surface">
+            {/* 1. Facial Recognition Component */}
+            <FacialRecognitionFeed onUploadSuccess={(url) => setLiveFacialUrl(url)} />
 
-        </div>
+            {/* 2. Voice Recognition Component */}
+            <VoiceRecognitionFeed onUploadSuccess={(url) => setLiveVoiceUrl(url)} />
 
+            {/* 3. Result [CCollapse] */}
+            <div className="w-full">
+              <button
+                onClick={() => setIsResultOpen(!isResultOpen)}
+                className="w-full flex items-center justify-between font-bold text-xl text-on-surface bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-outline/5 focus:outline-none hover:bg-surface-container-low transition-colors duration-200"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-tertiary text-2xl">psychology</span>
+                  Analysis Results
+                </span>
+                <span 
+                  className="material-symbols-outlined text-2xl transition-transform duration-300 ease-out" 
+                  style={{ transform: isResultOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                >
+                  keyboard_arrow_down
+                </span>
+              </button>
+              <CCollapse visible={isResultOpen}>
+                <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <EmotionalStateMetrics isLocked={!isReportGenerated} data={reportData?.result_analysis} />
+                </div>
+              </CCollapse>
+            </div>
 
-        {/* Full-Width Recommendations */}
-        {isLoading ? (
-          <div className="mt-8">
-            <Skeleton height={150} borderRadius={24} />
+            {/* 4. Suggestions [CCollapse] */}
+            <div className="w-full">
+              <button
+                onClick={() => setIsSuggestionsOpen(!isSuggestionsOpen)}
+                className="w-full flex items-center justify-between font-bold text-xl text-on-surface bg-surface-container-lowest rounded-3xl p-6 shadow-sm border border-outline/5 focus:outline-none hover:bg-surface-container-low transition-colors duration-200"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-primary text-2xl">analytics</span>
+                  Clinical Suggestions & Summary
+                </span>
+                <span 
+                  className="material-symbols-outlined text-2xl transition-transform duration-300 ease-out" 
+                  style={{ transform: isSuggestionsOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                >
+                  keyboard_arrow_down
+                </span>
+              </button>
+              <CCollapse visible={isSuggestionsOpen}>
+                <div className="mt-4 flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <DoctorAnalysis isLocked={!isReportGenerated} data={reportData?.ai_summary} />
+                  <Recommendations isLocked={!isReportGenerated} data={reportData?.ai_recommendations} />
+                </div>
+              </CCollapse>
+            </div>
           </div>
         ) : (
-          <div className="mt-8">
-            <Recommendations isLocked={!isReportGenerated} data={reportData?.ai_recommendations} />
-          </div>
+          /* Desktop Bento Grid Layout */
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-on-surface">
+              {/* Left Column (7 Columns) */}
+              <div className="lg:col-span-7 flex flex-col gap-8">
+                <FacialRecognitionFeed onUploadSuccess={(url) => setLiveFacialUrl(url)} />
+                <DoctorAnalysis isLocked={!isReportGenerated} data={reportData?.ai_summary} />
+              </div>
+
+              {/* Right Column (5 Columns) */}
+              <div className="lg:col-span-5 flex flex-col gap-8">
+                <VoiceRecognitionFeed onUploadSuccess={(url) => setLiveVoiceUrl(url)} />
+                <EmotionalStateMetrics isLocked={!isReportGenerated} data={reportData?.result_analysis} />
+              </div>
+            </div>
+
+            {/* Full-Width Recommendations */}
+            <div className="mt-8">
+              <Recommendations isLocked={!isReportGenerated} data={reportData?.ai_recommendations} />
+            </div>
+          </>
         )}
-
-
 
         {/* Footer Spacer */}
         <div className="h-16" />
