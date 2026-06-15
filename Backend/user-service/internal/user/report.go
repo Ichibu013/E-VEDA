@@ -233,7 +233,7 @@ func (s *Server) generateAnalysis(_ context.Context, videoUrl string, audioUrl s
 		return nil, status.Error(codes.Internal, "Failed to marshal request body")
 	}
 
-	resp, err := http.Post("http://e.veda.ai:8000/analyze", "application/json", bytes.NewBuffer(reqBody))
+	resp, err := http.Post("http://ai-service:8000/analyze", "application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
 		return nil, fmt.Errorf("failed to call E-VEDA API: %w", err)
 	}

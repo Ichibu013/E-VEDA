@@ -20,19 +20,25 @@ type Server struct {
 }
 
 func NewUserServer(db *sql.DB, rdb *redis.Client) *Server {
-	endpoint := os.Getenv("MINIO_ENDPOINT")
-	if endpoint == "" {
-		endpoint = "localhost:9000"
-	}
+        endpoint := os.Getenv("MINIO_ENDPOINT")
+        if endpoint == "" {
+                endpoint = "minio:9000" // Fallback to internal network name
+        }
 
-	// Initialize minio client object.
-	minioClient, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4("minioadmin", "minioadmin", ""),
-		Secure: false,
-	})
-	if err != nil {
-		log.Fatalf("Failed to initialize MinIO client: %v", err)
-	}
+        // Dynamically fetch YOUR custom credentials from the environment variables
+        accessKey := os.Getenv("MINIO_ACCESS_KEY")
+        secretKey := os.Getenv("MINIO_SECRET_KEY")
 
-	return &Server{db: db, minioClient: minioClient, rdb: rdb}
+        log.Printf("Connecting to MinIO at endpoint: %s", endpoint)
+
+        // Initialize minio client using your actual variables
+        minioClient, err := minio.New(endpoint, &minio.Options{
+                Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
+                Secure: false,
+        })
+        if err != nil {
+                log.Fatalf("Failed to initialize MinIO client: %v", err)
+        }
+
+        return &Server{db: db, minioClient: minioClient, rdb: rdb}
 }

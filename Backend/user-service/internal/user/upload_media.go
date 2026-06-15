@@ -55,7 +55,7 @@ func (s *Server) uploadMediaToMinio(ctx context.Context, bucketName string, req 
 	}
 
 	// Note: In production, change localhost to your actual domain name
-	return fmt.Sprintf("http://localhost:9000/%s/%s", bucketName, objectName), nil
+	return fmt.Sprintf("https://eveda.in/minio-storage/%s/%s", bucketName, objectName), nil
 }
 
 // ==========================================
